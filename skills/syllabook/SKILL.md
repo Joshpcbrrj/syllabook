@@ -82,7 +82,7 @@ They live in `scripts/`, install what they need and print short JSON with only w
 | `python scripts/book.py done <n> --summary "..."` | records progress and the summary; saves the checkpoint |
 | `python scripts/book.py status` | where the book stopped, the handoff note and the next step |
 | `python scripts/book.py handoff "<item>" ...` | saves the handoff note for the next conversation; no items = clear it |
-| `python scripts/images.py search "<query>"` · `fetch "File:<title>" --name <cNN-name>` · `screenshot <url> --name <cNN-name>` | real images: free-license photos from Wikimedia Commons, and screenshots of the book's running application; each one recorded in `img/CREDITS.md` |
+| `python scripts/images.py search "<query>"` · `fetch <fetch> --name <cNN-name>` · `screenshot <url> --name <cNN-name>` · `editor <folder> --name <cNN-name> [--open F] [--view scm]` | real images: free-license photos (Wikimedia Commons, Openverse), screenshots of web pages and of VS Code (code-server); each one recorded in `img/CREDITS.md`. It never installs anything: when it says what is missing, ask the user |
 | `python scripts/facts.py <n>` | lists the chapter's sentences with dates, numbers, names and quotations |
 | `python scripts/projects.py [--chapter <n>]` | assembles the projects from the code blocks and runs them |
 | `python scripts/audit.py [<n>]` | ready criteria: errors block, warnings go to the final summary |

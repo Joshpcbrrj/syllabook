@@ -86,9 +86,10 @@ Rules:
 
 Only with `choices.images` = `real`. Where they come from (details in `SOURCES.md` §7):
 
-- **Photos** of people, places, events, machines and documents: free-license images from Wikimedia Commons (`images.py search` and `fetch`).
+- **Photos** of people, places, events, machines and documents: free-license images from Wikimedia Commons and Openverse (Flickr, museums and other collections) with `images.py search` and `fetch`.
 - **Screenshots of a web page** (the book's application, a GitHub page): `images.py screenshot <url>`, taken after the step the reader just did.
-- **Screenshots of a desktop application** (an editor, a terminal window, a settings screen) that `images.py` cannot open: ask the user for it, saying exactly what to open, what must be visible and the file name (`img/c03-vscode-diff.png`); then record it in `img/CREDITS.md`. If the user declines, use text or an SVG instead and say so.
+- **Screenshots of VS Code** (files open, the Source Control panel, a diff): `images.py editor <folder>` opens the lab folder in VS Code for the web (code-server) with default settings and takes the screenshot itself. Prepare the folder first, in a temporary directory with an isolated `HOME`, in the exact state the chapter describes (for Git: the book's example author, never the user's name). Look at the image before using it.
+- **Screenshots of other desktop applications** (a terminal window, a settings screen, an installer), or of VS Code when `images.py editor` cannot run: ask the user for it, saying exactly what to open, what must be visible and the file name (`img/c03-vscode-diff.png`); then record it in `img/CREDITS.md`. If the user declines, use text or an SVG instead and say so.
 
 Never draw, generate or fake a real image. Each one has its caption with the credit, alt text, and its line in `img/CREDITS.md`. In Notion only the SVG diagrams go in (`notion.py` lists the rest in `left_out`).
 

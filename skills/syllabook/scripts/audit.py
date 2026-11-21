@@ -15,6 +15,8 @@ import re
 import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import diagram
+import illustration
 from common import READING, chapter_numbers, chapter_path, find_book, labels, load_yaml, out, research_path, slugify
 
 # blocks that hold program output or data, not code: no comment required
@@ -112,6 +114,15 @@ def uncredited(book_dir, names):
         yield name
 
 
+def illustrations(book_dir, names):
+    """SVGs drawn by hand (no spec in img/_source/): the illustrations that illustration.py checks."""
+    for name in names:
+        stem, ext = os.path.splitext(name)
+        path = os.path.join(book_dir, 'img', name)
+        if ext.lower() == '.svg' and os.path.exists(path) and                 not glob.glob(os.path.join(book_dir, 'img', '_source', stem + '.*')):
+            yield name, path
+
+
 def main():
     p = argparse.ArgumentParser(description='Ready criteria for a chapter or the whole book.')
     p.add_argument('n', type=int, nargs='?')
@@ -121,7 +132,8 @@ def main():
     data = load_yaml(path)
     language = data.get('language', 'en')
     lab = labels(language)
-    limits = READING[(data.get('choices') or {}).get('reading', 'large')]
+    reading = (data.get('choices') or {}).get('reading', 'large')
+    limits = READING[reading]
     errors, warnings, used = [], [], set()
 
     numbers = [args.n] if args.n else chapter_numbers(data)
@@ -134,6 +146,10 @@ def main():
         used.update(names)
         for name in uncredited(book_dir, names):
             errors.append(f'chapter {n}: img/{name} is a photo or screenshot without a line in img/CREDITS.md')
+        for name, svg in illustrations(book_dir, names):
+            problems, notes = illustration.check(svg, diagram.PROFILES[reading]['width'])
+            errors += [f'chapter {n}: img/{name}: {p}' for p in problems]
+            warnings += [f'chapter {n}: img/{name}: {w}' for w in notes]
         ch = next((c for c in data['chapters'] if c['n'] == n), {})
         if not data.get('translation_of') and not os.path.exists(research_path(book_dir, n)):
             # a translation reuses the original's research; every other chapter is written from its dossier

@@ -86,6 +86,7 @@ They live in `scripts/`, install what they need and print short JSON with only w
 | `python scripts/facts.py <n>` | lists the chapter's sentences with dates, numbers, names and quotations |
 | `python scripts/projects.py [--chapter <n>]` | assembles the projects from the code blocks and runs them |
 | `python scripts/audit.py [<n>]` | ready criteria: errors block, warnings go to the final summary |
+| `python scripts/illustration.py <img/file.svg>` | checks an illustration you drew by hand (analogies, imagined scenes; `VISUALS.md` §4b) |
 | `python scripts/diagram.py <spec.yaml>` | draws an SVG from a short spec (`--help` lists the types, `--icons` the icon names); `--sheet <n>` = one image with all of a chapter's diagrams |
 | `python scripts/build.py --out <dir> [--partial]` | navigation, map, concept index, EPUB (answers in an appendix) and zip; `--partial` = checkpoint zip, no EPUB. `<dir>` is always outside the library repository (claude.ai: `/mnt/user-data/outputs`; Claude Code: a folder the user picks, never inside `created-books/` or `improved-materials/`) |
 | `python scripts/build.py lists --library <repo>` | updates the book lists in `created-books/`, `improved-materials/` and `translated-books/` |
@@ -95,7 +96,7 @@ They live in `scripts/`, install what they need and print short JSON with only w
 
 ```text
 - [ ] 1. book.yaml saved and validated
-- [ ] 2. Choices: images (SVG diagrams + real images where they show it better, the default | SVG diagrams only) and reading (large screens | small e-reader). Ask always, even when the user says to go straight to writing: one short question with the defaults, then wait
+- [ ] 2. Choices: images (SVG diagrams and illustrations + real images where they show it better, the default | SVG only) and reading (large screens | small e-reader). Ask always, even when the user says to go straight to writing: one short question with the defaults, then wait
 - [ ] 3. Research: open every source once, then write research/guide.md (the topic guide) and research/c<nn>.md for every chapter of the book, even if the user wants only some chapters now (references/SOURCES.md §2)
 - [ ] 4. Chapters 1..n (loop below)
 - [ ] 5. Fixed parts: chapter 0, placement test, cheat sheets, mock exam, glossary, next steps

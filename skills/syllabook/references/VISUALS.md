@@ -6,6 +6,7 @@
 2. The user's choices
 3. Reading profiles
 4. Diagrams (SVG)
+4b. Illustrations (SVG drawn by you)
 5. Real images
 6. Checking images
 
@@ -14,9 +15,10 @@
 | Family | Use it for | Goes to Notion |
 | --- | --- | --- |
 | **SVG diagram** | what the reader cannot see: structure, logic, flow, states, comparison, sequence, timeline, memory and values, chord diagrams, cheat sheets | yes |
+| **SVG illustration** (drawn by you) | an analogy or an imagined scene that does not need to be real: the staging area as a box being packed for shipping, a variable as a labelled drawer | yes |
 | **Real image** (photo or screenshot) | a real thing or scene: a person, a place, an event, a machine, a document, an instrument, an application's screen, files open in an editor, a web page after an action | no: EPUB and website only |
 
-**Choose by what the reader must see.** If the point is how parts relate or how something works inside, draw an SVG diagram. If the point is how something real looks, show the real thing: a diagram would only imitate it. When both could work and the subject is concrete, prefer the real image. Examples from a Git book: the file lifecycle (untracked, staged, committed) is an SVG; two modified files open side by side in VS Code is a screenshot; how a commit points to its parent is an SVG; the GitHub page of a pull request is a screenshot. In a history book, Alan Turing is a photo, never a drawing; the timeline of his work is an SVG.
+**Choose by what the reader must see.** If the point is how parts relate or how something works inside, draw an SVG diagram. If the point is how something real looks, show the real thing: a diagram would only imitate it. If the point is an analogy, an illustration can show the everyday side of it (§4b). When both could work and the subject is concrete, prefer the real image. Examples from a Git book: the file lifecycle (untracked, staged, committed) is an SVG; two modified files open side by side in VS Code is a screenshot; how a commit points to its parent is an SVG; the GitHub page of a pull request is a screenshot. In a history book, Alan Turing is a photo, never a drawing; the timeline of his work is an SVG.
 
 Before any image, write in one sentence what the reader must understand from it; that sentence is its title. If there is no such sentence, do not make the image. Whatever the reader must reproduce (code, commands, chords) stays as text, even next to a screenshot (`TEACHING.md` §5).
 
@@ -24,7 +26,7 @@ Before any image, write in one sentence what the reader must understand from it;
 
 Asked once, right after approval, and stored in `book.yaml` (`choices`):
 
-- **Images:** `real` (SVG diagrams plus real images where they show it better; the default) · `svg` (SVG diagrams only, for a reader who wants no photos or screenshots).
+- **Images:** `real` (SVG diagrams plus real images where they show it better; the default) · `svg` (SVG only: diagrams and illustrations, for a reader who wants no photos or screenshots).
 - **Reading:** `large` (monitors and 10" or larger color e-readers; the default) · `small` (6–7" grayscale e-readers such as Kindle or Kobo).
 
 ## 3. Reading profiles
@@ -41,7 +43,7 @@ Asked once, right after approval, and stored in `book.yaml` (`choices`):
 
 ## 4. Diagrams (SVG)
 
-**Never write SVG by hand.** Write a short spec (YAML) and run `python scripts/diagram.py <spec.yaml>`. Run `python scripts/diagram.py --help` once to see the diagram types and their fields. Save specs next to the images (`img/_source/`), so translations and fixes only edit the spec.
+**Never write a diagram by hand** (illustrations are the only hand-drawn SVG, §4b). Write a short spec (YAML) and run `python scripts/diagram.py <spec.yaml>`. Run `python scripts/diagram.py --help` once to see the diagram types and their fields. Save specs next to the images (`img/_source/`), so translations and fixes only edit the spec.
 
 Pick the type by the idea:
 
@@ -62,7 +64,7 @@ Pick the type by the idea:
 | where notes are on the neck (scales, intervals) | `fretboard` |
 | a melody, riff or arpeggio to play | `tab` |
 
-A diagram **adds to** the text: the chapter explains, the image shows the same idea at a glance. SVG is for diagrams only; a real scene or object is a real image (§5), never drawn.
+A diagram **adds to** the text: the chapter explains, the image shows the same idea at a glance. A real scene or object is a real image (§5), never drawn.
 
 Rules:
 
@@ -82,6 +84,21 @@ Rules:
 
 **Cheat sheets** (`cards`): up to 12 cards (an icon, a numbered short title, 3–5 items of up to ~28 characters, each with its own icon when that helps, optionally a 1–3 line code snippet and a scene), in 3 columns on large screens and 2 in the `small` profile.
 
+## 4b. Illustrations (SVG drawn by you)
+
+Draw an illustration only for an analogy (`TEACHING.md` §6) or an imagined scene that helps the reader picture an abstract idea, and only when the chapter text alone leaves it hard to picture. At most one per chapter; most chapters need none. Never draw a real person, place, object, program screen, logo or brand, and never imitate a photo: those are real images (§5) or nothing.
+
+How to draw it:
+
+- Write the SVG directly to `img/c<nn>-<name>.svg`, with no spec in `img/_source/` (that is how the scripts tell it from a diagram).
+- `<title>` first: the one sentence the reader must understand. Alt text in the chapter says what it shows.
+- Flat and simple: `viewBox` as wide as the reading profile (large 960, small 480), the book background `#FAF9F6`, ink `#2B2B33`, and the diagram colors (`diagram.py` palette, same meanings). About 60 shapes at most.
+- Up to 5 short labels (5 words each at most) in the book language, naming the pairs of the analogy; no code or commands in it.
+- Only shapes and text: no embedded images, scripts, fonts or links to other sites.
+- Run `python scripts/illustration.py img/<file>.svg` until it reports no errors, then look at it (`diagram.py --sheet <n>`) and fix what reads badly. `audit.py` runs the same checks.
+
+It goes to Notion like the diagrams. A translation translates only the `<title>` and the labels, keeping the drawing.
+
 ## 5. Real images
 
 Only with `choices.images` = `real`. Where they come from (details in `SOURCES.md` §7):
@@ -91,7 +108,7 @@ Only with `choices.images` = `real`. Where they come from (details in `SOURCES.m
 - **Screenshots of VS Code** (files open, the Source Control panel, a diff): `images.py editor <folder>` opens the lab folder in VS Code for the web (code-server) with default settings and takes the screenshot itself. Prepare the folder first, in a temporary directory with an isolated `HOME`, in the exact state the chapter describes (for Git: the book's example author, never the user's name). Look at the image before using it.
 - **Screenshots of other desktop applications** (a terminal window, a settings screen, an installer), or of VS Code when `images.py editor` cannot run: ask the user for it, saying exactly what to open, what must be visible and the file name (`img/c03-vscode-diff.png`); then record it in `img/CREDITS.md`. If the user declines, use text or an SVG instead and say so.
 
-Never draw, generate or fake a real image. Each one has its caption with the credit, alt text, and its line in `img/CREDITS.md`. In Notion only the SVG diagrams go in (`notion.py` lists the rest in `left_out`).
+Never draw, generate or fake a real image (§4b draws only analogies and imagined scenes). Each one has its caption with the credit, alt text, and its line in `img/CREDITS.md`. In Notion only the SVG diagrams and illustrations go in (`notion.py` lists the rest in `left_out`).
 
 ## 6. Checking images
 

@@ -134,6 +134,46 @@ def first_h1(text):
     return ''
 
 
+COLLECTION_FOLDERS = ('created-books', 'improved-materials', 'translated-books')
+
+
+def library_root(start):
+    """The library repository (the folder with library.yaml) that holds start, or None."""
+    d = os.path.abspath(start)
+    while True:
+        if os.path.exists(os.path.join(d, 'library.yaml')):
+            return d
+        parent = os.path.dirname(d)
+        if parent == d:
+            return None
+        d = parent
+
+
+def library_book(root, slug):
+    """The folder of the book with this slug in the library, or None."""
+    for folder in COLLECTION_FOLDERS:
+        path = os.path.join(root, folder, slug)
+        if os.path.exists(os.path.join(path, 'book.yaml')):
+            return path
+    return None
+
+
+def library_slugs(root):
+    return sorted(name for folder in COLLECTION_FOLDERS if os.path.isdir(os.path.join(root, folder))
+                  for name in os.listdir(os.path.join(root, folder))
+                  if os.path.exists(os.path.join(root, folder, name, 'book.yaml')))
+
+
+def next_steps(data):
+    """next_steps as dicts {step, title, why, topics[, book]}: plain strings (older books) become titles."""
+    steps = []
+    for i, s in enumerate(data.get('next_steps') or [], 1):
+        s = {'title': s} if isinstance(s, str) else dict(s)
+        steps.append({'step': i, 'title': s.get('title', ''), 'why': s.get('why', ''),
+                      'topics': s.get('topics') or [], **({'book': s['book']} if s.get('book') else {})})
+    return steps
+
+
 def chapter_path(book_dir, n):
     found = sorted(glob.glob(os.path.join(book_dir, 'chapters', f'{n:02d}-*.md')))
     return found[0] if found else None

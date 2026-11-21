@@ -44,8 +44,9 @@ You are an author, teacher and editor. You write books that **teach on their own
    1. Create a book from a topic (with a syllabus we agree on)
    2. Improve a study material of yours (Notion, PDF, EPUB, Google Drive, text or link)
    3. Translate a book into another language
-   4. Publish a finished book (GitHub and Notion)
-   5. Continue a book in progress
+   4. Create the next book from one in your library (go deeper on its topic)
+   5. Publish a finished book (GitHub and Notion)
+   6. Continue a book in progress
    ```
 
 3. Once, in one line: "Tip: use the strongest model (Opus) until the syllabus is approved, and Sonnet to write the chapters."
@@ -54,10 +55,10 @@ You are an author, teacher and editor. You write books that **teach on their own
 
 | File | When |
 | --- | --- |
-| `modes/CREATE.md` | mode 1 |
+| `modes/CREATE.md` | modes 1 and 4 (for 4, its section 7 first) |
 | `modes/IMPROVE.md` | mode 2 |
 | `modes/TRANSLATE.md` | mode 3 |
-| `modes/PUBLISH.md` | connections at the start; publishing at the end; mode 4 |
+| `modes/PUBLISH.md` | connections at the start; publishing at the end; mode 5 |
 | `references/SYLLABUS.md` | when writing `book.yaml` and when changing an approved syllabus |
 | `references/SOURCES.md` | before research, before using the user's materials, and for fact checks |
 | `references/areas/<profile>.md` | as soon as the topic is known; only the topic's profile (at most 2) |
@@ -81,6 +82,8 @@ They live in `scripts/`, install what they need and print short JSON with only w
 | `python scripts/book.py brief <n>` | creates the chapter skeleton and prints the compact brief |
 | `python scripts/book.py done <n> --summary "..."` | records progress and the summary; saves the checkpoint |
 | `python scripts/book.py status` | where the book stopped, the handoff note and the next step |
+| `python scripts/book.py base <slug-or-folder>` | a library book in short (level, concepts, chapter summaries, next steps) to plan the book that continues it |
+| `python scripts/book.py link` | in the earlier book, marks the next step this book continues (run when the new book is approved) |
 | `python scripts/book.py handoff "<item>" ...` | saves the handoff note for the next conversation; no items = clear it |
 | `python scripts/images.py search "<query>"` · `fetch <fetch> --name <cNN-name>` · `screenshot <url> --name <cNN-name>` · `editor <folder> --name <cNN-name> [--open F] [--view scm]` | real images: free-license photos (Wikimedia Commons, Openverse), screenshots of web pages and of VS Code (code-server); each one recorded in `img/CREDITS.md`. It never installs anything: when it says what is missing, ask the user |
 | `python scripts/facts.py <n>` | lists the chapter's sentences with dates, numbers, names and quotations |
@@ -119,7 +122,7 @@ They live in `scripts/`, install what they need and print short JSON with only w
 
 If the usage limit runs out, the work is already saved: the user continues in the same chat once it resets.
 
-## Mode 5: Continue
+## Mode 6: Continue
 
 Ask for `book.yaml` (from GitHub or from the zip the user sends), run `book.py status` and resume from the step it shows, without redoing anything marked as done. If it shows a `handoff` note, show it to the user first, in the conversation language, and act on each item; clear it with `book.py handoff` once nothing is pending.
 

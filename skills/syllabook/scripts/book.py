@@ -7,6 +7,8 @@ Usage:
   python scripts/book.py done <n> --summary "..." [--book B]   record the chapter as done
   python scripts/book.py status [--book B]        where the book stopped and the next step
   python scripts/book.py handoff ["item"...] [--book B]   save what the next conversation must know (none = clear)
+  python scripts/book.py base <slug-or-folder> [--library L]   summary of a library book to plan the next one
+  python scripts/book.py link [--book B]          mark, in the earlier book, the next step this book continues
 
 Prints JSON. Exit code 1 when something blocks the next step.
 """
@@ -17,8 +19,8 @@ import re
 import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from common import (chapter_numbers, chapter_path, fail, find_book, labels, load_yaml, out,
-                    remember, research_path, save_yaml, slugify)
+from common import (chapter_numbers, chapter_path, fail, find_book, labels, library_book, library_root,
+                    library_slugs, load_yaml, next_steps, out, remember, research_path, save_yaml, slugify)
 
 REQUIRED = ['title', 'slug', 'origin', 'language', 'profiles', 'level', 'audience', 'goal',
             'sources', 'approved_on', 'concepts', 'chapters']
@@ -84,6 +86,7 @@ def validate(path):
         if data['origin'] == 'improved' and not ch.get('sources_original'):
             warnings.append(f'chapter {n}: sources_original empty (where it comes from in the original)')
 
+    track_rules(path, data, errors, warnings)
     concepts = data['concepts'] or []
     taught = {}
     for c in concepts:
@@ -97,7 +100,9 @@ def validate(path):
         taught[cid] = c.get('chapter')
     for c in concepts:
         for dep in c.get('depends') or []:
-            if dep not in taught:
+            if ':' in str(dep):
+                other_book_concept(path, data, c.get('id'), dep, errors, warnings)
+            elif dep not in taught:
                 errors.append(f'concept "{c.get("id")}": depends on unknown concept "{dep}"')
             elif isinstance(taught[dep], int) and isinstance(c.get('chapter'), int) and taught[dep] > c['chapter']:
                 errors.append(f'concept "{c["id"]}" (ch. {c["chapter"]}) depends on "{dep}", '
@@ -124,6 +129,46 @@ def validate(path):
     if data['approved_on'] and not DATE_RE.match(str(data['approved_on'])):
         errors.append('approved_on: must be empty or a YYYY-MM-DD date')
     return data, errors, warnings
+
+
+def track_rules(path, data, errors, warnings):
+    """next_steps, prerequisites, track and continues: what links this book to the others."""
+    for i, s in enumerate(data.get('next_steps') or [], 1):
+        if isinstance(s, dict):
+            if not s.get('title'):
+                errors.append(f'next_steps[{i}]: needs a title')
+            if 'topics' in s and not isinstance(s['topics'], list):
+                errors.append(f'next_steps[{i}]: topics must be a list')
+        elif not isinstance(s, str):
+            errors.append(f'next_steps[{i}]: a title or {{title, why, topics}}')
+    prerequisites = data.get('prerequisites') or []
+    if not isinstance(prerequisites, list):
+        errors.append('prerequisites: must be a list (slugs of earlier books, or plain text)')
+        prerequisites = []
+    track = data.get('track')
+    if track is not None and (not isinstance(track, dict) or not track.get('name')
+                              or not isinstance(track.get('order'), int)):
+        errors.append('track: needs name and order (a whole number)')
+    continues = data.get('continues')
+    if continues is not None:
+        if not isinstance(continues, dict) or not continues.get('book'):
+            errors.append('continues: needs book (the slug of the earlier book) and, if it came from one, step')
+        elif continues['book'] not in prerequisites:
+            errors.append(f'continues: "{continues["book"]}" must be in prerequisites')
+
+
+def other_book_concept(path, data, cid, dep, errors, warnings):
+    """A dependency on a concept taught by an earlier book: <slug>:<concept id>."""
+    slug, concept = dep.split(':', 1)
+    if slug not in (data.get('prerequisites') or []):
+        errors.append(f'concept "{cid}": depends on "{dep}", but "{slug}" is not in prerequisites')
+        return
+    root = library_root(os.path.dirname(path))
+    other = library_book(root, slug) if root else None
+    if not other:
+        warnings.append(f'concept "{cid}": "{slug}" is not in this library, so "{dep}" could not be checked')
+    elif concept not in {c.get('id') for c in load_yaml(os.path.join(other, 'book.yaml')).get('concepts') or []}:
+        errors.append(f'concept "{cid}": {slug} does not teach "{concept}"')
 
 
 def cmd_validate(args):
@@ -275,6 +320,85 @@ def cmd_handoff(args):
     out({'saved': True, 'handoff': items})
 
 
+def find_base(arg, library):
+    """(folder, root) of the book named by a folder or a slug."""
+    if os.path.exists(os.path.join(arg, 'book.yaml')):
+        folder = os.path.abspath(arg)
+        return folder, library or library_root(folder)
+    root = os.path.abspath(library) if library else library_root(os.getcwd())
+    if not root:
+        selected = find_book(None)[0]
+        root = library_root(selected)
+    folder = library_book(root, arg) if root else None
+    if not folder:
+        fail(f'book "{arg}" not found in the library' + (f'; it has: {", ".join(library_slugs(root))}' if root else
+                                                           ': pass --library <repository folder>'))
+    return folder, root
+
+
+def cmd_base(args):
+    folder, root = find_base(args.book_ref, args.library)
+    data = load_yaml(os.path.join(folder, 'book.yaml'))
+    note = ''
+    if data.get('translation_of') and root and library_book(root, data['translation_of']):
+        note = f'{data["slug"]} is a translation: this is its original, {data["translation_of"]}'
+        folder = library_book(root, data['translation_of'])
+        data = load_yaml(os.path.join(folder, 'book.yaml'))
+    done = summaries(data)
+    steps = next_steps(data)
+    if root:  # books already written from a step, even before book.py link
+        for slug in library_slugs(root):
+            other = load_yaml(os.path.join(library_book(root, slug), 'book.yaml')).get('continues') or {}
+            if other.get('book') == data['slug'] and isinstance(other.get('step'), int) \
+                    and 1 <= other['step'] <= len(steps):
+                steps[other['step'] - 1].setdefault('book', slug)
+    track = data.get('track') or {}
+    result = {
+        'book': {'title': data['title'], 'slug': data['slug'],
+                 'folder': os.path.relpath(folder, root).replace(os.sep, '/') if root else folder,
+                 'language': data.get('language')},
+        'level': data.get('level'), 'goal': data.get('goal'), 'track': track or None,
+        'covers': data.get('covers') or [],
+        'concepts': [{'id': c['id'], 'name': c['name'], 'chapter': c.get('chapter')} for c in data['concepts']],
+        'chapters': [{'n': c['n'], 'title': c['title'], 'summary': done.get(c['n'], '')} for c in data['chapters']],
+        'next_steps': steps,
+        'for_the_new_book': {
+            'level_start': (data.get('level') or {}).get('end'), 'prerequisites': [data['slug']],
+            'track': {'name': track['name'], 'order': track.get('order', 0) + 1} if track.get('name') else None},
+    }
+    if note:
+        result['note'] = note
+    out(result)
+
+
+def cmd_link(args):
+    book_dir, path = find_book(args.book)
+    data = load_yaml(path)
+    continues = data.get('continues') or {}
+    if not continues.get('book'):
+        fail('this book has no "continues" in book.yaml: nothing to link')
+    root = library_root(book_dir)
+    earlier = library_book(root, continues['book']) if root else None
+    if not earlier:
+        fail(f'"{continues["book"]}" not found in the library')
+    earlier_yaml = os.path.join(earlier, 'book.yaml')
+    other = load_yaml(earlier_yaml)
+    steps = list(other.get('next_steps') or [])
+    step = continues.get('step')
+    if isinstance(step, int) and 1 <= step <= len(steps):
+        entry = {'title': steps[step - 1]} if isinstance(steps[step - 1], str) else dict(steps[step - 1])
+    else:
+        entry = {'title': data['title'], 'why': data.get('goal', ''),
+                 'topics': [c['title'] for c in data['chapters']][:4]}
+        steps.append(entry)
+        step = len(steps)
+    entry['book'] = data['slug']
+    steps[step - 1] = entry
+    other['next_steps'] = steps
+    save_yaml(earlier_yaml, other)
+    out({'linked': continues['book'], 'step': step, 'title': entry['title']})
+
+
 def cmd_status(args):
     book_dir, path = find_book(args.book)
     data = load_yaml(path)
@@ -313,11 +437,15 @@ def main():
     s = sub.add_parser('status')
     h = sub.add_parser('handoff')
     h.add_argument('items', nargs='*')
-    for q in (b, d, s, h):
+    a = sub.add_parser('base')
+    a.add_argument('book_ref')
+    a.add_argument('--library')
+    k = sub.add_parser('link')
+    for q in (b, d, s, h, k):
         q.add_argument('--book')
     args = p.parse_args()
     {'validate': cmd_validate, 'brief': cmd_brief, 'done': cmd_done, 'status': cmd_status,
-     'handoff': cmd_handoff}[args.cmd](args)
+     'handoff': cmd_handoff, 'base': cmd_base, 'link': cmd_link}[args.cmd](args)
 
 
 if __name__ == '__main__':

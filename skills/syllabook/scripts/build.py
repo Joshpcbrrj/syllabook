@@ -25,8 +25,8 @@ import tempfile
 import zipfile
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from common import (SKILL, chapter_numbers, chapter_path, fail, find_book, first_h1, labels, load_yaml,
-                    need_yaml, out, pandoc_path, slugify)
+from common import (SKILL, chapter_numbers, chapter_path, fail, find_book, first_h1, labels, library_book,
+                    library_root, load_yaml, need_yaml, next_steps, out, pandoc_path, slugify)
 
 COLLECTIONS = {'created': 'created-books', 'improved': 'improved-materials', 'translated': 'translated-books'}
 COLLECTION_TITLES = {'created': 'Created books', 'improved': 'Improved materials',
@@ -108,6 +108,34 @@ def update_navigation(files, lab):
         if i + 1 < len(files):
             parts.append(f'[{lab["Next chapter"]} ▶]({os.path.basename(files[i + 1])})')
         write(path, set_block(read(path), 'nav', '---\n\n' + ' · '.join(parts)))
+
+
+def update_next_steps(book_dir, data, lab):
+    """The next steps at the end of the last chapter, from next_steps in book.yaml (references/BOOK.md §8)."""
+    steps = next_steps(data)
+    last = chapter_path(book_dir, max(chapter_numbers(data))) if data.get('chapters') else None
+    if not steps or not last:
+        return
+    root = library_root(book_dir)
+    lines = [f'## 🧭 {lab["Next steps"]}', '']
+    for s in steps:
+        target = library_book(root, s['book']) if root and s.get('book') else None
+        if target:
+            rel = os.path.relpath(os.path.join(target, 'README.md'), os.path.dirname(last)).replace(os.sep, '/')
+            line = f'- **[{s["title"]}]({rel})**'
+        else:
+            line = f'- **{s["title"]}**'
+        if s['why']:
+            line += f': {s["why"]}'
+        if s['topics']:
+            line += f' ({" · ".join(s["topics"])})'
+        lines.append(line)
+    text = read(last)
+    if '<!-- next-steps:start -->' not in text and '<!-- nav:start -->' in text:
+        # first time: put it before the navigation, which stays the last thing in the file
+        text = text.replace('<!-- nav:start -->', '<!-- next-steps:start -->\n<!-- next-steps:end -->\n\n'
+                                                  '<!-- nav:start -->', 1)
+    write(last, set_block(text, 'next-steps', '\n'.join(lines)))
 
 
 def update_map(book_dir, data, files, lab):
@@ -249,6 +277,7 @@ def cmd_book(args):
     files = book_files(book_dir, data, lab)
     result = {'book': data['title']}
     if files:
+        update_next_steps(book_dir, data, lab)
         update_navigation(files, lab)
         update_map(book_dir, data, files, lab)
         update_index(book_dir, data, files, lab)

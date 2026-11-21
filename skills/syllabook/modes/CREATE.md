@@ -27,7 +27,7 @@ Do not ask how much time per day: chapter 0 offers schedules at three paces.
 
 In the same message, offer (not a required question): "If you have books, PDFs, EPUBs or a Google Drive folder on this topic, send them: I'll use them as sources." If the user sends any, run each file through `ingest.py` and use only its outline until step 3. In Google Drive, list the files found and let the user choose before opening any. Usage rules are in `references/SOURCES.md` (understand and check, never copy).
 
-If the user has a library on GitHub, check `created-books/`, `improved-materials/` and `translated-books/` for a book on the same topic. If there is one, show what it covers and ask: expand it, write the next book in the track, or take another angle.
+If the user has a library on GitHub, check `created-books/`, `improved-materials/` and `translated-books/` for a book on the same topic. If there is one, show what it covers and ask: expand it, write the next book in the track (§7), or take another angle.
 
 ## 2. Area profile
 
@@ -88,7 +88,7 @@ Prerequisites: <knowledge or books>
 n. <Final project or challenge> → <what the reader delivers>
    Final mock exam
 
-Next steps: <2–4 topics for later books>
+Next steps: <2–4 later books, each with why and its main topics>
 Reference version: <only if the topic changes over time, with the date>
 
 Adjust freely: "longer", "shorter", "drop 5", "add X",
@@ -134,4 +134,18 @@ When you hear "approved" (or a clear equivalent in any language), and only then:
 1. Fill in `approved_on` and save to `created-books/<slug>/book.yaml` (with GitHub connected, on the `draft/<slug>` branch).
 2. Follow "Flow after approval" in `SKILL.md`, from step 1.
 
+**Next steps in `book.yaml`:** save each one as `{title, why, topics}` (2–4 topics). They become the last chapter's next steps (`build.py` writes them) and the starting point of the book that continues this one (§7).
+
 **Changes after approval:** show the impact ("dropping ch. 5 affects the examples in ch. 6 and 8"), ask approval for that change only, and update `book.yaml` as described in `references/SYLLABUS.md`.
+
+## 7. The next book in a track (mode 4)
+
+The user points to a book in their library ("my Docker book") and wants a book that goes further. It is mode 1 with a head start:
+
+1. Run `book.py base <slug or folder>`: the earlier book in short (level, goal, concepts, chapter summaries, next steps, and which steps already have a book). Do not open its chapters; the summary is enough. If it is a translation, the script gives its original.
+2. Offer 2–4 directions in one short message: its next steps that have no book yet (with their why and topics), plus "or tell me what you want to go deeper into". If the user already said it, skip this.
+3. Steps 1–5 of this mode as usual, but: no question about level or what the user already knows (the earlier book answers it); the research looks only at the new ground; the syllabus never reteaches what the earlier book's concepts cover, only reviews it in chapter 0 and in warm-ups.
+4. In the new `book.yaml`, from `for_the_new_book`: `level.start` = the earlier book's end level, `prerequisites: [<earlier slug>]`, the same `track` with the next `order`, and `continues: {book: <earlier slug>, step: <n>}` (no `step` when the idea came from the user). Concepts from the earlier book are written `<slug>:<concept id>` in `depends`; `book.py validate` checks them.
+5. Keep what the reader already knows: the same terms (the earlier glossary), the same style and, when it fits, the same running project, now growing further.
+6. The placement test says who can skip the earlier book and points to it for whoever cannot.
+7. Once approved, run `book.py link`: the earlier book's next step now points to this book, and its last chapter links here on its next build.

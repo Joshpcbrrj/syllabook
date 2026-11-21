@@ -70,4 +70,4 @@ For improved materials, add one line on the original: what it was, and that only
 
 ## 8. Next steps
 
-At the end of the last chapter: 2–4 suggested books, one line each, from `next_steps` in `book.yaml`, so the reader knows where to go next.
+At the end of the last chapter: 2–4 suggested books, so the reader knows where to go next. `build.py` writes them from `next_steps` in `book.yaml` (title, why, topics, and a link once a book continues it): keep `next_steps` complete and never write this section by hand. The same list is the starting point of the next book in the track (`modes/CREATE.md` §7).

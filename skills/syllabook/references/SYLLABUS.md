@@ -16,7 +16,8 @@ level: {start: beginner, end: intermediate}
 audience: "Who already runs containers with docker run"
 goal: "Describe an app with API, database and proxy in one compose.yaml and run it with one command"
 prerequisites: ["docker-do-zero"]    # slugs of other books, or plain text
-track: {name: devops, order: 1}
+track: {name: devops, order: 2}      # a series of books, in reading order
+continues: {book: docker-do-zero, step: 1}   # only for a next book (CREATE.md §7): the earlier book and its next step
 reference_version: "Docker Compose v5.6, Docker Engine 29.9"   # only if the topic changes over time
 review_by: "2027-11"                 # only if the topic changes over time
 sources:
@@ -35,7 +36,9 @@ chapters:
     topics: ["declarative vs imperative", "services"]
     minutes: 35
     sources_original: []             # mode 2: sections of the original this chapter comes from
-next_steps: ["Docker Swarm do zero", "Kubernetes do zero"]
+next_steps:                          # 2–4 later books; build.py writes them at the end of the last chapter
+  - {title: "Compose avançado", why: "Para levar o projeto a produção com segurança", topics: ["profiles", "secrets", "healthchecks"]}
+  - {title: "Kubernetes do zero", why: "Para rodar em vários servidores", topics: ["pods", "deployments", "services"]}
 covers: [compose, compose-yaml]      # short stable labels, used to compare books in a track
 progress: []                         # filled by book.py: {n, done, summary}
 changes: []                          # changes after approval: {date, what, why}
@@ -51,6 +54,7 @@ Mode-specific fields:
 
 - Every concept that a chapter teaches is listed once, with the chapter that teaches it.
 - `depends` lists the concepts it needs. `book.py validate` refuses a concept that depends on one taught in a later chapter.
+- A concept taught by an earlier book (one in `prerequisites`) is written `<slug>:<concept id>` in `depends` (`docker-do-zero:container`); `book.py validate` checks it when that book is in the library.
 - Keep it short: the 3–8 key concepts of each chapter, not every term. `build.py` uses it for the map, the glossary links and the index.
 
 ## Labels

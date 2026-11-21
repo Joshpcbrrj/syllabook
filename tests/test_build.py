@@ -8,7 +8,7 @@ import zipfile
 
 import build
 import pytest
-from conftest import ROOT, edit, load, read, save
+from conftest import ROOT, SKILL, edit, load, read, save
 
 BOOK_IN_LIB = os.path.join('created-books', 'python-do-zero-teste')
 
@@ -219,3 +219,52 @@ def test_index_is_skipped_when_there_is_no_glossary(cli, book, tmp_path):
 def test_a_chapter_title_without_h1_uses_the_file_name(book):
     edit(book / 'chapters' / '03-simulado-final.md', '# Simulado final', 'Simulado final')
     assert build.h1(str(book / 'chapters' / '03-simulado-final.md')) == '03-simulado-final.md'
+
+
+# ---------- translations live in their own folder ----------
+
+def add_translation(library):
+    """An English translation of the sample book, in translated-books/."""
+    folder = library / 'translated-books' / 'python-do-zero-teste-en'
+    shutil.copytree(library / BOOK_IN_LIB, folder)
+    data = load(folder / 'book.yaml')
+    data.update(slug='python-do-zero-teste-en', title='Python from scratch (test)', language='en',
+                translation_of='python-do-zero-teste', glossary=[{'source': 'lista', 'target': 'list'}])
+    save(folder / 'book.yaml', data)
+    return folder
+
+
+def test_a_translation_goes_to_translated_books(book, tmp_path):
+    data = load(book / 'book.yaml')
+    for origin in ('created', 'improved'):
+        data.update(origin=origin, translation_of='python-do-zero')
+        assert build.collection(data) == 'translated-books'
+        names = zipfile.ZipFile(build.pack(str(book), data, str(tmp_path))[0]['zip']).namelist()
+        assert all(n.startswith('translated-books/python-do-zero-teste/') for n in names)
+
+
+def test_lists_and_site_have_a_translated_books_section(cli, library):
+    add_translation(library)
+    code, r = cli('build', 'lists', '--library', library)
+    assert r['books'] == 2 and 'translated-books/README.md' in r['updated']
+    assert '[Python from scratch (test)](python-do-zero-teste-en/)' in read(library / 'translated-books' / 'README.md')
+    assert 'python-do-zero-teste-en' not in read(library / 'created-books' / 'README.md')
+    code, r = cli('build', 'site', '--library', library, '--out', library / '_site')
+    assert code == 0 and r['books'] == 2
+    assert '## Livros traduzidos' in read(library / '_site' / 'docs' / 'index.md')
+
+
+def test_the_brief_finds_the_original_in_another_collection(cli, library):
+    folder = add_translation(library)
+    code, r = cli('book', 'brief', 1, '--book', folder)
+    assert code == 0 and r['original_chapter'].replace('\\', '/').endswith(
+        'created-books/python-do-zero-teste/chapters/01-listas.md'), r
+
+
+def test_the_library_skeleton_has_the_three_collections():
+    for folder in ('created-books', 'improved-materials', 'translated-books'):
+        for readme in ('README.md', 'README.pt-BR.md'):
+            assert os.path.exists(os.path.join(SKILL, 'assets', 'library', folder, readme)), (folder, readme)
+    for workflow in ('epub.yml', 'site.yml'):
+        text = read(os.path.join(SKILL, 'assets', 'library', '.github', 'workflows', workflow))
+        assert text.count('translated-books') == 2, workflow  # the paths that trigger it and the find

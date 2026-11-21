@@ -88,7 +88,7 @@ They live in `scripts/`, install what they need and print short JSON with only w
 | `python scripts/audit.py [<n>]` | ready criteria: errors block, warnings go to the final summary |
 | `python scripts/diagram.py <spec.yaml>` | draws an SVG from a short spec (`--help` lists the types, `--icons` the icon names); `--sheet <n>` = one image with all of a chapter's diagrams |
 | `python scripts/build.py --out <dir> [--partial]` | navigation, map, concept index, EPUB (answers in an appendix) and zip; `--partial` = checkpoint zip, no EPUB. `<dir>` is always outside the library repository (claude.ai: `/mnt/user-data/outputs`; Claude Code: a folder the user picks, never inside `created-books/` or `improved-materials/`) |
-| `python scripts/build.py lists --library <repo>` | updates the book lists in `created-books/` and `improved-materials/` |
+| `python scripts/build.py lists --library <repo>` | updates the book lists in `created-books/`, `improved-materials/` and `translated-books/` |
 | `python scripts/notion.py <n>` | converts a chapter to Notion's format |
 
 ## Flow after approval (track this checklist yourself; never show it to the user)

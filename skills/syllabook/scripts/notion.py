@@ -142,11 +142,11 @@ def site_url(repository):
 
 def index_page(book_dir, data):
     """The book's index page in Notion: what it is, the links, and the chapter list."""
-    from build import COLLECTIONS, epub_url, library_settings
+    from build import collection, epub_url, library_settings
     settings, _ = library_settings(book_dir)
     lab = labels(data.get('language', 'en'))
     repo = settings.get('repository', '')
-    folder = COLLECTIONS.get(data.get('origin'), 'created-books')
+    folder = collection(data)
     links = []
     if repo:
         site = site_url(repo)

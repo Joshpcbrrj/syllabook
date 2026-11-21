@@ -52,6 +52,7 @@ Write as a patient Brazilian mentor talking to one reader. The text must read as
 | Back to the exercise | Voltar ao exercício |
 | Created books | Livros criados |
 | Improved materials | Materiais aprimorados |
+| Translated books | Livros traduzidos |
 | Download EPUB | Baixar EPUB |
 | Chapters | Capítulos |
 | Index | Índice remissivo |

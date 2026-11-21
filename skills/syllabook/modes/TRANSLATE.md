@@ -27,7 +27,7 @@ Show both in one message and wait for "approved". The table goes into the new `b
 
 ## 3. Create the sibling book
 
-- Folder: next to the original, with the language suffix (`created-books/<slug>-<lang>/` or `improved-materials/<slug>-<lang>/`).
+- Folder: `translated-books/<slug>-<lang>/`, whatever the original's collection (the original stays in `created-books/` or `improved-materials/`).
 - `book.yaml`: copy the original's, then set `language`, `translation_of: <slug>`, the translated titles and concept names, and an empty progress list. Add `translations: [<slug>-<lang>]` to the original.
 - Run `book.py validate`.
 

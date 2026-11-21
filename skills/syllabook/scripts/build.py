@@ -6,7 +6,7 @@ Usage:
       navigation between chapters, the map in the book's README, the concept index
       in the glossary, the EPUB (answers moved to an appendix) and the zip(s)
   python scripts/build.py lists --library ROOT
-      the book lists in the READMEs of created-books/ and improved-materials/
+      the book lists in the READMEs of created-books/, improved-materials/ and translated-books/
   python scripts/build.py site --library ROOT --out DIR
       the website source for Zensical (mkdocs.yml + docs/), answers as collapsible blocks
 
@@ -28,7 +28,16 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from common import (SKILL, chapter_numbers, chapter_path, fail, find_book, first_h1, labels, load_yaml,
                     need_yaml, out, pandoc_path, slugify)
 
-COLLECTIONS = {'created': 'created-books', 'improved': 'improved-materials'}
+COLLECTIONS = {'created': 'created-books', 'improved': 'improved-materials', 'translated': 'translated-books'}
+COLLECTION_TITLES = {'created': 'Created books', 'improved': 'Improved materials',
+                     'translated': 'Translated books'}
+
+
+def collection(data):
+    """The library folder of a book: translations have their own, whatever the original's origin."""
+    if data.get('translation_of'):
+        return COLLECTIONS['translated']
+    return COLLECTIONS.get(data.get('origin'), 'created-books')
 GITHUB_UPLOAD_LIMIT = 100  # files per upload on GitHub's website
 LINK_MD = re.compile(r'\]\((?!https?:)([^)#\s]+\.md)(#[^)\s]+)?\)')
 DETAILS_OPEN = re.compile(r'^\s*<details>\s*$')
@@ -215,7 +224,7 @@ def build_epub(book_dir, data, files, lab, out_dir, library):
 # ---------- book: zip ----------
 
 def pack(book_dir, data, out_dir, suffix=''):
-    collection = COLLECTIONS.get(data.get('origin'), 'created-books')
+    folder = collection(data)
     files = sorted(p for p in glob.glob(os.path.join(book_dir, '**', '*'), recursive=True) if os.path.isfile(p))
     chunks = [files[i:i + GITHUB_UPLOAD_LIMIT] for i in range(0, len(files), GITHUB_UPLOAD_LIMIT)] or [[]]
     made = []
@@ -225,7 +234,7 @@ def pack(book_dir, data, out_dir, suffix=''):
         with zipfile.ZipFile(target, 'w', zipfile.ZIP_DEFLATED) as z:
             for path in chunk:
                 rel = os.path.relpath(path, book_dir).replace(os.sep, '/')
-                z.write(path, f'{collection}/{data["slug"]}/{rel}')
+                z.write(path, f'{folder}/{data["slug"]}/{rel}')
         made.append({'zip': target, 'files': len(chunk)})
     return made
 
@@ -348,7 +357,7 @@ def cmd_site(args):
     home = [f'# 📚 {settings.get("site_title") or (settings.get("repository") or "Library").split("/")[-1]}', '']
     for origin, folder in COLLECTIONS.items():
         group = [b for b in books if b['folder'] == folder]
-        title = lab['Created books' if origin == 'created' else 'Improved materials']
+        title = lab[COLLECTION_TITLES[origin]]
         home += [f'## {title}', '']
         if group:
             home += [book_rows(group, settings, lab,

@@ -21,6 +21,7 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ### Changed
 
+- Translations have their own folder in the library, `translated-books/<slug>-<lang>/` (before: next to the original), with its READMEs, its section in the lists and on the website, and the EPUB and site workflows watching it. `book.py brief` finds the original in `created-books/` or `improved-materials/`, and still next to the translation in older libraries.
 - Images are chosen by context: SVG diagrams for what the reader cannot see (structure, logic, flow, states) and real images (photos, screenshots) for real things and scenes (a person, an application's screen, files open in an editor). The image choice is now `real` (the default) or `svg`; screenshots of desktop applications are asked of the user. Notion keeps only the SVG diagrams.
 
 - Analogies: each chapter checks whether its central concept is abstract and, if so, gives it one analogy with the fixed label (`Analogia`/`Analogy`), the pairs and where it breaks. `audit.py` warns when a whole book has none (found by comparing the Docker Compose pilot, with zero analogies, with an older book).

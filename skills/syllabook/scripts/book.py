@@ -181,6 +181,17 @@ def notes(book_dir, path):
         return {'file': rel, 'notes': f.read()}
 
 
+def original_book(book_dir, slug):
+    """The book a translation comes from: in created-books/ or improved-materials/ of the same library,
+    or next to the translation (the old layout)."""
+    library = os.path.dirname(os.path.dirname(book_dir))
+    for folder in ('created-books', 'improved-materials', os.path.basename(os.path.dirname(book_dir))):
+        candidate = os.path.join(library, folder, slug)
+        if os.path.isdir(candidate):
+            return candidate
+    return os.path.join(os.path.dirname(book_dir), slug)
+
+
 def cmd_brief(args):
     book_dir, path = find_book(args.book)
     data = load_yaml(path)
@@ -217,7 +228,7 @@ def cmd_brief(args):
     if ch.get('sources_original'):
         brief['original_sections'] = ch['sources_original']
     if data.get('translation_of'):
-        original = os.path.join(os.path.dirname(book_dir), data['translation_of'])
+        original = original_book(book_dir, data['translation_of'])
         source = chapter_path(original, n) or original
         brief['original_chapter'] = os.path.relpath(source, book_dir).replace(os.sep, '/')
         brief['glossary'] = data.get('glossary')

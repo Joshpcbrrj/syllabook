@@ -27,7 +27,7 @@ Do not ask how much time per day: chapter 0 offers schedules at three paces.
 
 In the same message, offer (not a required question): "If you have books, PDFs, EPUBs or a Google Drive folder on this topic, send them: I'll use them as sources." If the user sends any, run each file through `ingest.py` and use only its outline until step 3. In Google Drive, list the files found and let the user choose before opening any. Usage rules are in `references/SOURCES.md` (understand and check, never copy).
 
-If the user has a library on GitHub, check `created-books/` and `improved-materials/` for a book on the same topic. If there is one, show what it covers and ask: expand it, write the next book in the track, or take another angle.
+If the user has a library on GitHub, check `created-books/`, `improved-materials/` and `translated-books/` for a book on the same topic. If there is one, show what it covers and ask: expand it, write the next book in the track, or take another angle.
 
 ## 2. Area profile
 

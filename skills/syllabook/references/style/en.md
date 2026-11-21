@@ -49,6 +49,7 @@ Write as a patient mentor talking to one reader, in plain international English.
 | Back to the exercise | Back to the exercise |
 | Created books | Created books |
 | Improved materials | Improved materials |
+| Translated books | Translated books |
 | Download EPUB | Download EPUB |
 | Chapters | Chapters |
 | Index | Index |

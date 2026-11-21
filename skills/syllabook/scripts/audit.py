@@ -123,10 +123,38 @@ def illustrations(book_dir, names):
             yield name, path
 
 
+COPY_WORDS = 12  # this many words in a row, the same as in the original, is a copy, not a short quotation
+
+
+def prose_words(text):
+    """The words of a Markdown text, outside code blocks and inline code: commands may match, prose may not."""
+    text = re.sub(r'^(`{3,}|~{3,}).*?^\1\s*$', ' ', text, flags=re.S | re.M)
+    text = re.sub(r'`[^`\n]*`', ' ', text)
+    return re.findall(r'\w+', text.lower())
+
+
+def copied_from(original_dir, book_dir):
+    """(file of the book, the copied words) for each run of COPY_WORDS words that also appears in the original."""
+    seen = {}
+    for path in glob.glob(os.path.join(original_dir, '**', '*.md'), recursive=True):
+        words = prose_words(open(path, encoding='utf-8').read())
+        for i in range(len(words) - COPY_WORDS + 1):
+            seen.setdefault(tuple(words[i:i + COPY_WORDS]), True)
+    found = []
+    for path in sorted(glob.glob(os.path.join(book_dir, '**', '*.md'), recursive=True)):
+        words = prose_words(open(path, encoding='utf-8').read())
+        for i in range(len(words) - COPY_WORDS + 1):
+            if tuple(words[i:i + COPY_WORDS]) in seen:
+                found.append((os.path.relpath(path, book_dir).replace(os.sep, '/'), ' '.join(words[i:i + COPY_WORDS])))
+                break
+    return found
+
+
 def main():
     p = argparse.ArgumentParser(description='Ready criteria for a chapter or the whole book.')
     p.add_argument('n', type=int, nargs='?')
     p.add_argument('--book')
+    p.add_argument('--original', help='an improved book: the folder ingest.py wrote the original to')
     args = p.parse_args()
     book_dir, path = find_book(args.book)
     data = load_yaml(path)
@@ -183,6 +211,14 @@ def main():
                         if os.path.isfile(f) and '_source' not in f and not f.endswith('CREDITS.md')}
             for orphan in sorted(existing - used):
                 warnings.append(f'image not used in any chapter: img/{orphan}')
+
+    if args.original:
+        for file, words in copied_from(args.original, book_dir):
+            errors.append(f'{file}: text copied from the original ("{words}..."): '
+                          'rewrite it in your own words or quote one short passage with its link')
+    elif data.get('origin') == 'improved' and not args.n:
+        warnings.append('improved book: before publishing, run audit.py --original <the folder ingest.py wrote> '
+                        'to check that nothing of the original was copied (chapters, research, README)')
 
     out({'scope': f'chapter {args.n}' if args.n else 'whole book', 'ready': not errors,
          'errors': errors, 'warnings': warnings}, 0 if not errors else 1)

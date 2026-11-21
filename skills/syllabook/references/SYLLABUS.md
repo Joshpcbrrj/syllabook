@@ -16,7 +16,8 @@ level: {start: beginner, end: intermediate}
 audience: "Who already runs containers with docker run"
 goal: "Describe an app with API, database and proxy in one compose.yaml and run it with one command"
 prerequisites: ["docker-do-zero"]    # slugs of other books, or plain text
-track: {name: devops, order: 2}      # a series of books, in reading order
+track: {name: devops, order: 2}      # a series of books, in reading order; the front page lists the library by track
+                                     # (a display name can go in library.yaml: tracks: {devops: "DevOps"})
 continues: {book: docker-do-zero, step: 1}   # only for a next book (CREATE.md §7): the earlier book and its next step
 reference_version: "Docker Compose v5.6, Docker Engine 29.9"   # only if the topic changes over time
 review_by: "2027-11"                 # only if the topic changes over time

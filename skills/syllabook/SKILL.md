@@ -88,11 +88,11 @@ They live in `scripts/`, install what they need and print short JSON with only w
 | `python scripts/images.py search "<query>"` · `fetch <fetch> --name <cNN-name>` · `screenshot <url> --name <cNN-name>` · `editor <folder> --name <cNN-name> [--open F] [--view scm]` | real images: free-license photos (Wikimedia Commons, Openverse), screenshots of web pages and of VS Code (code-server); each one recorded in `img/CREDITS.md`. It never installs anything: when it says what is missing, ask the user |
 | `python scripts/facts.py <n>` | lists the chapter's sentences with dates, numbers, names and quotations |
 | `python scripts/projects.py [--chapter <n>]` | assembles the projects from the code blocks and runs them |
-| `python scripts/audit.py [<n>]` | ready criteria: errors block, warnings go to the final summary |
+| `python scripts/audit.py [<n>] [--original <dir>]` | ready criteria: errors block, warnings go to the final summary; `--original` (improved books) finds text copied from the ingested original |
 | `python scripts/illustration.py <img/file.svg>` | checks an illustration you drew by hand (analogies, imagined scenes; `VISUALS.md` §4b) |
 | `python scripts/diagram.py <spec.yaml>` | draws an SVG from a short spec (`--help` lists the types, `--icons` the icon names); `--sheet <n>` = one image with all of a chapter's diagrams |
 | `python scripts/build.py --out <dir> [--partial]` | navigation, map, concept index, EPUB (answers in an appendix) and zip; `--partial` = checkpoint zip, no EPUB. `<dir>` is always outside the library repository (claude.ai: `/mnt/user-data/outputs`; Claude Code: a folder the user picks, never inside `created-books/` or `improved-materials/`) |
-| `python scripts/build.py lists --library <repo>` | updates the book lists in `created-books/`, `improved-materials/` and `translated-books/` |
+| `python scripts/build.py lists --library <repo>` | updates the book lists in `created-books/`, `improved-materials/` and `translated-books/`, and the tracks on the library's front page |
 | `python scripts/notion.py <n>` | converts a chapter to Notion's format |
 
 ## Flow after approval (track this checklist yourself; never show it to the user)

@@ -327,6 +327,27 @@ def book_rows(books, settings, lab, link):
     return '\n'.join(rows)
 
 
+def track_lines(books, settings, lab, link):
+    """The library by track: each track's books in reading order, then the books in no track. [] if no track."""
+    books = [b for b in books if not b['data'].get('translation_of')]
+    tracks = {}
+    for b in books:
+        track = b['data'].get('track') or {}
+        if track.get('name'):
+            tracks.setdefault(track['name'], []).append((track.get('order', 0), b))
+    if not tracks:
+        return []
+    names = settings.get('tracks') or {}
+    lines = [f'## 🧭 {lab["Tracks"]}', '']
+    for name in sorted(tracks, key=lambda n: str(names.get(n, n)).lower()):
+        chain = ' → '.join(f'[{b["data"]["title"]}]({link(b)})' for _, b in sorted(tracks[name], key=lambda t: t[0]))
+        lines.append(f'- **{names.get(name) or name.replace("-", " ").capitalize()}:** {chain}')
+    others = [b for b in books if not (b['data'].get('track') or {}).get('name')]
+    if others:
+        lines.append(f'- **{lab["Other books"]}:** ' + ' · '.join(f'[{b["data"]["title"]}]({link(b)})' for b in others))
+    return lines
+
+
 def cmd_lists(args):
     root = os.path.abspath(args.library)
     settings, _ = library_settings(root)
@@ -342,6 +363,12 @@ def cmd_lists(args):
                 table = book_rows(group, settings, labels(lang), lambda b: os.path.basename(b['dir']) + '/')
                 write(path, set_block(read(path), 'list', table))
                 updated.append(os.path.relpath(path, root).replace(os.sep, '/'))
+    for readme, lang in (('README.md', 'en'), ('README.pt-BR.md', 'pt-BR')):
+        path = os.path.join(root, readme)
+        lines = track_lines(books, settings, labels(lang), lambda b: f'{b["folder"]}/{os.path.basename(b["dir"])}/')
+        if lines and os.path.exists(path):
+            write(path, set_block(read(path), 'tracks', '\n'.join(lines)))
+            updated.append(readme)
     out({'books': len(books), 'updated': updated})
 
 
@@ -384,6 +411,9 @@ def cmd_site(args):
     books = library_books(root)
     nav = [{'Home': 'index.md'}]
     home = [f'# 📚 {settings.get("site_title") or (settings.get("repository") or "Library").split("/")[-1]}', '']
+    tracks = track_lines(books, settings, lab, lambda b: f'{b["folder"]}/{os.path.basename(b["dir"])}/README.md')
+    if tracks:
+        home += tracks + ['']
     for origin, folder in COLLECTIONS.items():
         group = [b for b in books if b['folder'] == folder]
         title = lab[COLLECTION_TITLES[origin]]

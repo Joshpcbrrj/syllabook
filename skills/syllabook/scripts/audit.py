@@ -28,6 +28,10 @@ FILLER = {
     'es': r'\b(?:simplemente|obviamente|básicamente)\b',
 }
 IMAGE = re.compile(r'!\[([^\]]*)\]\(([^)\s]+)\)')
+# a port published with no host address listens on every network interface (stem profile: secure by default)
+OPEN_PORT = [re.compile(r'''^\s*-\s*["']?(\d+(?:-\d+)?:\d+(?:-\d+)?(?:/(?:tcp|udp))?)["']?\s*(?:#.*)?$'''),  # compose
+             re.compile(r'''(?:\s-p|--publish)[ =]["']?(\d+(?:-\d+)?:\d+(?:-\d+)?)\b''')]  # docker run
+YAML_LANGS = {'yaml', 'yml'}
 LINK = re.compile(r'(?<!!)\[[^\]]*\]\(([^)\s#]+\.md)(#[^)]*)?\)')
 
 
@@ -63,6 +67,13 @@ def audit_chapter(path, n, lab, limits, language, errors, warnings):
         if in_code:
             if COMMENT.match(line) or re.search(r'\s(#|//|--)\s', line):
                 commented = True
+            if lang not in NO_COMMENT_LANGS:
+                for rule in OPEN_PORT[:1] if lang in YAML_LANGS else OPEN_PORT[1:]:
+                    m = rule.search(line)
+                    if m:
+                        warnings.append(f'{where(i)}: port {m.group(1)} is published on every network interface: '
+                                        f'teach 127.0.0.1:{m.group(1)} first, or write 0.0.0.0 and say why it must '
+                                        'be open')
             if len(line) > limits['code']:
                 # real output, URLs and long unbreakable tokens cannot be wrapped honestly
                 unbreakable = lang in NO_COMMENT_LANGS or '://' in line or max(map(len, line.split() or [''])) >= 40

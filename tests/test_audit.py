@@ -142,3 +142,31 @@ def test_a_photo_without_credit_is_an_error(cli, book):
                                              encoding='utf-8')
     code, r = audit(cli, book, 1)
     assert code == 0, r
+
+
+OPEN_PORT = [
+    ('compose short syntax', '```yaml\n# a API na porta 8080\nports:\n  - "8080:80"\n```', '8080:80'),
+    ('compose without quotes', '```yaml\n# a API\nports:\n  - 8080:80\n```', '8080:80'),
+    ('docker run -p', '```bash\n# sobe o nginx\ndocker run -d -p 8080:80 nginx\n```', '8080:80'),
+    ('docker run --publish', '```bash\n# sobe o nginx\ndocker run -d --publish=5432:5432 postgres\n```', '5432:5432'),
+]
+
+
+@pytest.mark.parametrize('case, block, port', OPEN_PORT, ids=[o[0] for o in OPEN_PORT])
+def test_a_port_open_on_every_interface_is_a_warning(cli, book, case, block, port):
+    edit(book / CHAPTER, '## 🏋️ Pratique', block + '\n\n## 🏋️ Pratique')
+    code, r = audit(cli, book, 1)
+    assert code == 0 and any(port in w and '127.0.0.1' in w for w in r['warnings']), r
+
+
+@pytest.mark.parametrize('block', [
+    '```yaml\n# só nesta máquina\nports:\n  - "127.0.0.1:8080:80"\n```',
+    '```bash\n# só nesta máquina\ndocker run -d -p 127.0.0.1:8080:80 nginx\n```',
+    '```bash\n# aberta de propósito: o servidor recebe acessos da rede\ndocker run -d -p 0.0.0.0:80:80 nginx\n```',
+    '```text\n0.0.0.0:8080->80/tcp\n```',
+    '```bash\n# mapeia a porta\nssh -p 2222 ana@servidor\n```',
+], ids=['compose local', 'run local', 'explicit 0.0.0.0', 'output', 'ssh -p'])
+def test_local_explicit_or_unrelated_ports_are_fine(cli, book, block):
+    edit(book / CHAPTER, '## 🏋️ Pratique', block + '\n\n## 🏋️ Pratique')
+    code, r = audit(cli, book, 1)
+    assert not any('127.0.0.1' in w for w in r['warnings']), r

@@ -66,7 +66,7 @@ In the README and at the start of chapter 0, in the book language:
 
 > Written with AI (Claude) from the sources cited in each chapter. Checked on <date>. Human review: <yes/no>. Edition <x.y>.
 
-For improved materials, add one line on the original: what it was, and that only its structure, topics and goals were used. The README keeps a short changelog per edition and an errata section that points to the repository's "Report an error" form.
+For improved materials, add one line on the original: what it was, and that only its structure, topics and goals were used. The README keeps the history of editions (`build.py` writes it from `editions` in `book.yaml`, filled by `book.py edition` at the end of a review: `modes/REVIEW.md`) and an errata section that points to the repository's "Report an error" form.
 
 ## 8. Next steps
 

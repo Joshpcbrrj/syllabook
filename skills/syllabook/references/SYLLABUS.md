@@ -20,7 +20,9 @@ track: {name: devops, order: 2}      # a series of books, in reading order; the 
                                      # (a display name can go in library.yaml: tracks: {devops: "DevOps"})
 continues: {book: docker-do-zero, step: 1}   # only for a next book (CREATE.md §7): the earlier book and its next step
 reference_version: "Docker Compose v5.6, Docker Engine 29.9"   # only if the topic changes over time
-review_by: "2027-11"                 # only if the topic changes over time
+review_by: "2027-11"                 # month to review it by (modes/REVIEW.md); the library lists warn after it
+reviewed_on: ""                      # filled by book.py edition at the end of a review
+editions: []                         # filled by book.py edition: {edition, date, summary}
 sources:
   - {title: "How Compose works", url: "https://docs.docker.com/compose/intro/compose-application-model/", checked: "2026-11-17"}
 approved_on: ""                      # empty while it is a draft

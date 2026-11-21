@@ -157,9 +157,9 @@ def test_lists_in_both_languages_for_both_collections(cli, library):
     save(improved / 'book.yaml', data)
     code, r = cli('build', 'lists', '--library', library)
     assert code == 0 and r['books'] == 2 and len(r['updated']) == 4
-    assert '| Livro | Nível | Capítulos | EPUB |' in read(library / 'created-books' / 'README.pt-BR.md')
+    assert '| Livro | Nível | Capítulos | Edição | EPUB |' in read(library / 'created-books' / 'README.pt-BR.md')
     english = read(library / 'improved-materials' / 'README.md')
-    assert '| Book | Level | Chapters | EPUB |' in english and '[Notas de aula](notas-de-aula/)' in english
+    assert '| Book | Level | Chapters | Edition | EPUB |' in english and '[Notas de aula](notas-de-aula/)' in english
     assert 'releases/download/epubs/notas-de-aula.epub' in english
 
 

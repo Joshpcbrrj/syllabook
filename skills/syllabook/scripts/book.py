@@ -9,18 +9,23 @@ Usage:
   python scripts/book.py handoff ["item"...] [--book B]   save what the next conversation must know (none = clear)
   python scripts/book.py base <slug-or-folder> [--library L]   summary of a library book to plan the next one
   python scripts/book.py link [--book B]          mark, in the earlier book, the next step this book continues
+  python scripts/book.py review [--book B]        diagnosis for a review: audit with today's rules, old sources, dates
+  python scripts/book.py edition <x.y> --summary "..." [--review-by YYYY-MM] [--book B]   close a reviewed edition
 
 Prints JSON. Exit code 1 when something blocks the next step.
 """
 import argparse
 import datetime
+import json
 import os
 import re
+import subprocess
 import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from common import (chapter_numbers, chapter_path, fail, find_book, labels, library_book, library_root,
-                    library_slugs, load_yaml, next_steps, out, remember, research_path, save_yaml, slugify)
+                    library_slugs, load_yaml, next_steps, out, remember, research_path, review_due, save_yaml,
+                    slugify)
 
 REQUIRED = ['title', 'slug', 'origin', 'language', 'profiles', 'level', 'audience', 'goal',
             'sources', 'approved_on', 'concepts', 'chapters']
@@ -29,6 +34,9 @@ PROFILES = {'stem', 'languages', 'skills', 'knowledge'}
 CHOICES = {'images': {'real', 'svg'}, 'reading': {'large', 'small'}}
 LABEL_RE = re.compile(r'^[a-z0-9]+(-[a-z0-9]+)*$')
 DATE_RE = re.compile(r'^\d{4}-\d{2}-\d{2}$')
+MONTH_RE = re.compile(r'^\d{4}-\d{2}$')
+EDITION_RE = re.compile(r'^\d+\.\d+$')
+STALE_DAYS = 365  # a source not reopened for a year is checked again in a review
 # goals must be checkable (references/SYLLABUS.md); these openings are not
 WEAK_GOALS = re.compile(r'^(understand|know|learn about|be familiar|entender|compreender|conhecer|saber|'
                         r'aprender sobre|comprender|conocer)\b', re.I)
@@ -122,6 +130,12 @@ def validate(path):
             warnings.append(f'new content at {pct}%: above the ~20% limit, say why in the plan')
     if data.get('translation_of') and not data.get('glossary'):
         errors.append('translation: missing glossary')
+    for key, rule, form in (('reviewed_on', DATE_RE, 'a YYYY-MM-DD date'), ('review_by', MONTH_RE, 'a YYYY-MM month')):
+        if data.get(key) and not rule.match(str(data[key])):
+            errors.append(f'{key}: must be {form}')
+    for i, e in enumerate(data.get('editions') or [], 1):
+        if not isinstance(e, dict) or not all(e.get(k) for k in ('edition', 'date', 'summary')):
+            errors.append(f'editions[{i}]: needs edition, date and summary')
     handoff = data.get('handoff')
     if handoff is not None and (not isinstance(handoff, list)
                                 or not all(isinstance(h, str) and h.strip() for h in handoff)):
@@ -399,6 +413,51 @@ def cmd_link(args):
     out({'linked': continues['book'], 'step': step, 'title': entry['title']})
 
 
+def cmd_review(args):
+    book_dir, path = find_book(args.book)
+    data = load_yaml(path)
+    limit = datetime.date.today() - datetime.timedelta(days=STALE_DAYS)
+    stale = [{'title': s['title'], 'url': s['url'], 'checked': str(s.get('checked', ''))}
+             for s in data.get('sources') or [] if isinstance(s, dict)
+             and (not DATE_RE.match(str(s.get('checked', ''))) or str(s['checked']) < limit.isoformat())]
+    audit = subprocess.run([sys.executable, os.path.join(os.path.dirname(os.path.abspath(__file__)), 'audit.py'),
+                            '--book', book_dir], capture_output=True, text=True, encoding='utf-8')
+    try:
+        report = json.loads(audit.stdout)
+    except json.JSONDecodeError:
+        report = {'errors': [f'audit.py failed: {audit.stderr.strip()[-300:]}'], 'warnings': []}
+    out({'title': data.get('title'), 'edition': str(data.get('edition', '1.0')),
+         'reviewed_on': data.get('reviewed_on') or data.get('approved_on'), 'review_by': data.get('review_by'),
+         'due': review_due(data), 'reference_version': data.get('reference_version'),
+         'stale_sources': stale, 'audit': {'errors': report.get('errors', []), 'warnings': report.get('warnings', [])},
+         'next': 'read the reported errors (issues on the library repository), reopen the stale sources, run '
+                 'projects.py and the chapters\' commands again, then show the review assessment (modes/REVIEW.md)'})
+
+
+def cmd_edition(args):
+    book_dir, path = find_book(args.book)
+    data = load_yaml(path)
+    current = str(data.get('edition', '1.0'))
+    if not EDITION_RE.match(args.edition):
+        fail(f'edition "{args.edition}": write it like 1.1 or 2.0')
+    number = lambda e: tuple(int(x) for x in e.split('.'))  # noqa: E731
+    if EDITION_RE.match(current) and number(args.edition) <= number(current):
+        fail(f'edition {args.edition} must be newer than {current}')
+    summary = (args.summary or '').strip()
+    if not summary:
+        fail('--summary is required (one or two lines: what changed in this edition)')
+    if args.review_by and not MONTH_RE.match(args.review_by):
+        fail('--review-by: write the month as YYYY-MM')
+    today = datetime.date.today().isoformat()
+    data['edition'], data['reviewed_on'] = args.edition, today
+    if args.review_by:
+        data['review_by'] = args.review_by
+    data['editions'] = list(data.get('editions') or []) + [{'edition': args.edition, 'date': today,
+                                                            'summary': summary[:400]}]
+    save_yaml(path, data)
+    out({'saved': True, 'edition': args.edition, 'reviewed_on': today, 'review_by': data.get('review_by')})
+
+
 def cmd_status(args):
     book_dir, path = find_book(args.book)
     data = load_yaml(path)
@@ -419,7 +478,9 @@ def cmd_status(args):
         step = 'write the fixed parts: ' + ', '.join(k for k, v in fixed.items() if not v)
     else:
         step = 'audit.py (whole book), then build.py'
-    out({**handoff(data), 'title': data.get('title'), 'slug': data.get('slug'), 'language': data.get('language'),
+    if review_due(data):
+        step = f'review due since {data["review_by"]}: offer a review (modes/REVIEW.md)'
+    out({**handoff(data), **({'review_due': True} if review_due(data) else {}), 'title': data.get('title'), 'slug': data.get('slug'), 'language': data.get('language'),
          'approved': bool(data.get('approved_on')), 'chapters_done': f'{len(done)}/{len(chapter_numbers(data))}',
          'pending_chapters': pending, 'fixed_parts': fixed, 'next_step': step})
 
@@ -441,11 +502,17 @@ def main():
     a.add_argument('book_ref')
     a.add_argument('--library')
     k = sub.add_parser('link')
-    for q in (b, d, s, h, k):
+    r = sub.add_parser('review')
+    e = sub.add_parser('edition')
+    e.add_argument('edition')
+    e.add_argument('--summary')
+    e.add_argument('--review-by')
+    for q in (b, d, s, h, k, r, e):
         q.add_argument('--book')
     args = p.parse_args()
     {'validate': cmd_validate, 'brief': cmd_brief, 'done': cmd_done, 'status': cmd_status,
-     'handoff': cmd_handoff, 'base': cmd_base, 'link': cmd_link}[args.cmd](args)
+     'handoff': cmd_handoff, 'base': cmd_base, 'link': cmd_link,
+     'review': cmd_review, 'edition': cmd_edition}[args.cmd](args)
 
 
 if __name__ == '__main__':

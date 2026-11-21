@@ -1,4 +1,4 @@
-# Connections, checkpoints and publishing (also mode 5)
+# Connections, checkpoints and publishing (also mode 6)
 
 ## Contents
 
@@ -6,7 +6,7 @@
 2. Checkpoints during the book
 3. Publishing to GitHub
 4. Copying to Notion
-5. Mode 5: publish a finished book
+5. Mode 6: publish a finished book
 
 Integration guides live in the kit repository: `https://github.com/Joshpcbrrj/syllabook/tree/main/docs/integrations` (one page per integration, in English and Portuguese). When a connection is missing, explain in up to 3 lines and send the guide link; never reproduce the guide in the chat.
 
@@ -58,7 +58,7 @@ At the end, ask once: "Publish the book to GitHub and create the copy in Notion?
    - `left_out` lists the photos and screenshots that stay out of Notion on purpose: Notion keeps only the SVG diagrams, and the other images stay in the EPUB and the site.
 4. If a Notion call fails, retry once with a smaller piece (half of the content, then append the rest); if it fails again, report which chapter and continue with the next.
 
-## 5. Mode 5: publish a finished book
+## 5. Mode 6: publish a finished book
 
 For a book made earlier with this skill and never published (or published only in part):
 

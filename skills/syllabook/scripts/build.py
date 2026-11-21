@@ -26,7 +26,7 @@ import zipfile
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from common import (SKILL, chapter_numbers, chapter_path, fail, find_book, first_h1, labels, library_book,
-                    library_root, load_yaml, need_yaml, next_steps, out, pandoc_path, slugify)
+                    library_root, load_yaml, need_yaml, next_steps, out, pandoc_path, review_due, slugify)
 
 COLLECTIONS = {'created': 'created-books', 'improved': 'improved-materials', 'translated': 'translated-books'}
 COLLECTION_TITLES = {'created': 'Created books', 'improved': 'Improved materials',
@@ -148,7 +148,12 @@ def update_map(book_dir, data, files, lab):
         lines.append(f'- [{h1(path)}](chapters/{os.path.basename(path)}){extra}')
     readme = os.path.join(book_dir, 'README.md')
     text = read(readme) if os.path.exists(readme) else f'# {data["title"]}\n\n{data.get("subtitle", "")}\n'
-    write(readme, set_block(text, 'map', '\n'.join(lines)))
+    text = set_block(text, 'map', '\n'.join(lines))
+    if data.get('editions'):
+        history = [f'## 🗒️ {lab["Editions"]}', '']
+        history += [f'- **{e["edition"]}** ({e["date"]}): {e["summary"]}' for e in reversed(data['editions'])]
+        text = set_block(text, 'editions', '\n'.join(history))
+    write(readme, text)
 
 
 def update_index(book_dir, data, files, lab):
@@ -316,13 +321,16 @@ def epub_url(settings, slug):
 
 
 def book_rows(books, settings, lab, link):
-    rows = [f'| {lab["Book"]} | {lab["Level"]} | {lab["Chapters"]} | EPUB |', '| --- | --- | --- | --- |']
+    rows = [f'| {lab["Book"]} | {lab["Level"]} | {lab["Chapters"]} | {lab["Edition"]} | EPUB |',
+            '| --- | --- | --- | --- | --- |']
     for b in books:
         d = b['data']
         level = d.get('level') or {}
         url = epub_url(settings, d['slug'])
         rows.append(f'| [{d["title"]}]({link(b)}) ({d.get("language", "")}) | {level.get("start", "")} → '
                     f'{level.get("end", "")} | {len(d.get("chapters") or [])} | '
+                    f'{d.get("edition", "1.0")} · {d.get("reviewed_on") or d.get("approved_on", "")}'
+                    f'{" ⏰" if review_due(d) else ""} | '
                     + (f'[{lab["Download EPUB"]}]({url})' if url else '') + ' |')
     return '\n'.join(rows)
 

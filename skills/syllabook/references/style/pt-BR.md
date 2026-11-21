@@ -54,6 +54,8 @@ Write as a patient Brazilian mentor talking to one reader. The text must read as
 | Improved materials | Materiais aprimorados |
 | Translated books | Livros traduzidos |
 | Tracks | Trilhas |
+| Edition | Edição |
+| Editions | Edições |
 | Other books | Outros livros |
 | Download EPUB | Baixar EPUB |
 | Chapters | Capítulos |

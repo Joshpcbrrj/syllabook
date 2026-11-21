@@ -5,6 +5,7 @@ it uses the SYLLABOOK_BOOK environment variable, then the current folder if it
 holds a book.yaml, then the book selected by the last successful
 `book.py validate` (saved in ~/.syllabook/current, or SYLLABOOK_STATE).
 """
+import datetime
 import glob
 import json
 import os
@@ -172,6 +173,12 @@ def next_steps(data):
         steps.append({'step': i, 'title': s.get('title', ''), 'why': s.get('why', ''),
                       'topics': s.get('topics') or [], **({'book': s['book']} if s.get('book') else {})})
     return steps
+
+
+def review_due(data, today=None):
+    """True when review_by (YYYY-MM) is in the past: the book should be reviewed (modes/REVIEW.md)."""
+    month = (today or datetime.date.today()).strftime('%Y-%m')
+    return bool(data.get('review_by')) and str(data['review_by']) < month
 
 
 def chapter_path(book_dir, n):

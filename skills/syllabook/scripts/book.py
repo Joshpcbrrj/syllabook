@@ -6,6 +6,7 @@ Usage:
   python scripts/book.py brief <n> [--book B]     create the chapter skeleton and print its brief
   python scripts/book.py done <n> --summary "..." [--book B]   record the chapter as done
   python scripts/book.py status [--book B]        where the book stopped and the next step
+  python scripts/book.py handoff ["item"...] [--book B]   save what the next conversation must know (none = clear)
 
 Prints JSON. Exit code 1 when something blocks the next step.
 """
@@ -116,6 +117,10 @@ def validate(path):
             warnings.append(f'new content at {pct}%: above the ~20% limit, say why in the plan')
     if data.get('translation_of') and not data.get('glossary'):
         errors.append('translation: missing glossary')
+    handoff = data.get('handoff')
+    if handoff is not None and (not isinstance(handoff, list)
+                                or not all(isinstance(h, str) and h.strip() for h in handoff)):
+        errors.append('handoff: must be a list of sentences (what is pending for the next conversation)')
     if data['approved_on'] and not DATE_RE.match(str(data['approved_on'])):
         errors.append('approved_on: must be empty or a YYYY-MM-DD date')
     return data, errors, warnings
@@ -194,7 +199,7 @@ def cmd_brief(args):
         created = True
     done = summaries(data)
     others = {c['n']: c for c in data['chapters']}
-    brief = {
+    brief = {**handoff(data),
         'chapter': {k: ch.get(k) for k in ('n', 'title', 'goal', 'topics', 'minutes')},
         'file': os.path.relpath(file, book_dir).replace(os.sep, '/'),
         'skeleton_created': created,
@@ -242,6 +247,23 @@ def cmd_done(args):
          'next': f'book.py brief {pending[0]}' if pending else 'fixed parts (references/BOOK.md), then audit.py'})
 
 
+def handoff(data):
+    """The note left for the next conversation, shown first; nothing when there is none."""
+    return {'handoff': data['handoff']} if data.get('handoff') else {}
+
+
+def cmd_handoff(args):
+    book_dir, path = find_book(args.book)
+    data = load_yaml(path)
+    items = [i.strip() for i in args.items if i.strip()]
+    if items:
+        data['handoff'] = items
+    else:
+        data.pop('handoff', None)
+    save_yaml(path, data)
+    out({'saved': True, 'handoff': items})
+
+
 def cmd_status(args):
     book_dir, path = find_book(args.book)
     data = load_yaml(path)
@@ -262,7 +284,7 @@ def cmd_status(args):
         step = 'write the fixed parts: ' + ', '.join(k for k, v in fixed.items() if not v)
     else:
         step = 'audit.py (whole book), then build.py'
-    out({'title': data.get('title'), 'slug': data.get('slug'), 'language': data.get('language'),
+    out({**handoff(data), 'title': data.get('title'), 'slug': data.get('slug'), 'language': data.get('language'),
          'approved': bool(data.get('approved_on')), 'chapters_done': f'{len(done)}/{len(chapter_numbers(data))}',
          'pending_chapters': pending, 'fixed_parts': fixed, 'next_step': step})
 
@@ -278,10 +300,13 @@ def main():
     d.add_argument('n', type=int)
     d.add_argument('--summary')
     s = sub.add_parser('status')
-    for q in (b, d, s):
+    h = sub.add_parser('handoff')
+    h.add_argument('items', nargs='*')
+    for q in (b, d, s, h):
         q.add_argument('--book')
     args = p.parse_args()
-    {'validate': cmd_validate, 'brief': cmd_brief, 'done': cmd_done, 'status': cmd_status}[args.cmd](args)
+    {'validate': cmd_validate, 'brief': cmd_brief, 'done': cmd_done, 'status': cmd_status,
+     'handoff': cmd_handoff}[args.cmd](args)
 
 
 if __name__ == '__main__':

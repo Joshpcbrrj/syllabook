@@ -39,6 +39,7 @@ next_steps: ["Docker Swarm do zero", "Kubernetes do zero"]
 covers: [compose, compose-yaml]      # short stable labels, used to compare books in a track
 progress: []                         # filled by book.py: {n, done, summary}
 changes: []                          # changes after approval: {date, what, why}
+handoff: []                          # book.py handoff: what is pending for the next conversation
 ```
 
 Mode-specific fields:

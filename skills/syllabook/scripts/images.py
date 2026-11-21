@@ -114,8 +114,9 @@ def screenshot(url, name, book_dir, width, height):
     try:
         from playwright.sync_api import sync_playwright
     except ImportError:
-        fail('Playwright is not installed. In Claude Code: pip install playwright && python -m playwright install '
-             'chromium. On claude.ai (no browser): ask the user for a screenshot of the running application, '
+        fail('Playwright is not installed. In Claude Code: ask the user first (it downloads a browser, ~150 MB); '
+             'if they agree, pip install playwright && python -m playwright install chromium, otherwise ask them '
+             'for the screenshot. On claude.ai (no browser): ask the user for a screenshot of the running application, '
              'save it in img/ and record it in img/CREDITS.md. Never make up a screenshot.')
     os.makedirs(os.path.join(book_dir, 'img'), exist_ok=True)
     filename = f'{name}.png'

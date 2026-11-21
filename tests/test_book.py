@@ -209,3 +209,33 @@ def test_brief_says_when_the_topic_guide_is_missing(cli, book):
     os.remove(book / 'research' / 'guide.md')
     code, r = cli('book', 'brief', 2, '--book', book)
     assert r['guide'] == {'file': 'research/guide.md', 'missing': True}
+
+
+@pytest.mark.parametrize('handoff', ['capturas', [''], [1], {'a': 'b'}], ids=['text', 'empty', 'number', 'map'])
+def test_handoff_must_be_a_list_of_sentences(cli, tmp_path, handoff):
+    code, r = validate_with(cli, tmp_path, lambda d: d.update(handoff=handoff))
+    assert code == 1 and any('handoff:' in e for e in r['errors']), r['errors']
+
+
+def test_handoff_is_saved_and_shown_first_when_resuming(cli, book):
+    items = ['Captura do VS Code pedida para o cap. 1', 'Próximo: cap. 2 em conversa nova']
+    code, r = cli('book', 'handoff', *items, '--book', book)
+    assert code == 0 and r == {'saved': True, 'handoff': items}
+    assert load(book / 'book.yaml')['handoff'] == items
+    code, r = cli('book', 'validate', book / 'book.yaml')
+    assert code == 0, r
+    code, r = cli('book', 'status', '--book', book)
+    assert r['handoff'] == items and list(r)[0] == 'handoff'
+    code, r = cli('book', 'brief', 2, '--book', book)
+    assert r['handoff'] == items
+
+
+def test_handoff_without_items_clears_it(cli, book):
+    cli('book', 'handoff', 'algo pendente', '--book', book)
+    code, r = cli('book', 'handoff', '--book', book)
+    assert code == 0 and r == {'saved': True, 'handoff': []}
+    assert 'handoff' not in load(book / 'book.yaml')
+    code, r = cli('book', 'status', '--book', book)
+    assert 'handoff' not in r
+    code, r = cli('book', 'brief', 1, '--book', book)
+    assert 'handoff' not in r

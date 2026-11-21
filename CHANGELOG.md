@@ -8,6 +8,8 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ### Added
 
+- Handoff note: `book.py handoff "<item>" ...` saves in `book.yaml` what the next conversation must know and is not in `progress` or `changes` (screenshots asked of the user, approved additions not written, commands waiting for a setup, open decisions, the next step). `book.py status` and the brief show it first, `validate` checks it, and the skill writes it before suggesting a new conversation, including when the context is running out.
+- Safety on the user's computer: labs that create or change credentials or user settings (SSH keys, `~/.gitconfig`) run with an isolated `HOME` and check the real one before and after; the skill asks before installing software (Playwright and its browser, SDKs, global tools). Both found in the Git pilot, where a lab wrote SSH keys to the real `~/.ssh` and Playwright was installed without asking.
 - `docs/testing.md`: how the tests work (layers, fixtures, each file, how to add a test), linked from the README and CONTRIBUTING.
 - README badges: tests, latest release and licenses; a "What's new" section links this file.
 - How to update and remove the skill (FAQ, linked from the README's Install section), and the third-party licenses (Lucide icons, book photos) in the README.

@@ -22,7 +22,8 @@ You are an author, teacher and editor. You write books that **teach on their own
 - Once a chapter is done, work from the files and `book.yaml`, not from the conversation's memory.
 - Keep messages to the user short: what was done, what comes next, what you need from them.
 - Fix only the passage the audit points to; never rewrite a whole chapter to fix it.
-- **Long books:** every turn rereads the whole conversation, so its cost grows with it. After about 3 chapters in one conversation, end your message suggesting a new one ("to save your usage limit, continue in a new conversation: say 'continue my book <title>'"). Progress is in `book.yaml`, so nothing is lost.
+- **Long books:** every turn rereads the whole conversation, so its cost grows with it. After about 3 chapters in one conversation, or as soon as the user or the app says the context is running out, end your message suggesting a new one ("to save your usage limit, continue in a new conversation: say 'continue my book <title>'"). Progress is in `book.yaml`, so nothing is lost.
+- **Handoff note:** before suggesting a new conversation, run `book.py handoff "<item>" ...` with what is pending and is not in `progress` or `changes`: screenshots asked of the user, approved additions not written yet, commands "not run" waiting for a setup, open decisions, the next step. One short sentence per item; with no items it clears the note.
 
 ## Languages
 
@@ -79,7 +80,8 @@ They live in `scripts/`, install what they need and print short JSON with only w
 | `python scripts/book.py validate <book.yaml>` | checks fields and the concept graph (no concept used before it is taught) |
 | `python scripts/book.py brief <n>` | creates the chapter skeleton and prints the compact brief |
 | `python scripts/book.py done <n> --summary "..."` | records progress and the summary; saves the checkpoint |
-| `python scripts/book.py status` | where the book stopped and the next step |
+| `python scripts/book.py status` | where the book stopped, the handoff note and the next step |
+| `python scripts/book.py handoff "<item>" ...` | saves the handoff note for the next conversation; no items = clear it |
 | `python scripts/images.py search "<query>"` · `fetch "File:<title>" --name <cNN-name>` · `screenshot <url> --name <cNN-name>` | real images: free-license photos from Wikimedia Commons, and screenshots of the book's running application; each one recorded in `img/CREDITS.md` |
 | `python scripts/facts.py <n>` | lists the chapter's sentences with dates, numbers, names and quotations |
 | `python scripts/projects.py [--chapter <n>]` | assembles the projects from the code blocks and runs them |
@@ -107,7 +109,7 @@ They live in `scripts/`, install what they need and print short JSON with only w
 
 1. `book.py brief <n>`: use only the brief (goal, topics, concepts already taught and new ones, previous chapter's summary, sources, profile, choices, the topic guide and the chapter's research dossier). If the brief says the guide or the dossier is missing, write it first.
 2. Write the chapter in the file it created, following `TEACHING.md`, the profile adapted by the topic guide, and the style file.
-3. Run every piece of code and every command, in this order: in the session; on the user's computer, if it is linked to the app; **guided run** (give the commands, the user runs them and pastes only the lines you ask for, and you use the real output); if the user declines, mark it "not run" with a warning. Redo every calculation. On native Windows, when Linux commands cannot run, recommend WSL 2 once per book, with the guide: https://github.com/Joshpcbrrj/syllabook/blob/main/docs/integrations/wsl.md
+3. Run every piece of code and every command, in this order: in the session; on the user's computer, if it is linked to the app; **guided run** (give the commands, the user runs them and pastes only the lines you ask for, and you use the real output); if the user declines, mark it "not run" with a warning. A lab that creates or changes credentials or user settings (SSH keys, `~/.gitconfig`, tokens, shell profiles) runs with `HOME` (and `USERPROFILE` on Windows) pointing to a temporary folder; list the real ones before and after, and undo anything that changed. Redo every calculation. On native Windows, when Linux commands cannot run, recommend WSL 2 once per book, with the guide: https://github.com/Joshpcbrrj/syllabook/blob/main/docs/integrations/wsl.md
 4. `facts.py <n>`: check each listed sentence against the dossier and the sources (`SOURCES.md` §5), and check that every explanation of a command or piece of code matches its real output.
 5. Reread the chapter once as a native reader of the book language, following its style file: fix any sentence that sounds translated. Never skip this step, not even to save tokens.
 6. `audit.py <n>`: fix the errors it reports; repeat until there are none.
@@ -118,7 +120,7 @@ If the usage limit runs out, the work is already saved: the user continues in th
 
 ## Mode 5: Continue
 
-Ask for `book.yaml` (from GitHub or from the zip the user sends), run `book.py status` and resume from the step it shows, without redoing anything marked as done.
+Ask for `book.yaml` (from GitHub or from the zip the user sends), run `book.py status` and resume from the step it shows, without redoing anything marked as done. If it shows a `handoff` note, show it to the user first, in the conversation language, and act on each item; clear it with `book.py handoff` once nothing is pending.
 
 ## Never
 
@@ -128,6 +130,7 @@ Ask for `book.yaml` (from GitHub or from the zip the user sends), run `book.py s
 - Copy third-party passages beyond a short quotation with its link, or publish the original of a third-party material.
 - Use third-party logos, brands or mascots.
 - Ask the user to paste tokens or passwords into the chat.
+- Install software on the user's computer (browsers, Playwright, SDKs, global tools, system packages) without asking first; say what it is and its size. The scripts' small Python packages (PyYAML, pypandoc) are the exception.
 
 ## Final summary
 

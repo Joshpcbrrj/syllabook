@@ -62,7 +62,8 @@ def test_edition_refuses(cli, book, args, message):
 VALIDATION = [
     ('reviewed_on', lambda d: d.update(reviewed_on='ontem'), 'reviewed_on: must be'),
     ('review_by', lambda d: d.update(review_by='2027'), 'review_by: must be'),
-    ('editions entry', lambda d: d.update(editions=[{'edition': '1.1'}]), 'editions[1]: needs edition, date and summary'),
+    ('editions entry', lambda d: d.update(editions=[{'edition': '1.1'}]),
+     'editions[1]: needs edition, date and summary'),
 ]
 
 

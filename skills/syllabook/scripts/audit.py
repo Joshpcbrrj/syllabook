@@ -130,7 +130,8 @@ def illustrations(book_dir, names):
     for name in names:
         stem, ext = os.path.splitext(name)
         path = os.path.join(book_dir, 'img', name)
-        if ext.lower() == '.svg' and os.path.exists(path) and                 not glob.glob(os.path.join(book_dir, 'img', '_source', stem + '.*')):
+        if ext.lower() == '.svg' and os.path.exists(path) and \
+                not glob.glob(os.path.join(book_dir, 'img', '_source', stem + '.*')):
             yield name, path
 
 

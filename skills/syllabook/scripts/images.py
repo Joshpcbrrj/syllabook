@@ -231,7 +231,8 @@ def write_settings(user_data, dark):
         'telemetry.telemetryLevel': 'off', 'security.workspace.trust.enabled': False,
         'extensions.ignoreRecommendations': True, 'update.mode': 'none', 'chat.disableAIFeatures': True,
         'git.openRepositoryInParentFolders': 'always', 'git.autofetch': False,
-        'workbench.secondarySideBar.defaultVisibility': 'hidden', 'editor.fontSize': 15, 'editor.minimap.enabled': False,
+        'workbench.secondarySideBar.defaultVisibility': 'hidden',
+        'editor.fontSize': 15, 'editor.minimap.enabled': False,
     }
     with open(os.path.join(user_data, 'User', 'settings.json'), 'w', encoding='utf-8') as f:
         json.dump(settings, f, indent=2)

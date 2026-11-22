@@ -480,7 +480,8 @@ def cmd_status(args):
         step = 'audit.py (whole book), then build.py'
     if review_due(data):
         step = f'review due since {data["review_by"]}: offer a review (modes/REVIEW.md)'
-    out({**handoff(data), **({'review_due': True} if review_due(data) else {}), 'title': data.get('title'), 'slug': data.get('slug'), 'language': data.get('language'),
+    due = {'review_due': True} if review_due(data) else {}
+    out({**handoff(data), **due, 'title': data.get('title'), 'slug': data.get('slug'), 'language': data.get('language'),
          'approved': bool(data.get('approved_on')), 'chapters_done': f'{len(done)}/{len(chapter_numbers(data))}',
          'pending_chapters': pending, 'fixed_parts': fixed, 'next_step': step})
 

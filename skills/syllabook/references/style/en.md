@@ -53,6 +53,7 @@ Write as a patient mentor talking to one reader, in plain international English.
 | Tracks | Tracks |
 | Edition | Edition |
 | Editions | Editions |
+| See the image on the website | See the image on the website |
 | Other books | Other books |
 | Download EPUB | Download EPUB |
 | Chapters | Chapters |

@@ -15,7 +15,8 @@ What changes on the way:
   > quotes and notes     -> <callout> with the note's emoji as the icon
   SVG diagrams           -> uploads
   photos and screenshots (PNG/JPG) -> left out: Notion gets the SVG diagrams only;
-                            they stay in the EPUB and the site
+                            they stay in the EPUB and the site, and a line links to the chapter's page there
+  inline code ending in \\   -> plain text (Notion would read "\\`" as an escaped backtick)
   links to other chapters -> plain text (the chapters are subpages in Notion)
   <!-- comments -->, navigation and the generated map -> removed
 """
@@ -30,6 +31,8 @@ from common import chapter_path, fail, find_book, first_h1, labels, load_yaml, o
 IMAGE = re.compile(r'^!\[([^\]]*)\]\(\.\./img/([^)\s]+)\)\s*$')
 CHAPTER_LINK = re.compile(r'\[([^\]]+)\]\((?!https?:)[^)\s]+\.md(#[^)\s]*)?\)')
 COMMENT = re.compile(r'<!--.*?-->', re.S)
+# inline code ending in a backslash: Notion reads "\\`" as an escaped backtick and the code never closes
+TRAILING_BACKSLASH = re.compile(r'`([^`\n]*\\)`')
 # the emoji a note starts with picks the callout's color
 CALLOUT_COLORS = {'⚠️': 'yellow_bg', '💡': 'blue_bg', '🛠️': 'green_bg', '🔥': 'orange_bg', '❌': 'red_bg',
                   '✅': 'green_bg', '🔎': 'purple_bg', '🧪': 'blue_bg', '🎯': 'purple_bg'}
@@ -42,6 +45,11 @@ def strip_generated(text):
     return COMMENT.sub('', text)
 
 
+def inline(text):
+    """Text outside code blocks: inline code that ends in a backslash becomes plain, escaped text."""
+    return TRAILING_BACKSLASH.sub(lambda m: m.group(1).replace('\\', '\\\\'), text)
+
+
 def callout(lines):
     """A Markdown quote becomes a callout; its first emoji becomes the icon."""
     text = '\n'.join(re.sub(r'^>\s?', '', line) for line in lines).strip()
@@ -51,11 +59,11 @@ def callout(lines):
         text = (text[:m.start(1)] + text[m.end(1):]).lstrip()
         text = re.sub(r'^\*\*\s+', '**', text)
     color = CALLOUT_COLORS.get(icon, 'gray_bg')
-    return [f'<callout icon="{icon}" color="{color}">', text, '</callout>']
+    return [f'<callout icon="{icon}" color="{color}">', inline(text), '</callout>']
 
 
-def convert(text, book_dir):
-    """Returns (content, uploads, left_out)."""
+def convert(text, book_dir, page_url='', see_label='See the image on the website'):
+    """Returns (content, uploads, left_out). With page_url, a left-out image points to its page on the site."""
     lines = strip_generated(text).splitlines()
     result, uploads, left_out = [], [], []
     i, fence = 0, None
@@ -84,7 +92,7 @@ def convert(text, book_dir):
                 else:
                     body.append(lines[j])
                 j += 1
-            inner, more_uploads, more_left = convert('\n'.join(body), book_dir)
+            inner, more_uploads, more_left = convert('\n'.join(body), book_dir, page_url, see_label)
             uploads += more_uploads
             left_out += more_left
             # an answer starting with "4." would become a numbered list item
@@ -102,7 +110,7 @@ def convert(text, book_dir):
                 plain = [re.sub(r'^\s*>\s?', '', q) for q in quoted]
                 k = next(n for n, q in enumerate(plain) if q.strip() == '<details>')
                 result += callout(['> ' + q for q in plain[:k] if q.strip()])
-                inner, more_uploads, more_left = convert('\n'.join(plain[k:]), book_dir)
+                inner, more_uploads, more_left = convert('\n'.join(plain[k:]), book_dir, page_url, see_label)
                 uploads += more_uploads
                 left_out += more_left
                 result.append(inner.strip())
@@ -116,6 +124,8 @@ def convert(text, book_dir):
             if not name.lower().endswith('.svg'):
                 # Notion keeps the SVG diagram standard; photos and screenshots stay in the EPUB and the site
                 left_out.append(name)
+                if page_url:
+                    result.append(f'🖼️ *{alt}* · [{see_label}]({page_url})')
             else:
                 placeholder = f'UPLOAD:{name}'
                 uploads.append({'placeholder': placeholder, 'file': os.path.join(book_dir, 'img', name),
@@ -123,7 +133,7 @@ def convert(text, book_dir):
                 result.append(f'<image source="{placeholder}">{alt}</image>')
             i += 1
             continue
-        result.append(CHAPTER_LINK.sub(r'\1', line))
+        result.append(inline(CHAPTER_LINK.sub(r'\1', line)))
         i += 1
     content = re.sub(r'\n{3,}', '\n\n', '\n'.join(result)).strip() + '\n'
     return content, uploads, left_out
@@ -138,6 +148,17 @@ def site_url(repository):
         return ''
     owner, name = repository.split('/', 1)
     return f'https://{owner.lower()}.github.io/{name}/'
+
+
+def chapter_url(book_dir, data, file):
+    """The chapter's page on the library website, or '' when the book is not in a library on GitHub."""
+    from build import collection, library_settings
+    settings, _ = library_settings(book_dir)
+    site = site_url(settings.get('repository', ''))
+    if not site:
+        return ''
+    name = os.path.splitext(os.path.basename(file))[0]
+    return f'{site}{collection(data)}/{data["slug"]}/chapters/{name}/'
 
 
 def index_page(book_dir, data):
@@ -187,7 +208,8 @@ def main():
     else:
         fail('give a chapter number, a file in chapters/ or "index"')
     text = open(file, encoding='utf-8').read()
-    content, uploads, left_out = convert(text, book_dir)
+    content, uploads, left_out = convert(text, book_dir, chapter_url(book_dir, data, file),
+                                         labels(data.get('language', 'en'))['See the image on the website'])
     # the title becomes the Notion page title, not a heading inside the page
     title = title_of(text)
     if title and content.startswith(f'# {title}'):

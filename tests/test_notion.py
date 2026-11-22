@@ -111,3 +111,30 @@ def test_site_url():
 def test_a_chapter_without_a_title(book):
     edit(book / 'chapters' / '01-listas.md', '# 1. Listas', 'Listas')
     assert notion.title_of(open(book / 'chapters' / '01-listas.md', encoding='utf-8').read()) == ''
+
+
+@pytest.mark.parametrize('line, expected', [
+    (r'termine a linha com uma barra (`\`) ou com dois espaços',
+     r'termine a linha com uma barra (\\) ou com dois espaços'),
+    (r'a pasta `C:\estudos\` do Windows', r'a pasta C:\\estudos\\ do Windows'),
+])
+def test_inline_code_ending_in_a_backslash_becomes_plain_text(book, line, expected):
+    # Notion reads "\`" as an escaped backtick and the code never closes (it refused chapter 10 of the Git book)
+    content, _, _ = convert(line, book)
+    assert content.strip() == expected
+
+
+def test_other_inline_code_and_code_blocks_keep_their_backslashes(book):
+    text = 'o `\\n` quebra a linha\n\n```text\nC:\\estudos\\\n```\n'
+    content, _, _ = convert(text, book)
+    assert content == text
+
+
+def test_a_screenshot_left_out_points_to_the_website(cli, library):
+    book = library / 'created-books' / 'python-do-zero-teste'
+    (book / 'img' / 'c01-tela.png').write_bytes(b'png')
+    edit(book / 'chapters' / '01-listas.md', '## Listas', '## Listas\n\n![A tela do editor](../img/c01-tela.png)')
+    code, r = cli('notion', 1, '--book', book)
+    assert r['left_out'] == ['c01-tela.png']
+    assert ('🖼️ *A tela do editor* · [Ver a imagem no site](https://exemplo.github.io/minha-biblioteca/'
+            'created-books/python-do-zero-teste/chapters/01-listas/)') in r['content']

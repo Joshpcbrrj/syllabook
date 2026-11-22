@@ -56,6 +56,7 @@ Write as a patient Brazilian mentor talking to one reader. The text must read as
 | Tracks | Trilhas |
 | Edition | Edição |
 | Editions | Edições |
+| See the image on the website | Ver a imagem no site |
 | Other books | Outros livros |
 | Download EPUB | Baixar EPUB |
 | Chapters | Capítulos |

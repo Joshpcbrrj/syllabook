@@ -75,7 +75,7 @@ Profiles: `stem.md` (programming, math, statistics, technology), `languages.md`,
 
 ## Scripts (run them, do not read them)
 
-They live in `scripts/`, install what they need and print short JSON with only what needs action. `book.py validate` also selects the book for the other commands; any script takes `--book <folder>` to work on another one.
+They live in `scripts/`, install what they need and print short JSON with only what needs action. `book.py validate` also selects the book for the other commands; any script takes `--book <folder>` to work on another one. `<temp>` in these files is a temporary folder outside the library: the session's scratch folder if there is one, otherwise the system's (`/tmp` on claude.ai and Linux; on Windows, what `python -c "import tempfile; print(tempfile.gettempdir())"` prints).
 
 | Command | Does |
 | --- | --- |

@@ -13,6 +13,16 @@ The sections below follow this checklist, step by step. Track it yourself and ne
 
 **No chapter before "approved".** A wrong syllabus costs the whole book; adjusting it costs one message.
 
+## Contents
+
+1. Understand the request
+2. Area profile
+3. Research
+4. Assessment + syllabus
+5. Adjust until "approved"
+6. Save and continue
+7. The next book in a track (mode 4)
+
 ## 1. Understand the request
 
 One message, **at most 3 questions in total**, and only what the request did not say. Every question counts, including one about the approach (chronological or by theme, which style, which instrument): if a fourth seems useful, pick a sensible default for it, say it in one line and let the user change it later.
@@ -57,7 +67,7 @@ Start with the user's materials, if any (only the useful sections, by the outlin
 
 ## 4. Assessment + syllabus
 
-Before showing it, save the draft **outside the repository** (`/tmp/book-<slug>.yaml`, with `approved_on: ""`, the `sources` and the concept graph; the model is in `references/SYLLABUS.md`) and run `python scripts/book.py validate /tmp/book-<slug>.yaml`. Fix it until it passes.
+Before showing it, save the draft **outside the repository** (`<temp>/book-<slug>.yaml`, with `approved_on: ""`, the `sources` and the concept graph; the model is in `references/SYLLABUS.md`) and run `python scripts/book.py validate /tmp/book-<slug>.yaml`. Fix it until it passes.
 
 Show it in one message, in this format. Labels go in the conversation language; titles in the book language. Any note (a tool missing in this session, how the labs will run, the research links) goes **before** the 🔎 block: the message always ends with the invitation to adjust and to say "approved".
 

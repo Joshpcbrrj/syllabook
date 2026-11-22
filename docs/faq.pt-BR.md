@@ -1,4 +1,4 @@
-<!-- translation-of: faq.md sha256:4f63afcdc4af -->
+<!-- translation-of: faq.md sha256:24bd423b6bd8 -->
 # Perguntas frequentes
 
 [English](faq.md) | **Português**
@@ -78,10 +78,11 @@ Pode. Os capítulos são arquivos Markdown comuns, em `chapters/`. Depois de edi
 ## De onde vêm as imagens?
 
 - **Diagramas:** desenhados em SVG pelos scripts da skill, a partir de uma descrição da estrutura (blocos, fluxos, linhas do tempo, acordes...).
-- **Fotos:** só com licença livre (domínio público, CC0, CC BY, CC BY-SA), do Wikimedia Commons, com o autor e a licença embaixo da imagem.
-- **Capturas de tela:** da aplicação do livro rodando de verdade.
+- **Ilustrações:** desenhos simples para uma analogia ou uma cena imaginada (uma caixa de correio para a fila de commits, por exemplo). O Claude os escreve como código SVG, e um script confere que são só formas e texto, nas cores do livro.
+- **Fotos:** só com licença livre (domínio público, CC0, CC BY, CC BY-SA), do Wikimedia Commons e do Openverse, com o autor e a licença embaixo da imagem.
+- **Capturas de tela:** da aplicação do livro rodando de verdade e do VS Code (precisa do Docker ou do code-server no seu computador; a skill pergunta antes de baixar qualquer coisa).
 
-Por enquanto, o Syllabook não gera imagens com IA.
+O Syllabook não usa modelos que geram imagens e nunca finge uma foto ou captura de tela real.
 
 ## Achei um erro num livro. E agora?
 

@@ -41,8 +41,10 @@ All of them, plus GitHub Pages (searchable website), are on the [integrations pa
 - **Creates a book from a topic.** Tell it what you want to learn. It researches, shows a short assessment and a syllabus, and you adjust until you approve. Then it writes the whole book, from beginner to intermediate.
 - **Improves your study material.** Notion, PDF, EPUB, DOCX, Google Drive, plain text or a link. It keeps the purpose of the original, fixes errors, fills gaps and rewrites it for study, review and research.
 - **Translates a book** into another language, adapting examples and terms to the new readers.
+- **Writes the next book** of a track: it starts where an earlier book of your library ended (Git → GitHub Actions), without reteaching it, and links the two.
+- **Reviews a finished book:** it checks it with today's rules, what changed in the tool or the facts, and the errors readers reported, then fixes only what you approve and records a new edition.
 - **Works across fields:** programming and math, languages, practical skills (music, electronics...) and general knowledge (such as the history of computing).
-- **Tests what it teaches:** it runs every command and piece of code and shows the real output; images are diagrams drawn from the content and photos with a free license.
+- **Tests what it teaches:** it runs every command and piece of code and shows the real output. Images are diagrams drawn from the content, simple illustrations for analogies, photos with a free license and screenshots of the real application.
 - **Speaks your language:** it detects or asks the language of the conversation and of the book.
 
 Every book includes a map with links, a placement test, exercises with commented answers, spaced reviews, a final mock exam and a glossary.

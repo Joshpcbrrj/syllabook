@@ -1,4 +1,4 @@
-<!-- translation-of: README.md sha256:928ae8c02f88 -->
+<!-- translation-of: README.md sha256:34637e77e674 -->
 # <img src="docs/img/syllabook-icon.svg" alt="" height="40"> Syllabook
 
 [English](README.md) | **Português**
@@ -42,8 +42,10 @@ Todas, mais o GitHub Pages (site com busca), estão na [página de integrações
 - **Cria um livro a partir de um tema.** Você diz o que quer aprender. Ela pesquisa, apresenta um parecer e uma ementa, e você ajusta até aprovar. Depois ela escreve o livro inteiro, do básico ao intermediário.
 - **Aprimora um material seu.** Notion, PDF, EPUB, DOCX, Google Drive, texto ou link. Ela mantém a proposta do original, corrige, completa o que falta e reescreve para facilitar o estudo, a revisão e a pesquisa.
 - **Traduz um livro** para outro idioma, adaptando exemplos e termos para os novos leitores.
+- **Escreve o próximo livro** de uma trilha: começa de onde um livro da sua biblioteca terminou (Git → GitHub Actions), sem ensinar de novo o que ele já ensinou, e liga os dois.
+- **Revisa um livro pronto:** confere o livro com as regras de hoje, o que mudou na ferramenta ou nos fatos e os erros que os leitores relataram, corrige só o que você aprovar e registra uma nova edição.
 - **Funciona para áreas diferentes:** programação e matemática, idiomas, habilidades práticas (música, eletrônica...) e conhecimento geral (como a história da computação).
-- **Testa o que ensina:** executa cada comando e cada trecho de código e mostra a saída real; as imagens são diagramas feitos a partir do conteúdo e fotos com licença livre.
+- **Testa o que ensina:** executa cada comando e cada trecho de código e mostra a saída real. As imagens são diagramas feitos a partir do conteúdo, ilustrações simples para as analogias, fotos com licença livre e capturas de tela da aplicação de verdade.
 - **Fala o seu idioma:** ela deduz ou pergunta o idioma da conversa e o do livro.
 
 Cada livro traz mapa com links, teste de nivelamento, exercícios com gabarito comentado, revisões espaçadas, simulado final e glossário.

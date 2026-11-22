@@ -354,3 +354,129 @@ def test_search_skips_openverse_copies_of_commons_images(cli, commons, openverse
     assert [i['fetch'] for i in r['results']] == ['openverse:abc-123']
     code, r = cli('images', 'search', 'eniac', '--source', 'openverse')
     assert [i['fetch'] for i in r['results']] == ['openverse:wm-1', 'openverse:abc-123']
+
+
+
+# --- the network calls and the code-server process, simulated ---
+
+class FakeResponse:
+    def __init__(self, body):
+        self.body = body
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *exc):
+        return False
+
+    def read(self):
+        return self.body
+
+
+def test_api_calls_send_who_we_are_and_read_json(monkeypatch, tmp_path):
+    seen = []
+
+    def urlopen(request, timeout):
+        seen.append(request)
+        return FakeResponse(b'{"ok": true}')
+    monkeypatch.setattr(images.urllib.request, 'urlopen', urlopen)
+    monkeypatch.setattr(images.json, 'load', lambda response: {'ok': response.read() == b'{"ok": true}'})
+    assert images.api({'action': 'query'}) == {'ok': True}
+    assert images.openverse_api('images/', {'q': 'eniac'}) == {'ok': True}
+    images.download('https://example.org/a.jpg', str(tmp_path / 'a.jpg'))
+    assert (tmp_path / 'a.jpg').read_bytes() == b'{"ok": true}'
+    assert all(r.get_header('User-agent') == images.AGENT for r in seen)
+    assert seen[0].full_url.startswith(images.API) and 'format=json' in seen[0].full_url
+    assert seen[1].full_url == images.OPENVERSE + 'images/?q=eniac'
+
+
+def test_wait_until_up(monkeypatch):
+    monkeypatch.setattr(images.urllib.request, 'urlopen', lambda url, timeout: FakeResponse(b''))
+    images.wait_until_up('http://127.0.0.1:9/?folder=/x')  # returns as soon as /healthz answers
+
+    def down(url, timeout):
+        raise images.urllib.error.URLError('refused')
+    monkeypatch.setattr(images.urllib.request, 'urlopen', down)
+    monkeypatch.setattr(images.time, 'sleep', lambda s: None)
+    with pytest.raises(SystemExit):
+        images.wait_until_up('http://127.0.0.1:9/', seconds=0)
+
+
+def test_an_installed_code_server_runs_on_localhost(monkeypatch, lab, tmp_path):
+    started = []
+
+    class Process:
+        terminated = False
+
+        def terminate(self):
+            Process.terminated = True
+    monkeypatch.setattr(images.shutil, 'which', lambda name: '/usr/bin/code-server' if name == 'code-server' else None)
+    monkeypatch.setattr(images.subprocess, 'Popen', lambda cmd, **kw: started.append(cmd) or Process())
+    monkeypatch.setattr(images, 'wait_until_up', lambda url: None)
+    url, stop = images.start_editor(str(lab), str(tmp_path))
+    cmd = started[0]
+    assert cmd[0] == '/usr/bin/code-server' and cmd[cmd.index('--bind-addr') + 1].startswith('127.0.0.1:')
+    assert '--auth' in cmd and cmd[-1] == str(lab) and url.startswith('http://127.0.0.1:')
+    stop()
+    assert Process.terminated
+
+
+def test_the_docker_image_runs_when_it_is_here(monkeypatch, lab, tmp_path):
+    runs = []
+
+    def run(cmd, **kw):
+        runs.append(cmd)
+        return types.SimpleNamespace(returncode=0, stdout='', stderr='')
+    monkeypatch.setattr(images.shutil, 'which', lambda name: '/usr/bin/docker' if name == 'docker' else None)
+    monkeypatch.setattr(images.subprocess, 'run', run)
+    monkeypatch.setattr(images, 'wait_until_up', lambda url: None)
+    url, stop = images.start_editor(str(lab), str(tmp_path))
+    assert runs[0][:3] == ['docker', 'image', 'inspect'] and runs[1][:2] == ['docker', 'run']
+    assert url.endswith('/?folder=/home/coder/receitas')
+    stop()
+    assert runs[-1][:2] == ['docker', 'stop']
+
+
+def test_docker_that_cannot_start_code_server(monkeypatch, lab, tmp_path):
+    answers = iter([0, 1])
+    monkeypatch.setattr(images.shutil, 'which', lambda name: '/usr/bin/docker' if name == 'docker' else None)
+    monkeypatch.setattr(images.subprocess, 'run', lambda cmd, **kw: types.SimpleNamespace(
+        returncode=next(answers), stdout='', stderr='port is already allocated'))
+    with pytest.raises(SystemExit):
+        images.start_editor(str(lab), str(tmp_path))
+
+
+def test_a_server_that_never_answers_is_stopped(monkeypatch, lab, tmp_path):
+    stopped = []
+
+    class Process:
+        def terminate(self):
+            stopped.append(True)
+
+    def never(url):
+        raise SystemExit(1)
+    monkeypatch.setattr(images.shutil, 'which', lambda name: '/usr/bin/code-server' if name == 'code-server' else None)
+    monkeypatch.setattr(images.subprocess, 'Popen', lambda cmd, **kw: Process())
+    monkeypatch.setattr(images, 'wait_until_up', never)
+    with pytest.raises(SystemExit):
+        images.start_editor(str(lab), str(tmp_path))
+    assert stopped == [True]
+
+
+def test_drive_editor_opens_files_runs_commands_and_shows_the_view():
+    log = []
+
+    class Keyboard:
+        def press(self, key):
+            log.append(('press', key))
+
+        def type(self, text):
+            log.append(('type', text))
+
+    page = types.SimpleNamespace(keyboard=Keyboard(), mouse=types.SimpleNamespace(move=lambda x, y: None),
+                                 goto=lambda url, **kw: log.append(('goto', url)),
+                                 wait_for_selector=lambda s, **kw: None, wait_for_timeout=lambda ms: None)
+    images.drive_editor(page, 'http://x', ['a.md'], ['Git: Open Changes'], 'scm')
+    typed = [t for k, t in log if k == 'type']
+    assert typed == ['a.md', 'Git: Open Changes', 'View: Show Source Control', 'Notifications: Clear All Notifications']
+    assert log.index(('press', 'Backspace')) < log.index(('type', 'a.md'))  # Quick Open, not a command

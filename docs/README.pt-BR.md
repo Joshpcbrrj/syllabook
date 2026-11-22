@@ -1,4 +1,4 @@
-<!-- translation-of: README.md sha256:544cf2350f86 -->
+<!-- translation-of: README.md sha256:fee800a71bcc -->
 # Documentação
 
 [English](README.md) | **Português**
@@ -15,6 +15,6 @@ A documentação segue o modelo [Diátaxis](https://diataxis.fr/): cada parte re
 | **Explicação** | entender o porquê: como a skill funciona, a didática, a economia de tokens | a escrever |
 | [**Testes**](testing.pt-BR.md) | mudar a skill ou os scripts: como os testes funcionam e como acrescentar um | pronta |
 | [**Changelog**](../CHANGELOG.md) | ver o que mudou em cada versão (em inglês) | sempre atualizado |
-| **Decisões** | saber por que o projeto é como é (registros de decisão) | a escrever |
+| [**Decisões**](decisions/README.pt-BR.md) | saber por que o projeto é como é (registros de decisão) | pronta |
 
-Enquanto a reformulação não termina, o roteiro completo e as decisões estão em [`plano/PLANO.md`](../plano/PLANO.md).
+O plano de trabalho até a 1.0, com o histórico de cada decisão, está em [`plano/`](../plano/).

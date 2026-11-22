@@ -1,4 +1,4 @@
-<!-- translation-of: README.md sha256:34637e77e674 -->
+<!-- translation-of: README.md sha256:9e7d20c69461 -->
 # <img src="docs/img/syllabook-icon.svg" alt="" height="40"> Syllabook
 
 [English](README.md) | **Português**
@@ -13,7 +13,7 @@
 
 Syllabook é uma skill do Claude para quem estuda sozinho. Ela cria livros-curso sobre qualquer tema e aprimora os materiais de estudo que você já tem. Tudo o que ela produz é seu: Markdown no seu repositório do GitHub, EPUB para qualquer leitor digital, um site com busca e, se você quiser, uma cópia no Notion.
 
-> 🧪 **Versão inicial (0.x).** Funciona de ponta a ponta e vai melhorando em versões pequenas até a 1.0. O roteiro e as decisões estão em [`plano/PLANO.md`](plano/PLANO.md); as mudanças, no [CHANGELOG](CHANGELOG.md) (em inglês).
+> 🧪 **Versão inicial (0.x).** Funciona de ponta a ponta e vai melhorando em versões pequenas até a 1.0. As decisões de projeto estão em [`docs/decisions/`](docs/decisions/README.pt-BR.md); as mudanças, no [CHANGELOG](CHANGELOG.md) (em inglês).
 
 ## Instalar
 

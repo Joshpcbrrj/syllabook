@@ -1,4 +1,4 @@
-<!-- translation-of: CONTRIBUTING.md sha256:ef4c4773a430 -->
+<!-- translation-of: CONTRIBUTING.md sha256:657a8d982065 -->
 # Como contribuir
 
 [English](CONTRIBUTING.md) | **Português**
@@ -31,7 +31,7 @@ Abra uma issue com o formulário **Suggest a topic (Sugerir tema)**. Conte o que
 4. Rode as verificações antes de enviar (veja [Testes](#testes)). A Action "Kit tests" roda o mesmo em todo pull request, no Windows e no Linux.
 5. Abra o pull request preenchendo o roteiro que aparece.
 
-As decisões de projeto ficam registradas em [`plano/PLANO.md`](plano/PLANO.md) até irem para `docs/`. Se a sua mudança contraria uma delas, explique por quê no pull request.
+As decisões de projeto ficam registradas em [`docs/decisions/`](docs/decisions/README.pt-BR.md), um registro curto para cada uma. Se a sua mudança contraria uma delas, explique por quê no pull request.
 
 ## Testes
 

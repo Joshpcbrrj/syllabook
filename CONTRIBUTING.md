@@ -30,7 +30,7 @@ Open an issue with the **Suggest a topic** form. Tell us what you want to learn 
 4. Run the checks before sending (see [Tests](#tests)). The "Kit tests" Action runs the same on every pull request, on Windows and Linux.
 5. Open the pull request and fill in the checklist that appears.
 
-Design decisions are recorded in [`plano/PLANO.md`](plano/PLANO.md) (in Portuguese) until they move to `docs/`. If your change goes against one of them, explain why in the pull request.
+Design decisions are recorded in [`docs/decisions/`](docs/decisions/README.md), one short record each. If your change goes against one of them, explain why in the pull request.
 
 ## Tests
 

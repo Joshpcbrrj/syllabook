@@ -14,6 +14,6 @@ The documentation follows the [Diátaxis](https://diataxis.fr/) model: each part
 | **Explanation** | understand the why: how the skill works, the teaching approach, token savings | to be written |
 | [**Testing**](testing.md) | change the skill or its scripts: how the tests work and how to add one | done |
 | [**Changelog**](../CHANGELOG.md) | see what changed in each version | kept up to date |
-| **Decisions** | know why the project is the way it is (decision records) | to be written |
+| [**Decisions**](decisions/README.md) | know why the project is the way it is (decision records) | done |
 
-Until the rebuild is done, the full roadmap and decisions are in [`plano/PLANO.md`](../plano/PLANO.md) (in Portuguese).
+The working plan up to 1.0, with the history of each decision, is in [`plano/`](../plano/) (in Portuguese).

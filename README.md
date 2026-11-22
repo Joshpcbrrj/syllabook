@@ -12,7 +12,7 @@
 
 Syllabook is a Claude skill for self-learners. It writes course-books on any topic and improves the study materials you already have. Everything it produces is yours: Markdown in your GitHub repository, an EPUB for any e-reader, a searchable website and, if you want, a copy in Notion.
 
-> 🧪 **Early version (0.x).** It works end to end, and it keeps improving in small releases until 1.0. The roadmap and decisions are in [`plano/PLANO.md`](plano/PLANO.md) (in Portuguese); changes are in the [CHANGELOG](CHANGELOG.md).
+> 🧪 **Early version (0.x).** It works end to end, and it keeps improving in small releases until 1.0. The design decisions are in [`docs/decisions/`](docs/decisions/README.md); changes are in the [CHANGELOG](CHANGELOG.md).
 
 ## Install
 

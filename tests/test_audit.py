@@ -170,3 +170,13 @@ def test_local_explicit_or_unrelated_ports_are_fine(cli, book, block):
     edit(book / CHAPTER, '## 🏋️ Pratique', block + '\n\n## 🏋️ Pratique')
     code, r = audit(cli, book, 1)
     assert not any('127.0.0.1' in w for w in r['warnings']), r
+
+
+
+def test_an_image_used_only_in_the_readme_is_not_an_orphan(cli, book):
+    shutil.copy(book / 'img' / 'c01-lista.svg', book / 'img' / 'c00-cola.svg')
+    readme = book / 'README.md'
+    readme.write_text(readme.read_text(encoding='utf-8') + '\n![A cola do livro](img/c00-cola.svg)\n',
+                      encoding='utf-8')
+    code, r = audit(cli, book)
+    assert not any('c00-cola.svg' in w for w in r['warnings']), r

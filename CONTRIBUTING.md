@@ -37,6 +37,7 @@ Design decisions are recorded in [`plano/PLANO.md`](plano/PLANO.md) (in Portugue
 ```bash
 pip install -r requirements-dev.txt
 ruff check .              # lint
+git config core.hooksPath .githooks   # once per clone: lint and translations before each commit
 pytest --cov              # all tests, with coverage (must stay at 95% or more)
 pytest tests/test_build.py   # only one part
 pytest -m "not slow"      # skip the tests that build a real EPUB or website

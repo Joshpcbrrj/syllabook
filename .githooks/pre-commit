@@ -1,0 +1,9 @@
+#!/bin/sh
+# Runs the same checks as the CI before each commit, so a lint error never reaches GitHub.
+# Turn it on once per clone: git config core.hooksPath .githooks
+if command -v ruff >/dev/null 2>&1; then
+    ruff check . || exit 1
+else
+    python -m ruff check . || exit 1
+fi
+python tools/translation.py check || exit 1

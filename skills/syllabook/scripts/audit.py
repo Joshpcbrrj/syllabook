@@ -214,8 +214,11 @@ def main():
         if not any(f'**{lab["Analogy"]}:**' in text for text in chapters):
             # TEACHING.md §6: abstract new ideas get an analogy; a whole book without one usually skipped them
             warnings.append('no analogy in the whole book: check each chapter\'s central concept (TEACHING.md §6)')
-        if not os.path.exists(os.path.join(book_dir, 'README.md')):
+        readme = os.path.join(book_dir, 'README.md')
+        if not os.path.exists(readme):
             errors.append('README.md missing (the book front page)')
+        else:  # the book's front page may show an image too (the whole-book cheat sheet)
+            used.update(re.findall(r'\]\((?:\./)?img/([^)\s]+)\)', open(readme, encoding='utf-8').read()))
         img = os.path.join(book_dir, 'img')
         if os.path.isdir(img):
             existing = {os.path.relpath(f, img).replace(os.sep, '/')

@@ -130,3 +130,34 @@ def test_yaml_files_are_valid_and_library_yaml_has_every_key():
 def test_workflows_that_publish_run_only_in_the_kit_repository():
     for name in ('tests.yml', 'skill-release.yml'):
         assert "github.repository == 'Joshpcbrrj/syllabook'" in read(os.path.join(ROOT, '.github', 'workflows', name))
+
+
+TEXT_FILES = ('.py', '.md', '.yaml', '.yml', '.json', '.toml', '.txt', '.svg', '.sh', '.ps1', '.html', '.css')
+CONTROL = re.compile(r'[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]')
+
+
+def test_text_files_have_no_control_characters():
+    # a stray backspace once turned "\b" in a regex into an invisible character; only tests caught it
+    import subprocess
+    files = subprocess.run(['git', 'ls-files'], cwd=ROOT, capture_output=True, text=True, check=True).stdout.split()
+    found = []
+    for rel_path in files:
+        if rel_path.endswith(TEXT_FILES) and os.path.exists(os.path.join(ROOT, rel_path)):
+            text = open(os.path.join(ROOT, rel_path), encoding='utf-8', errors='replace').read()
+            for n, line in enumerate(text.splitlines(), 1):
+                if CONTROL.search(line.replace('\t', ' ')):
+                    found.append(f'{rel_path}:{n}')
+    assert not found, found
+
+
+def test_the_pre_commit_hook_runs_the_lint():
+    hook = os.path.join(ROOT, '.githooks', 'pre-commit')
+    assert os.path.exists(hook) and 'ruff check' in read(hook)
+    assert 'core.hooksPath .githooks' in read(os.path.join(ROOT, 'CONTRIBUTING.md'))
+    assert 'core.hooksPath .githooks' in read(os.path.join(ROOT, 'CONTRIBUTING.pt-BR.md'))
+
+
+def test_images_does_not_hard_code_a_version():
+    import importlib
+    images = importlib.import_module('images')
+    assert not re.search(r'/\d', images.AGENT), images.AGENT

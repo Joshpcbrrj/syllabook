@@ -42,7 +42,7 @@ OPENVERSE_LICENSES = 'by,by-sa,cc0,pdm'
 CODE_SERVER_IMAGE = 'codercom/code-server:4.146.0'
 VIEWS = {'explorer': 'View: Show Explorer', 'scm': 'View: Show Source Control', 'search': 'View: Show Search'}
 # Wikimedia asks every client to say who it is
-AGENT = 'Syllabook/0.3 (https://github.com/Joshpcbrrj/syllabook)'
+AGENT = 'Syllabook (https://github.com/Joshpcbrrj/syllabook)'  # no version: it would age with each release
 EXTENSIONS = {'image/jpeg': '.jpg', 'image/png': '.png', 'image/gif': '.gif', 'image/webp': '.webp',
               'image/svg+xml': '.svg'}
 FREE = re.compile(r'^(public domain|pd\b|pd-|cc0|cc[ -]by( |-sa |-sa$|$)|cc[ -]by[ -]\d|cc[ -]by-sa[ -]\d)', re.I)

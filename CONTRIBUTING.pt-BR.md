@@ -1,4 +1,4 @@
-<!-- translation-of: CONTRIBUTING.md sha256:2b659b064c9f -->
+<!-- translation-of: CONTRIBUTING.md sha256:ef4c4773a430 -->
 # Como contribuir
 
 [English](CONTRIBUTING.md) | **Português**
@@ -38,6 +38,7 @@ As decisões de projeto ficam registradas em [`plano/PLANO.md`](plano/PLANO.md) 
 ```bash
 pip install -r requirements-dev.txt
 ruff check .              # verificação de estilo do código
+git config core.hooksPath .githooks   # uma vez por clone: estilo e traduções antes de cada commit
 pytest --cov              # todos os testes, com cobertura (precisa ficar em 95% ou mais)
 pytest tests/test_build.py   # só uma parte
 pytest -m "not slow"      # pula os testes que geram um EPUB ou um site de verdade

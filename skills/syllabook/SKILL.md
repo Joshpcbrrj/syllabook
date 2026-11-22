@@ -98,6 +98,7 @@ They live in `scripts/`, install what they need and print short JSON with only w
 | `python scripts/build.py --out <dir> [--partial]` | navigation, map, concept index, EPUB (answers in an appendix) and zip; `--partial` = checkpoint zip, no EPUB. `<dir>` is always outside the library repository (claude.ai: `/mnt/user-data/outputs`; Claude Code: a folder the user picks, never inside `created-books/` or `improved-materials/`) |
 | `python scripts/build.py lists --library <repo>` | updates the book lists in `created-books/`, `improved-materials/` and `translated-books/`, and the tracks on the library's front page |
 | `python scripts/notion.py <n>` | converts a chapter to Notion's format |
+| `python scripts/report.py --what "..." --file <script> [--command C] [--error E] [--send]` | a report of a problem in the skill, with no personal data, and the link of a prefilled issue; `--send` opens it with `gh` |
 
 ## Flow after approval (track this checklist yourself; never show it to the user)
 
@@ -140,6 +141,10 @@ Ask for `book.yaml` (from GitHub or from the zip the user sends), run `book.py s
 - Ask the user to paste tokens or passwords into the chat.
 - Install software on the user's computer (browsers, Playwright, SDKs, global tools, system packages) without asking first; say what it is and its size. The scripts' small Python packages (PyYAML, pypandoc) are the exception.
 
+## Problems in the skill
+
+Note each problem of the skill itself, not of the book: a script that fails or refuses something valid, rules that contradict each other, an audit false positive. At the final summary, run `report.py` for each one, show the user the whole report and ask whether to send it to the skill's maintainers. Only after a clear yes: `--send` if GitHub is connected, otherwise give the link. Never put passages of the book or the user's materials in it.
+
 ## Final summary
 
-A few lines: links (site, GitHub, EPUB, Notion), chapters, what was not run and why, audit warnings that remained, and the suggested next steps.
+A few lines: links (site, GitHub, EPUB, Notion), chapters, what was not run and why, audit warnings that remained, problems of the skill to report, and the suggested next steps.

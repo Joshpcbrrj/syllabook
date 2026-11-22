@@ -18,6 +18,8 @@ import unicodedata
 if hasattr(sys.stdout, 'reconfigure'):
     sys.stdout.reconfigure(encoding='utf-8')
 
+# the skill's version, sent in problem reports (report.py); "-dev" while CHANGELOG.md has unreleased changes
+VERSION = '0.4.0-dev'
 SKILL = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 STATE = os.environ.get('SYLLABOOK_STATE') or os.path.join(os.path.expanduser('~'), '.syllabook', 'current')
 

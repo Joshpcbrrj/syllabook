@@ -1,4 +1,4 @@
-<!-- translation-of: faq.md sha256:5a0b8e39b6a1 -->
+<!-- translation-of: faq.md sha256:4f63afcdc4af -->
 # Perguntas frequentes
 
 [English](faq.md) | **Português**
@@ -87,3 +87,4 @@ Por enquanto, o Syllabook não gera imagens com IA.
 
 - **No seu próprio livro:** peça ao Syllabook para corrigir ("no capítulo 3 do meu livro de Docker, a porta está errada"). Ele muda o capítulo, confere de novo e registra a mudança.
 - **No funcionamento da skill:** abra uma [issue](https://github.com/Joshpcbrrj/syllabook/issues/new/choose) no repositório do Syllabook.
+- **Quando a skill tropeça num problema dela mesma** (um script que falha, um aviso da auditoria que está errado), ela avisa no resumo final e mostra o relato inteiro: o que aconteceu, o comando, a mensagem de erro, a versão da skill e o sistema. A sua pasta pessoal, o seu nome de usuário, endereços de e-mail e o que parecer senha ou token são retirados, e o relato nunca leva trechos do seu livro ou dos seus materiais. Ele só é enviado se você disser que sim: como issue aberta com o seu login do GitHub no Claude Code, ou como um link para você clicar no app do Claude. O relato vai para o [repositório do Syllabook](https://github.com/Joshpcbrrj/syllabook/issues), que é público.

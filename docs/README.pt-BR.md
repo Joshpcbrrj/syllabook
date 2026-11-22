@@ -1,4 +1,4 @@
-<!-- translation-of: README.md sha256:fee800a71bcc -->
+<!-- translation-of: README.md sha256:54deec1e2464 -->
 # Documentação
 
 [English](README.md) | **Português**
@@ -7,7 +7,7 @@ A documentação segue o modelo [Diátaxis](https://diataxis.fr/): cada parte re
 
 | Parte | Para quando você quer... | Situação |
 | --- | --- | --- |
-| **Tutorial** | aprender fazendo: seu primeiro livro, do zero ao site | a escrever |
+| [**Tutorial**](tutorial.pt-BR.md) | aprender fazendo: seu primeiro livro, do zero ao site | pronto |
 | [**Perguntas frequentes**](faq.pt-BR.md) | ter uma resposta rápida: planos, custo, privacidade, idiomas, imagens | pronta |
 | [**Integrações**](integrations/README.pt-BR.md) | conectar ou instalar algo à parte: GitHub, Notion, Google Drive, Docling, GitHub Pages, WSL 2 | pronta |
 | **Guias** | fazer uma tarefa: criar a sua biblioteca, publicar um livro pronto, continuar um livro | a escrever |

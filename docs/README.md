@@ -6,7 +6,7 @@ The documentation follows the [Diátaxis](https://diataxis.fr/) model: each part
 
 | Part | When you want to... | Status |
 | --- | --- | --- |
-| **Tutorial** | learn by doing: your first book, from zero to the website | to be written |
+| [**Tutorial**](tutorial.md) | learn by doing: your first book, from zero to the website | done |
 | [**FAQ**](faq.md) | get a quick answer: plans, cost, privacy, languages, images | done |
 | [**Integrations**](integrations/) | connect or install something separately: GitHub, Notion, Google Drive, Docling, GitHub Pages, WSL 2 | done |
 | **Guides** | do a task: create your library, publish a finished book, continue a book | to be written |

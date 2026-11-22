@@ -1,4 +1,5 @@
 """report.py: the problem report carries no personal data, fits a link and is sent only with --send."""
+import json
 import os
 import re
 import subprocess
@@ -124,3 +125,5 @@ def test_version_follows_the_changelog():
         assert tuple(map(int, common.VERSION[:-4].split('.'))) > latest
     else:
         assert common.VERSION == released[0]
+    plugin = json.load(open(os.path.join(ROOT, '.claude-plugin', 'plugin.json'), encoding='utf-8'))
+    assert plugin['version'] == released[0], 'plugin.json must carry the latest released version'

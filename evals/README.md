@@ -12,14 +12,19 @@ Cases for `claude plugin eval`: each one sends a real request to Claude with the
 | `06-escrever-capitulo` | writes chapter 2 of an approved book (needs a shell: Linux, macOS or WSL) |
 | `07-aprimorar` | improve mode: the material's promise and an improvement plan |
 | `08-publicar-sem-conexoes` | publishing path without GitHub or Notion |
+| `09-proximo-livro-direcoes` | option 4: offers directions from the earlier book's next steps, no level question |
+| `10-proximo-livro-ementa` | option 4: a syllabus that starts where the earlier book ended and does not reteach it |
+| `11-revisar` | option 5: review assessment, a wrong reader report is not taken as true, nothing changes before approval |
 
 ## Running
 
 From the repository root. The short cases (tag `curto`) need no shell, so they also run on Windows:
 
 ```bash
-claude plugin eval . --tag curto --runs 2 --judge-model sonnet --trust-plugin --no-publish --max-cost-usd 8 --threshold 0
+claude plugin eval . --tag curto --runs 2 --allow-tools Write --judge-model sonnet --trust-plugin --no-publish --max-cost-usd 10 --threshold 0
 ```
+
+`Write` must be granted (`--allow-tools Write`), or every case that lists it is refused. To run some cases only, `--case` takes one glob (the last `--case` wins and `{a,b}` is not supported): `--case "*proximo*"` runs 09 and 10.
 
 Case 6 grants Bash, which the eval refuses on Windows (no sandbox there), so run it in WSL, Linux or macOS. It needs `--scaffold` to prepare the book:
 

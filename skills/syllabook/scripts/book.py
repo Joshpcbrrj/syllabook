@@ -35,7 +35,7 @@ CHOICES = {'images': {'real', 'svg'}, 'reading': {'large', 'small'}}
 LABEL_RE = re.compile(r'^[a-z0-9]+(-[a-z0-9]+)*$')
 DATE_RE = re.compile(r'^\d{4}-\d{2}-\d{2}$')
 MONTH_RE = re.compile(r'^\d{4}-\d{2}$')
-EDITION_RE = re.compile(r'^\d+\.\d+$')
+EDITION_RE = re.compile(r'^\d+\.\d+(\.\d+)?$')  # 1.3 for a review, 1.3.1 for errata only
 STALE_DAYS = 365  # a source not reopened for a year is checked again in a review
 # goals must be checkable (references/SYLLABUS.md); these openings are not
 WEAK_GOALS = re.compile(r'^(understand|know|learn about|be familiar|entender|compreender|conhecer|saber|'
@@ -439,8 +439,10 @@ def cmd_edition(args):
     data = load_yaml(path)
     current = str(data.get('edition', '1.0'))
     if not EDITION_RE.match(args.edition):
-        fail(f'edition "{args.edition}": write it like 1.1 or 2.0')
-    number = lambda e: tuple(int(x) for x in e.split('.'))  # noqa: E731
+        fail(f'edition "{args.edition}": write it like 1.1, 1.1.1 or 2.0')
+
+    def number(e):  # 1.3 and 1.3.0 are the same edition
+        return tuple(int(x) for x in e.split('.')) + (0,) * (3 - e.count('.') - 1)
     if EDITION_RE.match(current) and number(args.edition) <= number(current):
         fail(f'edition {args.edition} must be newer than {current}')
     summary = (args.summary or '').strip()

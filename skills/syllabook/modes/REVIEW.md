@@ -42,7 +42,7 @@ Today's rules:            <what the current audit asks for → chapters>
 Reported by readers:      <issue → verdict: confirmed / not confirmed>
 Suggestions (optional):   <improvements that keep the promise>
 
-Proposed edition: <x.y+1 for fixes and small updates | x+1.0 when a new version of the tool or law changes the content>
+Proposed edition: <x.y.z+1 for errata only | x.y+1 for fixes and small updates | x+1.0 when a new version of the tool or law changes the content>
 Review again by: <YYYY-MM, sooner when the topic changes fast>
 
 Say what to keep out, or "approved".

@@ -51,12 +51,23 @@ def test_edition_records_the_new_edition(cli, book):
     (['1.0', '--summary', 'x'], 'must be newer than 1.0'),
     (['0.9', '--summary', 'x'], 'must be newer than 1.0'),
     (['1.1'], '--summary is required'),
-    (['um', '--summary', 'x'], 'like 1.1 or 2.0'),
+    (['um', '--summary', 'x'], 'like 1.1, 1.1.1 or 2.0'),
+    (['1.0.0', '--summary', 'x'], 'must be newer than 1.0'),  # 1.0.0 is the same edition as 1.0
     (['1.1', '--summary', 'x', '--review-by', 'logo'], 'YYYY-MM'),
 ])
 def test_edition_refuses(cli, book, args, message):
     code, r = cli('book', 'edition', *args, '--book', book)
     assert code == 1 and message in r['error'], r
+
+
+def test_a_patch_edition_for_errata(cli, book):
+    cli('book', 'edition', '1.3', '--summary', 'Portas.', '--book', book)
+    code, r = cli('book', 'edition', '1.3.1', '--summary', 'Duas erratas.', '--book', book)
+    assert code == 0 and r['edition'] == '1.3.1'
+    code, r = cli('book', 'edition', '1.3.1', '--summary', 'De novo.', '--book', book)
+    assert code == 1 and 'must be newer than 1.3.1' in r['error']
+    code, r = cli('book', 'edition', '1.4', '--summary', 'Próxima.', '--book', book)
+    assert code == 0
 
 
 VALIDATION = [

@@ -112,8 +112,14 @@ def html_to_md(html):
 
 # ---------- converters ----------
 
+MAX_DOWNLOAD = 50 * 1024 * 1024
+MAX_EPUB_PART = 50 * 1024 * 1024  # uncompressed: a tiny zip can unpack to gigabytes
+
+
 def epub_to_md(path):
     with zipfile.ZipFile(path) as z:
+        if any(info.file_size > MAX_EPUB_PART for info in z.infolist()):
+            fail(f'{os.path.basename(path)} has a part larger than 50 MB uncompressed: not a normal EPUB')
         container = ET.fromstring(z.read('META-INF/container.xml'))
         opf_path = container.find('.//{*}rootfile').get('full-path')
         opf = ET.fromstring(z.read(opf_path))
@@ -186,7 +192,10 @@ def pdf_basic(path, warnings):
 def fetch(url):
     request = urllib.request.Request(url, headers={'User-Agent': 'Syllabook ingest'})
     with urllib.request.urlopen(request, timeout=30) as r:
-        return r.read(), r.headers.get('Content-Type', '')
+        data = r.read(MAX_DOWNLOAD + 1)
+        if len(data) > MAX_DOWNLOAD:
+            fail(f'{url} is larger than 50 MB: download it and pass the file')
+        return data, r.headers.get('Content-Type', '')
 
 
 def convert(source, engine, warnings):
@@ -258,7 +267,11 @@ def main():
     if not sections:
         fail('the material has no text')
     os.makedirs(args.out, exist_ok=True)
-    for old in glob.glob(os.path.join(args.out, '[0-9][0-9]-*.md')):
+    old_sections = glob.glob(os.path.join(args.out, '[0-9][0-9]-*.md'))
+    # chapters have the same names (01-....md): delete only what an earlier ingest wrote
+    if old_sections and not os.path.exists(os.path.join(args.out, 'outline.json')):
+        fail(f'{args.out} already has numbered .md files that ingest did not write (chapters?): use an empty --out')
+    for old in old_sections:
         os.remove(old)  # a previous run of the same material would leave stale sections
     outline = []
     for i, s in enumerate(sections, 1):

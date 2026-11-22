@@ -201,3 +201,46 @@ def test_a_pdf_at_a_web_address(cli, tmp_path, monkeypatch):
     monkeypatch.setattr(ingest, 'docling_command', lambda: None)
     code, r = run(cli, 'https://example.org/a.pdf', tmp_path / 'out')
     assert r['engine'] == 'pdf-text' and 'Arquivo remoto' in read(tmp_path / 'out' / r['sections'][0]['file'])
+
+
+def test_a_second_run_replaces_its_own_sections(cli, tmp_path):
+    (tmp_path / 'a.md').write_text('# Um\n\nx\n\n# Dois\n\ny\n', encoding='utf-8')
+    run(cli, tmp_path / 'a.md', tmp_path / 'out')
+    (tmp_path / 'a.md').write_text('# Só um\n\nx\n', encoding='utf-8')
+    code, r = run(cli, tmp_path / 'a.md', tmp_path / 'out')
+    assert code == 0 and sorted(os.listdir(tmp_path / 'out')) == ['01-so-um.md', 'outline.json']
+
+
+def test_a_folder_with_chapters_is_never_emptied(cli, tmp_path):
+    chapters = tmp_path / 'chapters'
+    chapters.mkdir()
+    (chapters / '01-listas.md').write_text('# 1. Listas\n', encoding='utf-8')
+    (tmp_path / 'a.md').write_text('# Um\n\nx\n', encoding='utf-8')
+    code, r = run(cli, tmp_path / 'a.md', chapters)
+    assert code == 1 and 'use an empty --out' in r['error'] and (chapters / '01-listas.md').exists()
+
+
+def test_a_huge_download_is_refused(monkeypatch, capsys):
+    class Response:
+        headers = {'Content-Type': 'text/html'}
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *exc):
+            return False
+
+        def read(self, size=-1):
+            return b'x' * 20
+    monkeypatch.setattr(ingest, 'MAX_DOWNLOAD', 10)
+    monkeypatch.setattr(ingest.urllib.request, 'urlopen', lambda request, timeout: Response())
+    with pytest.raises(SystemExit):
+        ingest.fetch('https://example.org/big')
+    assert 'larger than 50 MB' in capsys.readouterr().out
+
+
+def test_an_epub_that_unpacks_to_a_huge_part_is_refused(cli, tmp_path, monkeypatch):
+    make_epub(tmp_path / 'livro.epub')
+    monkeypatch.setattr(ingest, 'MAX_EPUB_PART', 50)
+    code, r = run(cli, tmp_path / 'livro.epub', tmp_path / 'out')
+    assert code == 1 and 'not a normal EPUB' in r['error']

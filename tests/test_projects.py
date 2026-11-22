@@ -30,6 +30,15 @@ def test_a_project_is_assembled_and_runs(cli, book):
     assert read(book / 'projects' / 'calc' / 'util.py') == 'def dobro(n):\n    return n * 2\n'
 
 
+@pytest.mark.parametrize('name', ['../chapters', '..', 'a/b', 'a\\b'])
+def test_a_project_name_that_is_a_path_never_deletes_the_book(cli, book, name):
+    add(book, '01-listas.md', project_block(name))
+    before = sorted(os.listdir(book / 'chapters'))
+    code, r = cli('projects', '--book', book)
+    assert code == 1 and any('project name' in e for e in r['errors'])
+    assert sorted(os.listdir(book / 'chapters')) == before and not r['projects']
+
+
 def test_a_later_chapter_evolves_the_same_project(cli, book):
     add(book, '01-listas.md', project_block('calc', run=True, expect='63'))
     add(book, '02-o-laco-for.md', '<!-- project: calc -->\n\n**util.py**\n\n```python\ndef dobro(n):\n'

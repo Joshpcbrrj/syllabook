@@ -360,8 +360,9 @@ def test_search_skips_openverse_copies_of_commons_images(cli, commons, openverse
 # --- the network calls and the code-server process, simulated ---
 
 class FakeResponse:
-    def __init__(self, body):
+    def __init__(self, body, kind='image/jpeg'):
         self.body = body
+        self.headers = {'Content-Type': kind}
 
     def __enter__(self):
         return self
@@ -369,8 +370,42 @@ class FakeResponse:
     def __exit__(self, *exc):
         return False
 
-    def read(self):
-        return self.body
+    def read(self, size=-1):
+        return self.body if size < 0 else self.body[:size]
+
+
+@pytest.mark.parametrize('url, body, kind, message', [
+    ('file:///etc/passwd', b'x', 'image/jpeg', 'not an https address'),
+    ('http://example.org/a.jpg', b'x', 'image/jpeg', 'not an https address'),
+    ('https://example.org/a.jpg', b'<html>', 'text/html', 'not an image'),
+    ('https://example.org/a.svg', b'<svg><script>alert(1)</script></svg>', 'image/svg+xml', 'scripts'),
+    ('https://example.org/a.svg', b'<svg><rect onload="x()"/></svg>', 'image/svg+xml', 'scripts'),
+])
+def test_download_refuses_what_is_not_a_safe_image(monkeypatch, tmp_path, capsys, url, body, kind, message):
+    monkeypatch.setattr(images.urllib.request, 'urlopen', lambda request, timeout: FakeResponse(body, kind))
+    with pytest.raises(SystemExit):
+        images.download(url, str(tmp_path / 'a.img'))
+    assert message in capsys.readouterr().out and not (tmp_path / 'a.img').exists()
+
+
+def test_download_refuses_a_huge_image(monkeypatch, tmp_path, capsys):
+    monkeypatch.setattr(images, 'MAX_IMAGE', 10)
+    monkeypatch.setattr(images.urllib.request, 'urlopen', lambda request, timeout: FakeResponse(b'x' * 50))
+    with pytest.raises(SystemExit):
+        images.download('https://example.org/a.jpg', str(tmp_path / 'a.jpg'))
+    assert 'larger than' in capsys.readouterr().out and not (tmp_path / 'a.jpg').exists()
+
+
+@pytest.mark.parametrize('name', ['../../escape', 'c01/x', 'C01-Upper', '', 'c01 x'])
+def test_a_name_that_is_not_a_plain_file_name_is_refused(cli, book, commons, name):
+    commons['pages'] = [HOPPER]
+    code, r = cli('images', 'fetch', 'File:Grace Hopper.jpg', '--name', name, '--book', book)
+    assert code == 1 and 'invalid --name' in r['error'] and not commons['downloads']
+
+
+def test_screenshot_refuses_a_local_file(cli, book):
+    code, r = cli('images', 'screenshot', 'file:///home/user/.ssh/id_rsa', '--name', 'c05-x', '--book', book)
+    assert code == 1 and 'only http and https' in r['error']
 
 
 def test_api_calls_send_who_we_are_and_read_json(monkeypatch, tmp_path):

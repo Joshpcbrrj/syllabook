@@ -32,6 +32,7 @@ MARKER = re.compile(r'<!--\s*project:\s*(.+?)\s*-->')
 # ':' is accepted here only so that a drive path (C:/...) is seen and refused, not silently ignored
 FILE_LINE = re.compile(r'^\*\*`?([\w./:-]+\.[\w]+|[\w./:-]*/[\w.-]+)`?\*\*\s*$')
 QUOTE = re.compile(r'^(?:>\s?)+')
+PROJECT_NAME = re.compile(r'^(?!\.+$)[\w.-]+$')
 
 
 def parse_marker(text):
@@ -61,6 +62,13 @@ def collect(text, default_name, projects, errors, chapter):
         marker = MARKER.search(lines[i])
         if marker:
             spec = parse_marker(marker.group(1))
+            if not PROJECT_NAME.match(spec['name']):
+                # the name becomes a folder that is deleted and rebuilt: "../chapters" would erase the book
+                errors.append(f'chapter {chapter}: project name "{spec["name"]}" must be letters, digits, '
+                              '"-", "_" or "." (no folders)')
+                current = None  # its files are left out until the next valid marker
+                i += 1
+                continue
             current = spec['name']
             project = projects.setdefault(current, {'files': {}, 'chapters': []})
             project.update({k: v for k, v in spec.items() if k != 'name'})
@@ -76,7 +84,7 @@ def collect(text, default_name, projects, errors, chapter):
                 path = m.group(1)
                 if not safe_path(path):
                     errors.append(f'chapter {chapter}: path "{path}" leaves the project folder')
-                else:
+                elif current is not None:
                     project = projects.setdefault(current, {'files': {}, 'chapters': []})
                     project['files'][path] = '\n'.join(lines[j + 1:end]) + '\n'
                     if chapter not in project['chapters']:

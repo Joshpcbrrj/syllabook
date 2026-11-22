@@ -414,6 +414,8 @@ def cmd_site(args):
     lab = labels(lang)
     out_dir = os.path.abspath(args.out)
     docs = os.path.join(out_dir, 'docs')
+    if os.path.exists(os.path.join(out_dir, 'library.yaml')) or os.path.exists(os.path.join(out_dir, 'book.yaml')):
+        fail(f'--out {args.out} is a library or a book: its docs/ would be deleted; use a separate folder (_site)')
     if os.path.exists(docs):
         shutil.rmtree(docs)
     books = library_books(root)

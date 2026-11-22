@@ -169,6 +169,13 @@ def test_lists_leave_empty_collections_untouched(cli, library):
     assert read(library / 'improved-materials' / 'README.md') == before
 
 
+def test_site_never_builds_into_the_library_itself(cli, library):
+    (library / 'docs').mkdir()
+    (library / 'docs' / 'nota.md').write_text('minha', encoding='utf-8')
+    code, r = cli('build', 'site', '--library', library, '--out', library)
+    assert code == 1 and 'is a library or a book' in r['error'] and (library / 'docs' / 'nota.md').exists()
+
+
 def test_site_source(cli, library):
     import yaml
     code, r = cli('build', 'site', '--library', library, '--out', library / '_site')

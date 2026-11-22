@@ -62,10 +62,33 @@ def openverse_api(path, params=None):
         return json.load(response)
 
 
+MAX_IMAGE = 25 * 1024 * 1024
+NAME = re.compile(r'^[a-z0-9][a-z0-9-]{0,80}$')
+# what a downloaded SVG may not carry: it is published on the library's website
+UNSAFE_SVG = re.compile(r'<\s*(script|foreignObject|iframe|embed|object)\b|\son\w+\s*=|javascript:', re.I)
+
+
 def download(url, path):
+    """Saves an image: https only (an address from an API is never a local file), an image type, at most 25 MB."""
+    if urllib.parse.urlparse(url or '').scheme != 'https':
+        fail(f'not an https address: {url}')
     request = urllib.request.Request(url, headers={'User-Agent': AGENT})
-    with urllib.request.urlopen(request, timeout=60) as response, open(path, 'wb') as f:
-        f.write(response.read())
+    with urllib.request.urlopen(request, timeout=60) as response:
+        kind = response.headers.get('Content-Type', '').split(';')[0].strip().lower()
+        data = response.read(MAX_IMAGE + 1)
+    if not kind.startswith('image/'):
+        fail(f'not an image ({kind or "no type"}): {url}')
+    if len(data) > MAX_IMAGE:
+        fail(f'image larger than {MAX_IMAGE // 1024 // 1024} MB: pick a smaller one')
+    if kind == 'image/svg+xml' and UNSAFE_SVG.search(data.decode('utf-8', errors='replace')):
+        fail('the SVG carries scripts or embedded content: pick another image')
+    with open(path, 'wb') as f:
+        f.write(data)
+
+
+def check_name(name):
+    if not NAME.match(name):
+        fail(f'invalid --name "{name}": lowercase letters, digits and hyphens only, like c03-eniac')
 
 
 def free_license(name):
@@ -208,6 +231,9 @@ def playwright():
 
 
 def screenshot(url, name, book_dir, width, height):
+    # a file:// address would photograph a private file into a published book
+    if urllib.parse.urlparse(url).scheme not in ('http', 'https'):
+        fail(f'only http and https pages can be photographed: {url}')
     sync_playwright = playwright()
     os.makedirs(os.path.join(book_dir, 'img'), exist_ok=True)
     filename = f'{name}.png'
@@ -388,6 +414,7 @@ def main():
     args = p.parse_args()
     if args.cmd == 'search':
         search(args.query, args.limit, args.source)
+    check_name(args.name)
     book_dir, _ = find_book(args.book)
     if args.cmd == 'fetch':
         fetch(args.title, args.name, book_dir)

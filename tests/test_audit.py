@@ -49,6 +49,8 @@ ERRORS = [
      'after <summary>'),
     ('no blank line before /details', 'maior valor.\n\n</details>', 'maior valor.\n</details>', 'before </details>'),
     ('unclosed code block', '```text\n3\n```', '```text\n3\n', 'never closed'),
+    ('placeholder read as a tag', '## 📚 Fontes', 'Cole aqui: <sua resposta>.\n\n## 📚 Fontes',
+     '"<sua resposta>" outside code'),
 ]
 
 

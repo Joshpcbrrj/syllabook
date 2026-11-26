@@ -16,6 +16,13 @@ Cases for `claude plugin eval`: each one sends a real request to Claude with the
 | `10-proximo-livro-ementa` | option 4: a syllabus that starts where the earlier book ended and does not reteach it |
 | `11-revisar` | option 5: review assessment, a wrong reader report is not taken as true, nothing changes before approval |
 | `12-projeto-continuo` | a programming syllabus names one running project that the chapters build step by step |
+| `13-traduzir` | option 3: a term table and adaptation notes first, nothing created before approval |
+| `14-publicar-livro-pronto` | option 6: a finished book from its unzipped folder is validated, audited and built into an EPUB (needs a shell) |
+| `15-continuar` | option 7: `book.py status` first, and the handoff note shown before anything else (needs a shell) |
+| `16-perfil-idiomas` | languages profile: research-backed assessment (input, output, spaced repetition), CEFR "can do" goals |
+| `17-perfil-conhecimento` | knowledge profile: reference sources, legends to check, fact × interpretation × legend |
+
+Every start option has at least one case: 1 (03–06, 12), 2 (07), 3 (13), 4 (09, 10), 5 (11), 6 (08, 14), 7 (15), and every area profile: stem (03, 12), skills (05), languages (16), knowledge (17). Cases that need a shell are tagged `completo` and use `scaffold.sh` with the sample book of the tests (`tests/fixtures/sample-book`).
 
 ## Running
 

@@ -19,7 +19,7 @@ if hasattr(sys.stdout, 'reconfigure'):
     sys.stdout.reconfigure(encoding='utf-8')
 
 # the skill's version, sent in problem reports (report.py); "-dev" while CHANGELOG.md has unreleased changes
-VERSION = '0.4.0'
+VERSION = '0.4.1-dev'
 SKILL = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 STATE = os.environ.get('SYLLABOOK_STATE') or os.path.join(os.path.expanduser('~'), '.syllabook', 'current')
 
@@ -77,6 +77,56 @@ def out(obj, code=0):
 
 def fail(message):
     out({'ok': False, 'error': message}, 1)
+
+
+# the HTML a book may hold in its Markdown; any other <word> outside code is a placeholder such as <sua resposta>,
+# which GitHub and the website hide as an unknown tag and which makes the EPUB's XHTML invalid
+HTML_TAGS = {'a', 'abbr', 'b', 'br', 'code', 'details', 'div', 'em', 'figcaption', 'figure', 'hr', 'i', 'img', 'kbd',
+             'li', 'mark', 'ol', 'p', 'picture', 'pre', 's', 'small', 'source', 'span', 'strong', 'sub', 'summary',
+             'sup', 'table', 'tbody', 'td', 'th', 'thead', 'tr', 'u', 'ul'}
+TAG = re.compile(r'<(/?)([^<>\s/!][^<>\n]*?)>')
+INLINE_CODE = re.compile(r'(`+)[^`\n]*?\1')
+
+
+def is_placeholder(inner):
+    first = re.split(r'[\s/]', inner, maxsplit=1)[0].lower()
+    # an autolink (<https://...>, <mailto:...>) or an e-mail address is not a placeholder either
+    return not (first in HTML_TAGS or re.match(r'[a-z][a-z0-9+.-]*:', first) or '@' in first)
+
+
+def outside_code(text, change):
+    """Applies change(segment) to the Markdown outside fenced blocks and inline code; returns the new text."""
+    out, fence = [], None
+    for line in text.split('\n'):
+        stripped = line.strip().lstrip('> ').lstrip()
+        m = re.match(r'(`{3,}|~{3,})', stripped)
+        if fence:
+            fence = None if m and stripped.startswith(fence) else fence
+            out.append(line)
+            continue
+        if m:
+            fence = m.group(1)
+            out.append(line)
+            continue
+        parts, last = [], 0
+        for code in INLINE_CODE.finditer(line):
+            parts += [change(line[last:code.start()]), code.group(0)]
+            last = code.end()
+        out.append(''.join(parts) + change(line[last:]))
+    return '\n'.join(out)
+
+
+def placeholders(text):
+    """The <placeholders> written outside code."""
+    found = []
+    outside_code(text, lambda s: found.extend(m.group(2) for m in TAG.finditer(s) if is_placeholder(m.group(2))) or s)
+    return found
+
+
+def escape_placeholders(text):
+    """<sua resposta> -> &lt;sua resposta&gt; outside code, so every reader sees it."""
+    return outside_code(text, lambda s: TAG.sub(
+        lambda m: f'&lt;{m.group(1)}{m.group(2)}&gt;' if is_placeholder(m.group(2)) else m.group(0), s))
 
 
 CONNECTORS = {'a', 'o', 'e', 'as', 'os', 'de', 'da', 'do', 'das', 'dos', 'em', 'na', 'no', 'nas', 'nos', 'com',
@@ -211,3 +261,4 @@ def research_path(book_dir, n):
 
 def chapter_numbers(data):
     return [c['n'] for c in data.get('chapters', []) if isinstance(c, dict) and 'n' in c]
+

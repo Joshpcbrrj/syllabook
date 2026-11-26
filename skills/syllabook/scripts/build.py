@@ -25,7 +25,8 @@ import tempfile
 import zipfile
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from common import (SKILL, chapter_numbers, chapter_path, fail, find_book, first_h1, labels, library_book,
+from common import (SKILL, chapter_numbers, chapter_path, escape_placeholders, fail, find_book, first_h1, labels,
+                    library_book, outside_code,
                     library_root, load_yaml, need_yaml, next_steps, out, pandoc_path, review_due, site_url,
                     slugify)
 
@@ -221,7 +222,10 @@ def file_id(path):
 def epub_markdown(files, lab):
     parts, answers = [], []
     for path in files:
-        text = drop_block(read(path), 'nav')
+        # a <placeholder> left in the text would be an unclosed tag, and a comment holding "--" (a project marker
+        # with `--services`) is invalid XML: both make XHTML that strict readers refuse; comments mean nothing there
+        text = escape_placeholders(drop_block(read(path), 'nav'))
+        text = outside_code(text, lambda s: re.sub(r'<!--.*?-->', '', s))
         # explicit ids on the chapter titles, so links between chapters survive the merge
         anchor = file_id(path)
         text = re.sub(r'^# (.+)$', lambda m, a=anchor: f'# {m.group(1)} {{#{a}}}', text, count=1, flags=re.M)
@@ -516,7 +520,7 @@ def cmd_site(args):
             dest = os.path.join(docs, folder, os.path.basename(src))
             shutil.copytree(src, dest, ignore=shutil.ignore_patterns('_source', 'book.yaml', 'cover.svg'))
             for md in glob.glob(os.path.join(dest, '**', '*.md'), recursive=True):
-                write(md, collapsible(read(md)))
+                write(md, collapsible(escape_placeholders(read(md))))
             blab = labels(d.get('language', lang))
             rel = f'{folder}/{os.path.basename(src)}'
             entries = [{blab['Book map']: f'{rel}/README.md'}]

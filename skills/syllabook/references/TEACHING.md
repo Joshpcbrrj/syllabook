@@ -114,8 +114,9 @@ Write it as a note with the fixed label, in the book language: `> 💡 **<Analog
 - **Warm-up and quick review:** retrieval questions; the brief tells you which earlier chapters to revisit.
 - **Review today:** the chapters the brief suggests, for spaced review.
 - **AI tutor prompts:** two per chapter, ready to copy, for example (in the book language):
-  - "Ask me 5 questions about <topic>, one at a time. Wait for my answer before giving feedback, and do not give me the answers first."
-  - "Here is my answer to exercise <x>: <answer>. Point out my mistakes without giving me the solution."
+  - "Ask me 5 questions about [topic], one at a time. Wait for my answer before giving feedback, and do not give me the answers first."
+  - "Here is my answer to exercise [x]: [my answer]. Point out my mistakes without giving me the solution."
+  - What the reader fills in goes in square brackets, `[my answer]`, never `<my answer>`: outside code, `<...>` is read as an HTML tag, so GitHub and the website hide it and the EPUB breaks (`audit.py` reports it).
 - **Summary:** a table of the chapter's key items, one sentence each.
 
 ## 8. Chapter checklist (before `book.py done`)

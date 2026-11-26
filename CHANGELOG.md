@@ -6,6 +6,12 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ## [Unreleased]
 
+### Fixed
+
+- EPUBs with invalid XHTML, which strict e-readers refuse: a `<placeholder>` written outside code (`<minha resposta>` in the AI tutor prompts, as `TEACHING.md` itself showed) was an unclosed tag, and a project marker holding `--` (`run: docker compose config --services`) was an invalid comment. `build.py` now escapes placeholders and drops comments in the EPUB text (and escapes placeholders on the website, where they disappeared, as on GitHub); `audit.py` reports a placeholder outside code as an error; `TEACHING.md` writes them in square brackets, `[my answer]`. Found by opening a book in the small reading profile: all 12 chapters of a published book and 3 of another were affected.
+- With Sonnet, the skill refused to make a syllabus without code execution, though the assessment and the syllabus need only web search: code execution is now required from approval on, and without it the skill still does the assessment and the syllabus (or improvement plan) and stops at approval. Found by running the eval suite with Sonnet.
+- With Sonnet, the skill wrote a whole chapter as a "preview" before approval: the rule now names samples, previews and drafts. And the line saying what changed in an adjusted syllabus is the very first line of the reply.
+
 ## [0.4.0] - 2026-11-26
 
 ### Library and books

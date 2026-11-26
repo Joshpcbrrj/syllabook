@@ -1,0 +1,29 @@
+schema_version: "1.1"
+name: 13-traduzir
+description: Option 3, translate a finished book: glossary and adaptation notes first, nothing created before approval
+tags: [curto]
+runs: 1
+context:
+  scaffold_script: scaffold.sh
+execution:
+  max_turns: 20
+  timeout_seconds: 600
+  allowed_tools: [Read, Glob, Grep, Skill, Write]
+  prompt: >-
+    Quero traduzir para inglês o meu livro "Python do zero (exemplo de teste)", que está pronto na pasta
+    created-books/python-do-zero-teste desta biblioteca do Syllabook. A conversa continua em português.
+    Sem GitHub e sem Notion por enquanto.
+graders:
+  - name: nada-criado-antes
+    type: file_exists
+    path: translated-books
+    exists: false
+  - name: glossario-e-adaptacao
+    type: llm
+    criteria: >-
+      The reply, in Portuguese, starts the translation of a Portuguese Python book into English. Pass if it
+      shows (1) a term table "Portuguese term → English term" built from the book's concepts or glossary
+      (for example lista → list, laço/laço for → for loop, média → average or mean), using the terms English
+      speakers actually use; and (2) what will be adapted (names in the examples, numbers or decimal comma,
+      units, cultural references, sources in English); and then waits for approval ("aprovado" or similar)
+      before translating. Fail if it translates any chapter text already, or if it skips the term table.

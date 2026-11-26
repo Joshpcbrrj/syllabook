@@ -21,6 +21,23 @@ def test_slugify_cuts_long_text_at_a_word_boundary():
     assert len(slug) <= 30 and not slug.endswith('-') and slug.endswith('palavra')
 
 
+PLACEHOLDER_TEXT = ('Cole aqui: <sua resposta>. Veja <https://docs.docker.com> e <details> com `<nome>`.\n'
+                    '```bash\necho "<h1>Oi</h1>" > <arquivo>\n```\n'
+                    '> 2. "Aqui está o meu exercício: <minha resposta>."\n'
+                    '    ```text\n    <saída>\n    ```\n')
+
+
+def test_placeholders_outside_code_are_found():
+    assert common.placeholders(PLACEHOLDER_TEXT) == ['sua resposta', 'minha resposta']
+
+
+def test_escape_placeholders_keeps_code_links_and_html():
+    escaped = common.escape_placeholders(PLACEHOLDER_TEXT)
+    assert '&lt;sua resposta&gt;' in escaped and '&lt;minha resposta&gt;' in escaped
+    assert '<https://docs.docker.com>' in escaped and '<details>' in escaped and '`<nome>`' in escaped
+    assert 'echo "<h1>Oi</h1>" > <arquivo>' in escaped and '    <saída>' in escaped
+
+
 def test_a_cut_slug_never_ends_on_a_connecting_word():
     assert common.slugify('Docker Desktop na prática: interface × linha de comando') == \
         'docker-desktop-na-pratica-interface-linha'

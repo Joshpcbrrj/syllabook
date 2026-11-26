@@ -17,7 +17,8 @@ import sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import diagram
 import illustration
-from common import READING, chapter_numbers, chapter_path, find_book, labels, load_yaml, out, research_path, slugify
+from common import (READING, chapter_numbers, chapter_path, find_book, labels, load_yaml, out, placeholders,
+                    research_path, slugify)
 
 # blocks that hold program output or data, not code: no comment required
 NO_COMMENT_LANGS = {'', 'text', 'txt', 'output', 'console', 'plaintext', 'json', 'csv', 'markdown', 'md', 'diff'}
@@ -52,6 +53,9 @@ def audit_chapter(path, n, lab, limits, language, errors, warnings):
         if lab[part] not in text:
             errors.append(f'{name}: missing section "{lab[part]}"')
 
+    for tag in dict.fromkeys(placeholders(text)):
+        errors.append(f'{name}: "<{tag}>" outside code is read as an HTML tag: it disappears on GitHub and on the '
+                      f'website and breaks the EPUB; write [{tag}] (TEACHING.md §7)')
     in_code, lang, start, commented = False, '', 0, False
     for i, line in enumerate(lines, 1):
         stripped = line.strip()

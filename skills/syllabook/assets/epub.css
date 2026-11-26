@@ -1,5 +1,7 @@
 /* EPUB style: readable on large color e-readers and on small grayscale ones */
-body { font-family: serif; line-height: 1.5; margin: 0; padding: 0 2%; }
+body { font-family: serif; line-height: 1.5; margin: 0; padding: 0 2%; overflow-wrap: break-word; }
+/* a source's address written out in full is one long word: on a 6-inch screen it must break */
+a { overflow-wrap: anywhere; }
 h1, h2, h3 { font-family: sans-serif; line-height: 1.25; page-break-after: avoid; break-after: avoid; }
 h1 { font-size: 1.5em; margin-top: 0; page-break-before: always; break-before: page; }
 h2 { font-size: 1.25em; }

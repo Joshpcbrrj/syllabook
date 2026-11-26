@@ -1,0 +1,30 @@
+schema_version: "1.1"
+name: 15-continuar
+description: Option 7, continue a book: status first, the handoff note shown before anything else (needs a shell)
+tags: [completo]
+runs: 1
+context:
+  scaffold_script: scaffold.sh
+execution:
+  max_turns: 20
+  timeout_seconds: 600
+  allowed_tools: [Read, Glob, Grep, Skill, Bash]
+  prompt: >-
+    Continue meu livro "Python do zero (exemplo de teste)", da pasta created-books/python-do-zero-teste.
+    Antes de escrever qualquer coisa, me diga onde paramos e o que vem agora.
+graders:
+  - name: status
+    type: tool_used
+    tool: Bash
+    input_match: "status"
+  - name: nao-escreveu
+    type: file_exists
+    path: created-books/python-do-zero-teste/chapters/02-o-laco-for.md
+    exists: false
+  - name: nota-de-passagem
+    type: llm
+    criteria: >-
+      The reply, in Portuguese, says where the book stopped (chapter 1, lists, is done) and that the next
+      step is chapter 2 (the for loop), and it shows the pending note from the previous conversation: the
+      user asked that chapter 2 use Ana's grades (7,5, 8,0 and 6,5) in the average example. Fail if it does
+      not mention that note, or if it starts the book over.

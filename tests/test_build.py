@@ -65,6 +65,16 @@ def test_a_one_line_answer_that_looks_like_a_list_is_escaped(book):
     assert '\n0\\.\n' in text
 
 
+def test_the_epub_text_has_no_comments_or_bare_placeholders(book):
+    # both made invalid XHTML in published books: "--" inside a project marker, and <minha resposta>
+    edit(book / 'chapters' / '01-listas.md', '## Listas',
+         '<!-- project: calc | run: docker compose config --services | expect: db -->\n\n'
+         'Cole aqui: <minha resposta>.\n\n```html\n<!-- comentário do exemplo -->\n```\n\n## Listas')
+    text, _ = build.epub_markdown([str(book / 'chapters' / '01-listas.md')], build.labels('pt-BR'))
+    assert 'project: calc' not in text and '&lt;minha resposta&gt;' in text
+    assert '<!-- comentário do exemplo -->' in text  # code is never touched
+
+
 def test_pack_splits_in_parts_by_the_upload_limit(book, tmp_path, monkeypatch):
     monkeypatch.setattr(build, 'GITHUB_UPLOAD_LIMIT', 3)
     zips = build.pack(str(book), load(book / 'book.yaml'), str(tmp_path))

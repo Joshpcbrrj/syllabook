@@ -1,0 +1,34 @@
+schema_version: "1.1"
+name: 14-publicar-livro-pronto
+description: Option 6, publish a finished book from its unzipped folder: validate, audit, build the EPUB (needs a shell)
+tags: [completo]
+runs: 1
+context:
+  scaffold_script: scaffold.sh
+execution:
+  max_turns: 40
+  timeout_seconds: 1200
+  allowed_tools: [Read, Glob, Grep, Skill, Bash, Write, Edit]
+  prompt: >-
+    Tenho um livro pronto que o Syllabook me entregou num zip; já descompactei em
+    livro-pronto/python-do-zero-teste. Quero publicá-lo. Não tenho GitHub nem Notion: quero só o EPUB,
+    gerado na pasta saida/ aqui mesmo.
+graders:
+  - name: validou
+    type: tool_used
+    tool: Bash
+    input_match: "validate"
+  - name: auditou
+    type: tool_used
+    tool: Bash
+    input_match: "audit.py"
+  - name: epub
+    type: file_exists
+    path: saida/python-do-zero-teste.epub
+  - name: entrega
+    type: llm
+    criteria: >-
+      The reply, in Portuguese, says the book was checked (validation and audit) and where the EPUB is
+      (saida/python-do-zero-teste.epub), and explains briefly how to publish it later on GitHub (the zip
+      extracted at the root of a library repository, or uploaded through GitHub's website) without asking
+      the user to paste any token. Fail if it says something was published online.

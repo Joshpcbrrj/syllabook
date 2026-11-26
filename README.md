@@ -20,6 +20,8 @@ Syllabook is a Claude skill for self-learners. It writes course-books on any top
 - **Claude Code:** `claude plugin marketplace add Joshpcbrrj/syllabook`, then `claude plugin install syllabook@syllabook`.
 - **On Windows, add WSL 2** ([installation guide](docs/integrations/wsl.md)): with Claude Code running inside Ubuntu, the skill tests every Linux command and code example and puts the real output in the book.
 
+**Requirements:** code execution (Python 3.10 or later) and web search, which the skill uses to research and check every fact. It does not work through the Claude API without network access: there it can neither research nor install the small Python packages its scripts need.
+
 To update or remove it, see the [FAQ](docs/faq.md#how-do-i-update-or-remove-syllabook).
 
 👀 **See it working:** the [demo library](https://github.com/Joshpcbrrj/syllabook-demo) and its [searchable website](https://joshpcbrrj.github.io/syllabook-demo/), built by the same workflows every library gets.

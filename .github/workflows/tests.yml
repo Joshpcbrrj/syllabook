@@ -34,5 +34,11 @@ jobs:
           actionlint .github/workflows/*.yml skills/syllabook/assets/library/.github/workflows/*.yml
       - name: Plugin and marketplace manifests are valid JSON
         run: python -c "import json; [json.load(open(p)) for p in ('.claude-plugin/plugin.json', '.claude-plugin/marketplace.json')]"
+      - name: Skill is valid for the Agent Skills specification
+        # the reference validator (github.com/anthropics/agentskills) needs Python 3.11+, pinned like any tool
+        if: matrix.python != '3.10'
+        run: |
+          pip install skills-ref==0.1.1
+          agentskills validate skills/syllabook
       - name: Tests with coverage
         run: pytest --cov

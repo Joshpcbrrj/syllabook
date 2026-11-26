@@ -1,4 +1,4 @@
-<!-- translation-of: README.md sha256:9e7d20c69461 -->
+<!-- translation-of: README.md sha256:fef48e701696 -->
 # <img src="docs/img/syllabook-icon.svg" alt="" height="40"> Syllabook
 
 [English](README.md) | **Português**
@@ -20,6 +20,8 @@ Syllabook é uma skill do Claude para quem estuda sozinho. Ela cria livros-curso
 - **App do Claude (claude.ai, desktop):** baixe o `syllabook.zip` da [versão mais recente](https://github.com/Joshpcbrrj/syllabook/releases/latest) e envie na seção de Skills das configurações do Claude. A execução de código precisa estar ligada (**Configurações → Capacidades**).
 - **Claude Code:** `claude plugin marketplace add Joshpcbrrj/syllabook` e depois `claude plugin install syllabook@syllabook`.
 - **No Windows, use também o WSL 2** ([guia de instalação](docs/integrations/wsl.pt-BR.md)): com o Claude Code rodando dentro do Ubuntu, a skill testa cada comando de Linux e cada exemplo de código e põe a saída real no livro.
+
+**Requisitos:** execução de código (Python 3.10 ou mais novo) e busca na web, que a skill usa para pesquisar e conferir cada fato. Ela não funciona pela API do Claude sem acesso à rede: lá não consegue pesquisar nem instalar os pequenos pacotes Python de que os scripts precisam.
 
 Para atualizar ou remover, veja as [perguntas frequentes](docs/faq.pt-BR.md#como-atualizo-ou-removo-o-syllabook).
 

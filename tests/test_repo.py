@@ -25,9 +25,13 @@ def rel(path, base=SKILL):
 
 def test_skill_frontmatter_follows_the_agent_skills_rules():
     text = read(os.path.join(SKILL, 'SKILL.md'))
-    m = re.match(r'---\nname: (.+)\ndescription: (.+?)\n---\n', text, re.S)
-    assert m, 'frontmatter with name and description not found'
-    name, desc = m.groups()
+    m = re.match(r'---\n(.+?)\n---\n', text, re.S)
+    assert m, 'frontmatter not found'
+    # parsed as YAML, like the validators do: an unquoted ": " inside the description breaks it
+    front = yaml.safe_load(m.group(1))
+    assert isinstance(front, dict) and set(front) <= {'name', 'description', 'license', 'compatibility',
+                                                     'metadata', 'allowed-tools'}, front
+    name, desc = front['name'], front['description']
     assert name == os.path.basename(SKILL)
     assert re.fullmatch(r'[a-z0-9-]{1,64}', name) and not re.search(r'anthropic|claude', name)
     assert 0 < len(desc) <= 1024 and not re.search(r'<[a-zA-Z/]', desc)

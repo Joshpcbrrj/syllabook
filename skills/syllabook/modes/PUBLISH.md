@@ -50,10 +50,12 @@ At the end, ask once: "Publish the book to GitHub and create the copy in Notion?
 
 ## 4. Copying to Notion
 
+**Tool names** (Notion's official connector; the prefix changes with the app, so look for the tool whose name ends in these): `notion-fetch` (read a page and its subpages), `notion-search`, `notion-create-pages` (title in `properties`, content in Notion's Markdown, `parent` = the page id), `notion-update-page` (append the rest of a long page), `notion-create-file-upload` (images). In Claude Code they look like `mcp__claude_ai_Notion__notion-create-pages`; in the Claude app, `Notion:notion-create-pages`.
+
 1. If `notion_page` in `library.yaml` is empty, ask for the link of the Notion page where books should go, and save it (commit with the book when GitHub is connected).
 2. **Index page:** `python scripts/notion.py index` prints its title and content (the subtitle, a 📚 callout with the links to the site, the GitHub folder and the EPUB, and the chapter list). Create it under that page.
 3. **Pages, in reading order, under the index:** chapter 0 (`notion.py 0`), each chapter (`notion.py <n>`), the mock exam (`notion.py <its number>`) and the glossary (`notion.py <its file name>`). Each command prints `title`, `content` and `uploads`:
-   - upload each file in `uploads` with the Notion file tools, then replace its `placeholder` in `content` with what the upload returns (an upload is valid for about an hour, so upload right before creating the page);
+   - upload each file in `uploads`: `notion-create-file-upload` with its file name returns `upload_url` and `upload_headers`; send the file in one multipart POST (field `file`, every header returned), for example with `curl -F "file=@<path>"`; then replace its `placeholder` in `content` with the `markdown_source` the upload answers (an upload is valid for about an hour, so upload right before creating the page);
    - create the page with that `title` and `content`, sending the content as printed: it is already in Notion's format (toggles, callouts, images);
    - `left_out` lists the photos and screenshots that stay out of Notion on purpose: Notion keeps only the SVG diagrams, and the other images stay in the EPUB and the site.
 4. If a Notion call fails, retry once with a smaller piece (half of the content, then append the rest); if it fails again, report which chapter and continue with the next.

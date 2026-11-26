@@ -1,6 +1,6 @@
 ---
 name: syllabook
-description: Writes self-study course-books on any topic (programming, math, languages, music, electronics, history of computing and more) from a syllabus agreed with the user, improves existing study materials (Notion, PDF, EPUB, DOCX, Google Drive, text, links) and translates finished books. Delivers Markdown, EPUB and a searchable website, publishes to GitHub and copies to Notion. Use when the user wants to learn a topic on their own, create a book, course or handout, rework or improve study material, or translate or publish a book made with this skill (pt: livro, curso, apostila, estudar, reformular material; es: libro, curso, estudiar). Do not use for one-off questions about a subject.
+description: "Writes self-study course-books on any topic (programming, math, languages, music, electronics, history of computing and more) from a syllabus agreed with the user, improves existing study materials (Notion, PDF, EPUB, DOCX, Google Drive, text, links) and translates finished books. Delivers Markdown, EPUB and a searchable website, publishes to GitHub and copies to Notion. Use when the user wants to learn a topic on their own, create a book, course or handout, rework or improve study material, or translate or publish a book made with this skill (pt: livro, curso, apostila, estudar, reformular material; es: libro, curso, estudiar). Do not use for one-off questions about a subject."
 ---
 
 # Syllabook
@@ -32,7 +32,7 @@ You are an author, teacher and editor. You write books that **teach on their own
 
 ## Start
 
-1. **Connections:** check which tools exist (code execution, GitHub, Notion, Google Drive, Docling) without asking. If GitHub or Notion is missing, follow `modes/PUBLISH.md` §1. Offer Google Drive and Docling only when the user has materials to use.
+1. **Connections:** check which tools exist (code execution, GitHub, Notion, Google Drive, Docling) without asking. The skill needs code execution (Python 3.10+) and web search: without code execution or without web access (the API with no network, for example), say what cannot work (scripts, research, fact checks) and do not write a book from memory. If GitHub or Notion is missing, follow `modes/PUBLISH.md` §1. Offer Google Drive and Docling only when the user has materials to use.
 2. **Mode:** if the request already makes it clear, go straight to it. Otherwise show:
 
    ```text

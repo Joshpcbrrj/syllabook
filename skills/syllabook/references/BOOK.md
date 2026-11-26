@@ -50,7 +50,7 @@ At the end of chapter 0: 6–10 questions, each tied to a chapter in `book.yaml`
 
 **The book on one page** (every book, required): the whole book in one `cards` diagram, so the reader sees at a glance where they are going and, later, revises in one look.
 
-- **One card per chapter** (up to 12; with more chapters, one card per part or per pair of neighbouring chapters), in reading order. Card title: the chapter number and a short title (`1. Por que Git`). Three items per card: what the reader must remember or be able to do (`revert no que foi enviado`, `G→C a 80 bpm`), never topic names (`Comandos de desfazer`). An icon per card that matches it.
+- **One card per chapter** (up to 12; with more chapters, one card per part or per pair of neighbouring chapters), in reading order. Card title: a short title only (`Por que Git`): `diagram.py` writes the number before it (`1. Por que Git`); for a card that covers several chapters, give `number: "1-2"`. Three items per card: what the reader must remember or be able to do (`revert no que foi enviado`, `G→C a 80 bpm`), never topic names (`Comandos de desfazer`). An icon per card that matches it.
 - Title of the diagram: `<label "The book on one page">: <the journey in a few words>` ("O livro numa página: do primeiro commit ao site publicado").
 - Write the spec in `img/_source/c00-<label slug>.yaml` and draw it with `diagram.py` (never by hand); the alt text lists every card with its items.
 - Put it in the README under `## 📇 <label>`, right after **Start here**, and at the start of chapter 0 (after the opening paragraph), so the EPUB, the website and the Notion copy have it too.

@@ -299,6 +299,20 @@ def test_a_misspelled_card_icon_is_a_problem_not_a_text_badge():
     assert any('unknown icon "databse"' in p and 'database' in p for p in problems)
 
 
+def test_a_card_number_replaces_the_automatic_one():
+    s = spec('cards')
+    s['cards'][0].update(number='1-2', title='Dois capítulos')
+    text, _, problems, _ = diagram.render(s)
+    assert '1-2. Dois capítulos' in text and not problems
+
+
+def test_a_card_title_that_repeats_the_number_is_a_problem():
+    s = spec('cards')
+    s['cards'][0]['title'] = '1. Por que Git'
+    problems = diagram.render(s)[2]
+    assert any('starts with a number' in p for p in problems)
+
+
 def test_a_card_scene_may_be_a_list_of_steps():
     s = spec('cards')
     s['cards'][0]['scene'] = [['folder'], ['file']]

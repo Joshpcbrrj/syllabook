@@ -27,8 +27,9 @@ Types and their fields:
   tree      root: {text, note, icon, color, children: [...]}
   sequence  participants: [name or {name, icon}, at most 4], messages: [{from, to, text, dashed}]
   bars      bars: [{label, value, highlight}], unit
-  cards     cards: [{icon, title, items: [text or {text, icon}], code: [...], scene}]   (the cheat sheet,
-            up to 12; icon = a name from --icons, or up to 4 characters such as "for")
+  cards     cards: [{icon, title, items: [text or {text, icon}], code: [...], scene, number}]   (the cheat
+            sheet, up to 12; icon = a name from --icons, or up to 4 characters such as "for"; number replaces
+            the automatic one, e.g. "1-2" for a card that covers two chapters)
   scene     steps: [[icon, ...], ...] (up to 4 steps of 1-3 icons), ops: [→ + = ↔], label
             a scene shows a relation with icons (folder → files, A + B = C); in a card, `scene` is
             {steps, ops, label} or just the list of steps, and goes under the items. It demonstrates the
@@ -509,7 +510,11 @@ def card_layout(c, card, number, w, size, small):
         raise ValueError(f'card {number} scene must be {{steps, ops, label}} or a list of steps')
     badge = size * 2.1 if icon else 0
     inner = w - 2 * 14
-    title = c.wrap(f'{number}. {card["title"]}', size, inner - (badge + 10 if badge else 0))
+    # `number` replaces the automatic one: "1-2" for a card that sums up two chapters
+    if re.match(r'\d+(-\d+)?\.\s', str(card['title'])):
+        c.problems.append(f'card {number}: the title starts with a number, which diagram.py already writes '
+                          '(drop it; for a card of several chapters, give number: "1-2")')
+    title =c.wrap(f'{card.get("number", number)}. {card["title"]}', size, inner - (badge + 10 if badge else 0))
     items = []
     for item in card.get('items', []):
         text, mark = (item.get('text', ''), item.get('icon')) if isinstance(item, dict) else (item, None)

@@ -58,7 +58,8 @@ One chapter at a time, only the passages in the approved list:
 2. Run what changed (code, commands, calculations), check new facts against the sources (`SOURCES.md` §5), update the source's `checked` date, reread the passage as a native reader and run `audit.py <n>`.
 3. A fix that changes what the reader does or believes (a command that was wrong, a fact that changed) gets a short note right there, in the book language: `> ⚠️ **Fixed in edition <x.y>:** <what it said, what is right and why>`. Typos, links and wording need no note.
 4. Record each change in `changes` (`SYLLABUS.md`), and reply in each confirmed issue with what was fixed (GitHub connected) or list them for the user.
-5. Long reviews follow the same economy as long books: after about 3 chapters, write the handoff note (`book.py handoff`) and suggest a new conversation.
+5. If a fix changes what a chapter teaches, update its card in the book on one page (`BOOK.md` §4) and redraw it. A book written before that rule gets one now: the review audit lists it.
+6. Long reviews follow the same economy as long books: after about 3 chapters, write the handoff note (`book.py handoff`) and suggest a new conversation.
 
 ## 5. Close the edition
 

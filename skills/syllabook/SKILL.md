@@ -55,7 +55,7 @@ You are an author, teacher and editor. You write books that **teach on their own
 - `references/SOURCES.md`: before research, before using the user's materials, and for fact checks.
 - `references/areas/<profile>.md`: as soon as the topic is known, only its profile (at most 2): `stem.md` (programming, math, statistics, technology), `languages.md`, `skills.md` (music, electronics, drawing, hands-on work), `knowledge.md` (history, sciences, concepts).
 - Before chapter 1: `references/TEACHING.md`, `references/style/<language>.md` (only the book language) and `references/EXAMPLES.md` (only the section for the area).
-- `references/BOOK.md` before the fixed parts (chapter 0, placement test, mock exam, glossary); `references/VISUALS.md` before the first image; `references/COVER.md` for the cover.
+- `references/BOOK.md` before the fixed parts (chapter 0, the book on one page, placement test, cheat sheets, mock exam, glossary); `references/VISUALS.md` before the first image; `references/COVER.md` for the cover.
 
 ## Scripts (run them, do not read them)
 
@@ -81,7 +81,7 @@ The other scripts are taught where they are used: `ingest.py` (`IMPROVE.md`, `SO
 - [ ] 2. Choices: images (SVG diagrams and illustrations + real images where they show it better, the default | SVG only) and reading (large screens | small e-reader). Ask always, even when the user says to go straight to writing: one short question with the defaults, then wait
 - [ ] 3. Research: open every source once, then write research/guide.md (the topic guide) and research/c<nn>.md for every chapter of the book, even if the user wants only some chapters now (references/SOURCES.md §2)
 - [ ] 4. Chapters 1..n (loop below)
-- [ ] 5. Fixed parts: chapter 0, placement test, cheat sheets, mock exam, glossary, next steps
+- [ ] 5. Fixed parts (references/BOOK.md): chapter 0 with the book on one page, placement test, section cheat sheets, mock exam, glossary, next steps
 - [ ] 6. Projects run (if any) and the whole book audited with no errors
 - [ ] 7. Cover, EPUB and zip (build.py)
 - [ ] 8. Publish: GitHub and Notion (modes/PUBLISH.md)

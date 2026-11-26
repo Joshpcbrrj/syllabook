@@ -1,0 +1,9 @@
+type: cards
+title: "O livro numa página: da lista à média"
+cards:
+  - icon: list
+    title: "Listas"
+    items: ["notas = [7, 8, 9]", "len() conta os itens", "Índice começa em 0"]
+  - icon: repeat
+    title: "O laço for"
+    items: ["for nota in notas:", "Soma num acumulador", "Média = soma / len"]

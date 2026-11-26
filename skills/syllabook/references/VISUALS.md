@@ -58,7 +58,7 @@ Pick the type by the idea:
 | memory, data, positions | `boxes` with names and real values |
 | parts talking to each other | `sequence` |
 | quantities | `bars` |
-| a summary of a part of the book | `cards` (the cheat sheet) |
+| a summary of the whole book or of a part | `cards` (the book on one page, a section cheat sheet) |
 | a relation between a few things (A → B, A + B = C, wrong → right) | `scene` (icons joined by arrows or signs) |
 | a chord shape on a fretted instrument | `chord` (guitar by default; set `tuning` for bass, ukulele, cavaquinho) |
 | where notes are on the neck (scales, intervals) | `fretboard` |
@@ -82,7 +82,7 @@ Rules:
 
 **Music diagrams** (`chord`, `fretboard`, `tab`): `diagram.py` also prints `text`, the same content as copyable text; put it right under the image, because whatever the reader plays stays as text. Circuit and pinout diagrams are not supported yet: describe them with `layers`, `boxes` or a table.
 
-**Cheat sheets** (`cards`): up to 12 cards (an icon, a numbered short title, 3–5 items of up to ~28 characters, each with its own icon when that helps, optionally a 1–3 line code snippet and a scene), in 3 columns on large screens and 2 in the `small` profile.
+**Cheat sheets** (`cards`): up to 12 cards (an icon, a numbered short title, 3–5 items of up to ~28 characters, each with its own icon when that helps, optionally a 1–3 line code snippet and a scene), in 3 columns on large screens and 2 in the `small` profile. Two uses, both in `BOOK.md` §4: the book on one page (one card per chapter, 3 items each, in the README and chapter 0) and the section cheat sheets (one per part).
 
 ## 4b. Illustrations (SVG drawn by you)
 

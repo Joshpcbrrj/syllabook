@@ -27,7 +27,7 @@ FILLER = {
     'pt': r'\b(?:simplesmente|obviamente|basicamente|é só)\b',
     'es': r'\b(?:simplemente|obviamente|básicamente)\b',
 }
-IMAGE = re.compile(r'!\[([^\]]*)\]\(([^)\s]+)\)')
+IMAGE = re.compile(r'!\[(.*?)\]\(([^)\s]+)\)')  # alt text may hold brackets: [7, 8, 9]
 # a port published with no host address listens on every network interface (stem profile: secure by default)
 OPEN_PORT = [re.compile(r'''^\s*-\s*["']?(\d+(?:-\d+)?:\d+(?:-\d+)?(?:/(?:tcp|udp))?)["']?\s*(?:#.*)?$'''),  # compose
              re.compile(r'''(?:\s-p|--publish)[ =]["']?(\d+(?:-\d+)?:\d+(?:-\d+)?)\b''')]  # docker run
@@ -162,6 +162,28 @@ def copied_from(original_dir, book_dir):
     return found
 
 
+def book_on_one_page(book_dir, lab, readme, chapter0):
+    """BOOK.md §4: the whole book as one cards diagram, in the README and at the start of chapter 0. Returns errors."""
+    label = lab['The book on one page']
+    m = re.search(rf'^## .*{re.escape(label)}\s*$(.*?)(?=^## |\Z)', readme, re.M | re.S)
+    # the alt text may hold brackets of its own (code such as [7, 8, 9]): match up to "](img/"
+    image = re.search(r'!\[.+?\]\((?:\./)?img/([^)\s]+\.svg)\)', m.group(1), re.S) if m else None
+    if not image:
+        return [f'README.md: no "{label}" section with its SVG (BOOK.md §4): one card per chapter, '
+                'drawn with diagram.py (type cards) from a spec in img/_source/']
+    name = image.group(1)
+    errors = []
+    spec = os.path.join(book_dir, 'img', '_source', os.path.splitext(name)[0] + '.yaml')
+    if not os.path.exists(os.path.join(book_dir, 'img', name)):
+        errors.append(f'README.md: img/{name} ("{label}") not found')
+    elif not os.path.exists(spec) or (load_yaml(spec) or {}).get('type') != 'cards':
+        errors.append(f'img/{name}: "{label}" must be drawn by diagram.py from a cards spec '
+                      f'(img/_source/{os.path.basename(spec)})')
+    if f'../img/{name}' not in chapter0:
+        errors.append(f'chapter 0: "{label}" (img/{name}) missing near the start, so the EPUB and Notion have it too')
+    return errors
+
+
 def main():
     p = argparse.ArgumentParser(description='Ready criteria for a chapter or the whole book.')
     p.add_argument('n', type=int, nargs='?')
@@ -217,8 +239,12 @@ def main():
         readme = os.path.join(book_dir, 'README.md')
         if not os.path.exists(readme):
             errors.append('README.md missing (the book front page)')
-        else:  # the book's front page may show an image too (the whole-book cheat sheet)
-            used.update(re.findall(r'\]\((?:\./)?img/([^)\s]+)\)', open(readme, encoding='utf-8').read()))
+        else:  # the book's front page shows the book on one page
+            front = open(readme, encoding='utf-8').read()
+            used.update(re.findall(r'\]\((?:\./)?img/([^)\s]+)\)', front))
+            zero = fixed['chapter 0']
+            chapter0 = open(os.path.join(book_dir, 'chapters', zero[0]), encoding='utf-8').read() if zero else ''
+            errors += book_on_one_page(book_dir, lab, front, chapter0)
         img = os.path.join(book_dir, 'img')
         if os.path.isdir(img):
             existing = {os.path.relpath(f, img).replace(os.sep, '/')

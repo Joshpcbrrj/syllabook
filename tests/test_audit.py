@@ -14,6 +14,19 @@ def audit(cli, book, *args):
     return cli('audit', *args, '--book', book)
 
 
+@pytest.mark.parametrize('file, old, new, message', [
+    ('README.md', '## 📇 O livro numa página', '## Resumo', 'no "O livro numa página" section'),
+    (os.path.join('chapters', '00-como-estudar-este-livro.md'), '(../img/c00-o-livro-numa-pagina.svg)',
+     '(../img/c01-lista.svg)', 'chapter 0: "O livro numa página"'),
+    (os.path.join('img', '_source', 'c00-o-livro-numa-pagina.yaml'), 'type: cards', 'type: boxes',
+     'must be drawn by diagram.py from a cards spec'),
+])
+def test_the_book_on_one_page_is_required_in_the_readme_and_chapter_0(cli, book, file, old, new, message):
+    edit(book / file, old, new)
+    code, r = audit(cli, book)
+    assert code == 1 and any(message in e for e in r['errors']), r['errors']
+
+
 def test_the_sample_book_is_ready(cli, book):
     code, r = audit(cli, book)
     assert code == 0 and r['ready'] and not r['errors'] and not r['warnings'], r
@@ -29,6 +42,8 @@ ERRORS = [
     ('image without alt', '![A lista notas com os índices 0, 1 e 2 e os valores 7,5, 8,0 e 6,5]', '![]',
      'image without alt text'),
     ('missing image', '../img/c01-lista.svg', '../img/nao-existe.svg', 'image not found'),
+    ('missing image, alt with brackets', '![A lista notas com os índices 0, 1 e 2 e os valores 7,5, 8,0 e 6,5]'
+     '(../img/c01-lista.svg)', '![A lista notas = [7.5, 8.0, 6.5]](../img/nao-existe.svg)', 'image not found'),
     ('broken link', '## 📚 Fontes', 'Veja o [capítulo 5](05-nao-existe.md).\n\n## 📚 Fontes', 'missing file'),
     ('no blank line after summary', '<summary>Ver resposta</summary>\n\n4.', '<summary>Ver resposta</summary>\n4.',
      'after <summary>'),

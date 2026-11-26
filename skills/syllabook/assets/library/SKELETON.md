@@ -4,7 +4,7 @@ The skill copies these files into the user's library repository when it does not
 
 | File | Where it goes |
 | --- | --- |
-| `README.md`, `README.pt-BR.md` | repository root: the library's front page; replace `<user>` and `<repository>` in the site address |
+| `README.md`, `README.pt-BR.md` | repository root: the library's front page; `build.py lists` turns the site address into a link once `repository` is set in `library.yaml`, and lists every book with its website and EPUB |
 | `LICENSE`, `LICENSE-CODIGO` | repository root: CC BY-SA 4.0 for the content, MIT for code; the user may choose others |
 | `library.yaml` | repository root; the skill fills `author`, `repository`, `commit_name` and `commit_email` |
 | `created-books/`, `improved-materials/`, `translated-books/`, `site/` | repository root, with their READMEs in English and Portuguese |

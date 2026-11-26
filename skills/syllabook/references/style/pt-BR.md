@@ -61,6 +61,7 @@ Write as a patient Brazilian mentor talking to one reader. The text must read as
 | Download EPUB | Baixar EPUB |
 | Read online | Ler no site |
 | Books | Livros |
+| The book on one page | O livro numa página |
 | Created by | Criado pela skill Claude Syllabook |
 | Chapters | Capítulos |
 | Index | Índice remissivo |

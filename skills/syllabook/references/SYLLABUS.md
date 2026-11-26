@@ -12,12 +12,13 @@ origin: created                      # created | improved
 language: pt-BR                      # book language
 conversation_language: pt-BR
 profiles: [stem]                     # stem | languages | skills | knowledge (at most 2)
-level: {start: beginner, end: intermediate}
+level: {start: iniciante, end: intermediário}   # in the book language: the library lists show it as written
 audience: "Who already runs containers with docker run"
 goal: "Describe an app with API, database and proxy in one compose.yaml and run it with one command"
 prerequisites: ["docker-do-zero"]    # slugs of other books, or plain text
 track: {name: devops, order: 2}      # a series of books, in reading order; the front page lists the library by track
-                                     # (a display name can go in library.yaml: tracks: {devops: "DevOps"})
+                                     # a NEW track also gets its display name in library.yaml, in the library's
+                                     # language (tracks: {devops: "DevOps"}); without it, "devops" shows as "Devops"
 continues: {book: docker-do-zero, step: 1}   # only for a next book (CREATE.md §7): the earlier book and its next step
 reference_version: "Docker Compose v5.6, Docker Engine 29.9"   # only if the topic changes over time
 review_by: "2027-11"                 # month to review it by (modes/REVIEW.md); the library lists warn after it

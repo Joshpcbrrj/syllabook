@@ -21,6 +21,11 @@ def test_slugify_cuts_long_text_at_a_word_boundary():
     assert len(slug) <= 30 and not slug.endswith('-') and slug.endswith('palavra')
 
 
+def test_a_cut_slug_never_ends_on_a_connecting_word():
+    assert common.slugify('Docker Desktop na prática: interface × linha de comando') == \
+        'docker-desktop-na-pratica-interface-linha'
+
+
 def test_labels_in_the_book_language():
     assert common.labels('pt-BR')['See answer'] == 'Ver resposta'
     assert common.labels('en')['See answer'] == 'See answer'

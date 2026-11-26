@@ -86,6 +86,32 @@ def test_a_project_that_hangs_times_out(cli, book):
     assert code == 1 and 'timed out' in r['projects'][0]['output']
 
 
+def test_a_server_passes_once_its_output_shows_the_expected_text(cli, book):
+    # a server never ends by itself: it is stopped when the output shows "expect", well before the timeout
+    add(book, '01-listas.md', f'<!-- project: servidor | run: "{PY}" -u main.py | expect: Servidor pronto -->\n\n'
+                              '**main.py**\n\n```python\n# sobe e fica no ar\nimport time\nprint("Servidor pronto")\n'
+                              'time.sleep(60)\n```')
+    code, r = cli('projects', '--book', book, '--timeout', 20)
+    assert code == 0 and r['projects'][0]['status'] == 'ok', r
+    assert 'Servidor pronto' in r['projects'][0]['output']
+
+
+def test_a_server_that_never_shows_the_expected_text_times_out(cli, book):
+    add(book, '01-listas.md', f'<!-- project: mudo | run: "{PY}" -u main.py | expect: pronto -->\n\n'
+                              '**main.py**\n\n```python\n# nunca avisa\nimport time\nprint("subindo")\n'
+                              'time.sleep(60)\n```')
+    code, r = cli('projects', '--book', book, '--timeout', 2)
+    assert code == 1 and 'timed out' in r['projects'][0]['output'] and 'subindo' in r['projects'][0]['output']
+
+
+def test_files_without_an_extension_and_dotfiles_belong_to_the_project(cli, book):
+    add(book, '01-listas.md', '<!-- project: api -->\n\n**Dockerfile**\n\n```dockerfile\nFROM python:3.14-slim\n```\n\n'
+                              '**.dockerignore**\n\n```text\n.venv\n```\n\n**app/Makefile**\n\n```make\nall:\n```\n\n'
+                              '**Resultado**\n\n```text\nnão é um arquivo\n```')
+    code, r = cli('projects', '--book', book)
+    assert code == 0 and r['projects'][0]['files'] == ['.dockerignore', 'Dockerfile', 'app/Makefile'], r
+
+
 def test_without_a_marker_the_project_is_named_after_the_chapter_and_not_run(cli, book):
     add(book, '02-o-laco-for.md', '**media.py**\n\n```python\n# calcula a média\nprint(7.33)\n```')
     code, r = cli('projects', '--book', book)

@@ -17,23 +17,29 @@ one, so a project can evolve across chapters. Files go to projects/<name>/.
 `--chapter N` checks the projects chapter N writes to, assembled with every chapter up to N (the
 state the reader has at that point of the book).
 
-`run` is executed in the project folder; `expect` is a text its output must contain. A project
+`run` is executed in the project folder; `expect` is a text its output must contain. A server, which
+never ends by itself, passes as soon as its output shows `expect`, and is then stopped. A project
 without `run` is only assembled ("not run"), e.g. when it needs a service the session lacks.
+A file path may also be a name without an extension (Dockerfile, Makefile) or a dotfile (.dockerignore).
 Prints JSON; exit code 1 when a project fails or a path tries to leave the project folder.
 """
 import argparse
 import os
 import re
 import shutil
+import signal
 import subprocess
 import sys
+import threading
+import time
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from common import chapter_numbers, chapter_path, fail, find_book, load_yaml, out
 
 MARKER = re.compile(r'<!--\s*project:\s*(.+?)\s*-->')
 # ':' is accepted here only so that a drive path (C:/...) is seen and refused, not silently ignored
-FILE_LINE = re.compile(r'^\*\*`?([\w./:-]+\.[\w]+|[\w./:-]*/[\w.-]+)`?\*\*\s*$')
+FILE_LINE = re.compile(r'^\*\*`?([\w./:-]+\.[\w]+|[\w./:-]*/[\w.-]+|\.[\w.-]+|'
+                       r'(?:Docker|Container|Make|Proc|Gem|Rake|Jenkins|Vagrant)file)`?\*\*\s*$')
 QUOTE = re.compile(r'^(?:>\s?)+')
 PROJECT_NAME = re.compile(r'^(?!\.+$)[\w.-]+$')
 
@@ -96,18 +102,50 @@ def collect(text, default_name, projects, errors, chapter):
         i += 1
 
 
-def run_project(folder, spec, timeout):
+def stop(process):
+    """Stops the command and everything it started (the shell, then the server it runs)."""
+    if os.name == 'nt':
+        subprocess.run(['taskkill', '/T', '/F', '/PID', str(process.pid)], capture_output=True)
+    else:
+        try:
+            os.killpg(process.pid, signal.SIGTERM)
+        except ProcessLookupError:
+            pass
     try:
-        r = subprocess.run(spec['run'], shell=True, cwd=folder, capture_output=True, text=True,
-                           encoding='utf-8', errors='replace', timeout=timeout)
+        process.wait(10)
     except subprocess.TimeoutExpired:
-        return False, f'timed out after {timeout} s'
-    output = (r.stdout + r.stderr).strip()
+        process.kill()
+
+
+def run_project(folder, spec, timeout):
+    """Runs the project's command. A server never ends by itself: once its output shows `expect`, it is
+    stopped and passes."""
+    group = {'creationflags': subprocess.CREATE_NEW_PROCESS_GROUP} if os.name == 'nt' else {'start_new_session': True}
+    process = subprocess.Popen(spec['run'], shell=True, cwd=folder, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+                               text=True, encoding='utf-8', errors='replace', **group)
+    lines = []
+
+    def read():
+        for line in process.stdout:
+            lines.append(line)
+    reader = threading.Thread(target=read, daemon=True)
+    reader.start()
+    expect, deadline = spec.get('expect'), time.monotonic() + timeout
+    while process.poll() is None:
+        if expect and expect in ''.join(lines):
+            stop(process)
+            return True, ''.join(lines).strip()[-600:]
+        if time.monotonic() > deadline:
+            stop(process)
+            return False, f'timed out after {timeout} s: {"".join(lines).strip()[-600:]}'
+        time.sleep(0.2)
+    reader.join(10)
+    output = ''.join(lines).strip()
     tail = output[-600:]
-    if r.returncode != 0:
-        return False, f'exit code {r.returncode}: {tail}'
-    if spec.get('expect') and spec['expect'] not in output:
-        return False, f'output does not contain "{spec["expect"]}": {tail}'
+    if process.returncode != 0:
+        return False, f'exit code {process.returncode}: {tail}'
+    if expect and expect not in output:
+        return False, f'output does not contain "{expect}": {tail}'
     return True, tail
 
 

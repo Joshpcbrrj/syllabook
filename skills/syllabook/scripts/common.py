@@ -79,12 +79,20 @@ def fail(message):
     out({'ok': False, 'error': message}, 1)
 
 
+CONNECTORS = {'a', 'o', 'e', 'as', 'os', 'de', 'da', 'do', 'das', 'dos', 'em', 'na', 'no', 'nas', 'nos', 'com',
+              'por', 'para', 'um', 'uma', 'y', 'del', 'la', 'el', 'en', 'con', 'an', 'the', 'of', 'and', 'to',
+              'in', 'on', 'for', 'with'}
+
+
 def slugify(text, limit=48):
     ascii_text = unicodedata.normalize('NFKD', text).encode('ascii', 'ignore').decode()
     slug = re.sub(r'[^a-z0-9]+', '-', ascii_text.lower()).strip('-')
     if len(slug) > limit:
         # cut at a word boundary so file names stay readable
         slug = slug[:limit].rsplit('-', 1)[0]
+        # nor end on "de", "the"...: "linha-de" reads as a broken name
+        while '-' in slug and slug.rsplit('-', 1)[1] in CONNECTORS:
+            slug = slug.rsplit('-', 1)[0]
     return slug
 
 

@@ -1,4 +1,5 @@
 """images.py: free-license photos from Wikimedia Commons and screenshots of the book's application."""
+import base64
 import sys
 import types
 
@@ -525,3 +526,76 @@ def test_drive_editor_opens_files_runs_commands_and_shows_the_view():
     typed = [t for k, t in log if k == 'type']
     assert typed == ['a.md', 'Git: Open Changes', 'View: Show Source Control', 'Notifications: Clear All Notifications']
     assert log.index(('press', 'Backspace')) < log.index(('type', 'a.md'))  # Quick Open, not a command
+
+
+# ---------- images of official documentation repositories on GitHub ----------
+
+def license_file(spdx, text=''):
+    return {'license': {'spdx_id': spdx}, 'html_url': 'https://github.com/o/r/blob/main/LICENSE',
+            'content': base64.b64encode(text.encode()).decode()}
+
+
+@pytest.fixture
+def github(monkeypatch, commons):
+    """Fake GitHub API: one repository with a license, a tree of files; downloads go to the commons fixture."""
+    state = {'license': license_file('Apache-2.0'), 'calls': [],
+             'tree': ['content/images/virtualization-enabled.png', 'content/images/wsl2-enabled.png',
+                      'content/install.md', 'assets/logo.svg']}
+
+    def call(path):
+        state['calls'].append(path)
+        if path.endswith('/license'):
+            return state['license']
+        if '/git/trees/' in path:
+            return {'tree': [{'path': p, 'type': 'blob'} for p in state['tree']]}
+        return {'default_branch': 'main'}
+    monkeypatch.setattr(images, 'github_api', call)
+    return state, commons
+
+
+def test_docs_lists_the_images_whose_path_has_the_words(cli, github):
+    code, r = cli('images', 'docs', 'docker/docs', 'task manager virtualization')
+    assert code == 0 and r['license'] == 'Apache 2.0'
+    assert r['images'] == ['github:docker/docs/content/images/virtualization-enabled.png']
+
+
+def test_docs_refuses_a_repository_without_a_free_license(cli, github):
+    state, _ = github
+    state['license'] = license_file('NOASSERTION', 'All rights reserved.')
+    code, r = cli('images', 'docs', 'acme/docs', 'install')
+    assert code == 1 and 'no free license' in r['error']
+
+
+def test_a_creative_commons_license_github_does_not_name_is_read_from_the_file(cli, github):
+    state, _ = github
+    state['license'] = license_file('NOASSERTION', 'Attribution 4.0 International\n=====')
+    code, r = cli('images', 'docs', 'MicrosoftDocs/WSL', 'wsl')
+    assert code == 0 and r['license'] == 'CC BY 4.0'
+
+
+def test_a_non_commercial_license_is_not_free(cli, github):
+    state, _ = github
+    state['license'] = license_file('NOASSERTION', 'Attribution-NonCommercial 4.0 International')
+    code, r = cli('images', 'docs', 'acme/docs', 'wsl')
+    assert code == 1 and 'no free license' in r['error']
+
+
+def test_fetch_from_github_saves_the_image_and_credits_the_repository(cli, book, github):
+    _, commons = github
+    code, r = cli('images', 'fetch', 'github:docker/docs/content/images/virtualization-enabled.png',
+                  '--name', 'c02-virtualizacao', '--book', book)
+    assert code == 0 and (book / 'img' / 'c02-virtualizacao.png').exists()
+    assert commons['downloads'] == [
+        'https://raw.githubusercontent.com/docker/docs/main/content/images/virtualization-enabled.png']
+    credits = (book / 'img' / 'CREDITS.md').read_text(encoding='utf-8')
+    assert 'docker/docs contributors' in credits and 'Apache 2.0' in credits
+    assert 'https://github.com/docker/docs/blob/main/content/images/virtualization-enabled.png' in credits
+    assert r['caption'] == 'docker/docs contributors, Apache 2.0, via GitHub (docker/docs)'
+
+
+@pytest.mark.parametrize('ref', ['github:docker/docs/content/install.md', 'github:docker/docs/../x.png',
+                                 'github:not a repo/x.png'])
+def test_fetch_from_github_refuses_what_is_not_an_image_of_the_repository(cli, book, github, ref):
+    _, commons = github
+    code, r = cli('images', 'fetch', ref, '--name', 'c02-x', '--book', book)
+    assert code == 1 and not commons['downloads']

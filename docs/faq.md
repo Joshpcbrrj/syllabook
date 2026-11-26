@@ -79,7 +79,7 @@ Yes. Every command and every piece of code is run while the chapter is written, 
 - **Diagrams:** drawn by the skill's scripts as SVG, from a description of the structure (blocks, flows, timelines, chords...).
 - **Illustrations:** simple drawings for an analogy or an imagined scene (a mailbox for a commit queue, for example). Claude writes them as SVG code, and a script checks that they are plain shapes and text, in the book's colors.
 - **Photos:** only with a free license (public domain, CC0, CC BY, CC BY-SA), from Wikimedia Commons and Openverse, with the author and license under the image.
-- **Screenshots:** of the book's application actually running, and of VS Code (it needs Docker or code-server on your computer; the skill asks before downloading anything).
+- **Screenshots:** of the book's application actually running, and of VS Code (it needs Docker or code-server on your computer; the skill asks before downloading anything). Screenshots of other programs (an installer, Docker Desktop, the Task Manager) come from the vendor's own documentation on GitHub when its license allows reuse; when there is none, the step is written in text. You never have to take screenshots yourself.
 
 Syllabook does not use image-generation models, and it never fakes a real photo or screenshot.
 

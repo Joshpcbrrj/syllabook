@@ -4,13 +4,18 @@ pages and of VS Code, each one recorded in img/CREDITS.md (references/SOURCES.md
 
 Usage:
   python scripts/images.py search "<what to look for>" [--limit 6] [--source all|commons|openverse]
-  python scripts/images.py fetch "File:<title>" | "openverse:<id>" --name c03-eniac [--book B]
+  python scripts/images.py docs <owner/repo> "<words>" [--limit 20]
+  python scripts/images.py fetch "File:<title>" | "openverse:<id>" | "github:<owner/repo>/<path>" --name c03-eniac
+                                 [--book B]
   python scripts/images.py screenshot <url> --name c05-app [--book B] [--width 1280 --height 800]
   python scripts/images.py editor <folder> --name c03-vscode [--open FILE]... [--command "<palette>"]...
                                   [--view explorer|scm|search] [--dark] [--book B] [--width --height]
 
 search lists only public domain, CC0, CC BY and CC BY-SA images, with author, license and the value
 to give fetch (--limit is per source). Openverse gathers Flickr, museums and other collections.
+docs lists the images of an official documentation repository on GitHub (docker/docs, MicrosoftDocs/WSL)
+whose path has the words, only when the repository's license lets a book reuse them with credit (Apache 2.0,
+MIT, BSD, CC BY, CC BY-SA, CC0): screenshots of desktop applications that the vendor published itself.
 fetch downloads the image to img/<name>.<ext>, records the credit and prints the Markdown and the
 caption credit to use. A non-free image is refused.
 screenshot opens a web page (the book's application, a GitHub page) with Playwright and saves img/<name>.png.
@@ -19,6 +24,7 @@ opens the files, runs the palette commands, shows the view and saves img/<name>.
 if installed, otherwise the Docker image; it never installs or downloads anything: it says what to ask.
 """
 import argparse
+import base64
 import html
 import json
 import os
@@ -213,9 +219,73 @@ def fetch_openverse(ident, name, book_dir):
     save_image(book_dir, name, image, extension, f'"{image["title"]}"')
 
 
+GITHUB = 'https://api.github.com/'
+# licenses of a documentation repository that let a book reuse its images with credit
+FREE_REPO = {'apache-2.0': 'Apache 2.0', 'mit': 'MIT', 'bsd-2-clause': 'BSD 2-Clause', 'bsd-3-clause': 'BSD 3-Clause',
+             'cc-by-4.0': 'CC BY 4.0', 'cc-by-sa-4.0': 'CC BY-SA 4.0', 'cc0-1.0': 'CC0 1.0'}
+# GitHub answers NOASSERTION for some Creative Commons files (MicrosoftDocs): read the license's own title
+LICENSE_TITLES = (('Attribution-ShareAlike 4.0 International', 'cc-by-sa-4.0'),
+                  ('Attribution 4.0 International', 'cc-by-4.0'))
+REPO = re.compile(r'^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$')
+IMAGE_FILE = re.compile(r'\.(png|jpe?g|gif|webp)$', re.I)
+
+
+def github_api(path):
+    request = urllib.request.Request(GITHUB + path, headers={'User-Agent': AGENT,
+                                                             'Accept': 'application/vnd.github+json'})
+    with urllib.request.urlopen(request, timeout=30) as response:
+        return json.load(response)
+
+
+def repo_license(repo):
+    """(default branch, license name, license URL) of a GitHub repository; fails when its license is not free."""
+    if not REPO.match(repo):
+        fail(f'invalid repository "{repo}": write it as owner/name, like docker/docs')
+    try:
+        branch = github_api(f'repos/{repo}')['default_branch']
+        found = github_api(f'repos/{repo}/license')
+    except urllib.error.HTTPError:
+        fail(f'{repo} not found on GitHub, or it has no license file: its images cannot be reused')
+    code = ((found.get('license') or {}).get('spdx_id') or '').lower()
+    if code not in FREE_REPO:
+        text = base64.b64decode(found.get('content') or '').decode('utf-8', errors='replace')
+        code = next((c for title, c in LICENSE_TITLES if title in text), code)
+    if code not in FREE_REPO:
+        fail(f'{repo} has no free license ({code or "none"}): its images cannot be reused')
+    return branch, FREE_REPO[code], found.get('html_url') or f'https://github.com/{repo}'
+
+
+def docs(repo, words, limit):
+    branch, licence, _ = repo_license(repo)
+    paths = [t['path'] for t in github_api(f'repos/{repo}/git/trees/{branch}?recursive=1').get('tree', [])
+             if t.get('type') == 'blob' and IMAGE_FILE.search(t['path'])]
+    words = [w for w in re.findall(r'\w+', words.lower())]
+    scored = sorted(((sum(w in p.lower() for w in words), p) for p in paths), key=lambda s: (-s[0], s[1]))
+    found = [p for score, p in scored if score][:limit]
+    out({'repository': repo, 'license': licence, 'images': [f'github:{repo}/{p}' for p in found],
+         'note': 'look at each image before using it; fetch one with images.py fetch <github:...>'
+         if found else 'no image path has these words: try other words (English, as in the file names)'})
+
+
+def fetch_github(ref, name, book_dir):
+    parts = ref.split('/')
+    repo, path = '/'.join(parts[:2]), '/'.join(parts[2:])
+    if not IMAGE_FILE.search(path) or '..' in path.split('/'):
+        fail(f'github:{ref} is not an image file of the repository (.png, .jpg, .gif, .webp)')
+    branch, licence, license_url = repo_license(repo)
+    quoted = urllib.parse.quote(path)
+    image = {'url': f'https://raw.githubusercontent.com/{repo}/{branch}/{quoted}', 'author': f'{repo} contributors',
+             'license': licence, 'license_url': license_url, 'via': f'GitHub ({repo})',
+             'source': f'https://github.com/{repo}/blob/{branch}/{quoted}'}
+    save_image(book_dir, name, image, os.path.splitext(path)[1].lower().replace('.jpeg', '.jpg'),
+               f'"{os.path.basename(path)}"')
+
+
 def fetch(title, name, book_dir):
     if title.startswith('openverse:'):
         return fetch_openverse(title.split(':', 1)[1], name, book_dir)
+    if title.startswith('github:'):
+        return fetch_github(title.split(':', 1)[1], name, book_dir)
     pages = list((api({'action': 'query', 'titles': title, **INFO}).get('query') or {}).get('pages', {}).values())
     if not pages or 'missing' in pages[0] or not pages[0].get('imageinfo'):
         fail(f'{title} not found on Wikimedia Commons')
@@ -398,6 +468,10 @@ def main():
     s.add_argument('query')
     s.add_argument('--limit', type=int, default=6)
     s.add_argument('--source', choices=['all', 'commons', 'openverse'], default='all')
+    d = sub.add_parser('docs')
+    d.add_argument('repo')
+    d.add_argument('words')
+    d.add_argument('--limit', type=int, default=20)
     f = sub.add_parser('fetch')
     f.add_argument('title')
     f.add_argument('--name', required=True)
@@ -421,6 +495,8 @@ def main():
     args = p.parse_args()
     if args.cmd == 'search':
         search(args.query, args.limit, args.source)
+    if args.cmd == 'docs':
+        docs(args.repo, args.words, args.limit)
     check_name(args.name)
     book_dir, _ = find_book(args.book)
     if args.cmd == 'fetch':

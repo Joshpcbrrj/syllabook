@@ -11,3 +11,5 @@ The reply, in Portuguese, contains both parts in the same message:
    "entender" or "conhecer"); a final project or challenge and a final mock exam; next steps for later books.
 It ends by inviting adjustments and asking the user to answer "aprovado" (or similar) when it looks right.
 It must NOT contain the text of any chapter: no explanations, exercises or code blocks teaching the content.
+It must NOT contain "O livro numa página" (the one-card-per-chapter summary of the whole book) or say it was drawn:
+that part is made only after the syllabus is approved and the chapters are written.

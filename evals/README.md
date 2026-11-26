@@ -6,7 +6,7 @@ Cases for `claude plugin eval`: each one sends a real request to Claude with the
 | --- | --- |
 | `01-acionamento` | the skill is triggered by a study request |
 | `02-idioma` | it talks in the user's language (English here) |
-| `03-parecer-ementa` | assessment + syllabus in one message, nothing written yet |
+| `03-parecer-ementa` | assessment + syllabus in one message, nothing written yet (no "book on one page" either) |
 | `04-ajuste` | an adjustment returns the whole syllabus, renumbered |
 | `05-nada-antes-do-aprovado` | no chapter before "aprovado" |
 | `06-escrever-capitulo` | writes chapter 2 of an approved book (needs a shell: Linux, macOS or WSL) |
@@ -15,6 +15,7 @@ Cases for `claude plugin eval`: each one sends a real request to Claude with the
 | `09-proximo-livro-direcoes` | option 4: offers directions from the earlier book's next steps, no level question |
 | `10-proximo-livro-ementa` | option 4: a syllabus that starts where the earlier book ended and does not reteach it |
 | `11-revisar` | option 5: review assessment, a wrong reader report is not taken as true, nothing changes before approval |
+| `12-projeto-continuo` | a programming syllabus names one running project that the chapters build step by step |
 
 ## Running
 

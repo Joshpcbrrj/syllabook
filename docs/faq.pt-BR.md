@@ -1,4 +1,4 @@
-<!-- translation-of: faq.md sha256:975da7868a79 -->
+<!-- translation-of: faq.md sha256:620233aeaca5 -->
 # Perguntas frequentes
 
 [English](faq.md) | **Português**
@@ -46,7 +46,7 @@ Os seus livros não são afetados: eles ficam na sua biblioteca, não na skill. 
 
 Num plano por assinatura (Pro, Max...), o livro não custa nada além do plano: ele gasta os seus limites de uso. Um livro longo costuma levar mais de uma sessão; quando um limite acaba, continue depois que ele renovar.
 
-Como referência: no livro-piloto de Docker Compose (escrito com o Claude Code em novembro de 2026), cada capítulo gastou o equivalente a uns US$ 2 a 2,50 em preço de API, contando a pesquisa, o teste de cada comando e as checagens.
+Como referência, em preço de API (Claude Code, novembro de 2026): o livro *Docker do zero* inteiro (12 capítulos, com cada comando rodado de verdade, mais as partes fixas, a capa e a auditoria) custou US$ 15,31, com a ementa feita pelo Opus (US$ 0,90) e o resto pelo Sonnet, perto de US$ 1 por capítulo. A maior parte do custo de uma sessão é a própria conversa, então um livro feito em algumas sessões curtas sai bem mais barato que uma conversa longa: a skill sugere uma conversa nova a cada poucos capítulos.
 
 ## Posso parar e continuar depois?
 

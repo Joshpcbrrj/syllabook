@@ -45,7 +45,7 @@ Your books are not touched: they live in your library, not in the skill. What ch
 
 On a subscription plan (Pro, Max...), a book costs nothing beyond your plan: it uses your usage limits. A long book usually takes more than one session; when a limit is reached, continue after it resets.
 
-As a reference: in the Docker Compose pilot book (written with Claude Code, November 2026), each chapter used about US$ 2 to 2.50 at API prices, including the research, the tests of every command and the checks.
+As a reference, at API prices (Claude Code, November 2026): the whole *Docker do zero* book (12 chapters, every command run for real, plus the fixed parts, the cover and the audit) cost US$ 15.31, with the syllabus written by Opus (US$ 0.90) and everything else by Sonnet, about US$ 1 per chapter. Most of a session's cost is the conversation itself, so a book written in a few short sessions costs much less than one long conversation: the skill suggests a new conversation every few chapters.
 
 ## Can I stop and continue later?
 

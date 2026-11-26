@@ -1,4 +1,5 @@
 """The library's index by track, and the audit that keeps the original of an improved book out of it."""
+import re
 import shutil
 
 import pytest
@@ -36,9 +37,11 @@ def test_lists_write_the_tracks_on_the_front_page(cli, tracked):
     front = read(tracked / 'README.pt-BR.md')
     block = front.split('<!-- tracks:start -->')[1].split('<!-- tracks:end -->')[0]
     assert '## 🧭 Trilhas' in block
+    # without the website and EPUB links next to each book, the track reads in order
+    plain = re.sub(r' \(\[Ler no site\]\([^)]*\) · \[EPUB\]\([^)]*\)\)', '', block)
     assert (f'- **Python:** [Python do zero (exemplo de teste)](created-books/{FIRST}/) → '
-            '[Funções em Python](improved-materials/funcoes-em-python/)') in block
-    assert '- **Outros livros:** [Violão básico](created-books/violao-basico/)' in block
+            '[Funções em Python](improved-materials/funcoes-em-python/)') in plain
+    assert '- **Outros livros:** [Violão básico](created-books/violao-basico/)' in plain
     assert 'Python from scratch' not in block  # a translation is listed with its own collection, not in the track
     assert '## 🧭 Tracks' in read(tracked / 'README.md')
 
@@ -51,9 +54,20 @@ def test_a_track_name_from_library_yaml(cli, tracked):
     assert '- **Programação em Python:**' in read(tracked / 'README.pt-BR.md')
 
 
-def test_no_tracks_no_section(cli, library):
+def test_no_tracks_still_lists_every_book_with_its_site_and_epub(cli, library):
     cli('build', 'lists', '--library', library)
-    assert 'tracks:start' not in read(library / 'README.pt-BR.md')
+    home = read(library / 'README.pt-BR.md')
+    assert '## 🧭 Trilhas' not in home and '## 📚 Livros' in home
+    assert ('- [Python do zero (exemplo de teste)](created-books/python-do-zero-teste/) '
+            '([Ler no site](https://exemplo.github.io/minha-biblioteca/created-books/python-do-zero-teste/) · '
+            '[EPUB](https://github.com/exemplo/minha-biblioteca/releases/download/epubs/python-do-zero-teste.epub))'
+            ) in home
+
+
+def test_tracks_on_the_front_page_have_the_site_and_epub_next_to_each_book(cli, tracked):
+    cli('build', 'lists', '--library', tracked)
+    home = read(tracked / 'README.md')
+    assert '## 🧭 Tracks' in home and '([Read online](https://' in home and '· [EPUB](https://' in home
 
 
 def test_the_website_home_shows_the_tracks(cli, tracked):

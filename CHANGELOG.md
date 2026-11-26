@@ -8,7 +8,7 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ### Library and books
 
-- The book lists have a **Site** column with each book's page on the library website, next to the EPUB link, and `build.py lists` turns the website placeholder on the library's front page into a link once `repository` is set in `library.yaml`. The collection pages no longer point to the website's source folder.
+- The book lists have a **Site** column with each book's page on the library website, next to the EPUB link, and `build.py lists` turns the website placeholder on the library's front page into a link once `repository` is set in `library.yaml`. The collection pages no longer point to the website's source folder. On the front page, every book has its website page and EPUB next to it, by track or, in a library with no tracks yet, in a plain list of books.
 - Every book ends with the skill's credit, in the book language ("Criado pela skill Claude Syllabook - Joshpcbrrj" / "Created by the Claude skill Syllabook - Joshpcbrrj", with the link to the repository): `build.py` writes it at the end of the last file in reading order and in the book map, so it reaches the website, the EPUB and the Notion copy.
 - Programming, infrastructure and code books build one **running project** by default: each chapter's lab adds a step to it, with complete, copyable files, the command, its real output and a check at the end of the chapter; the syllabus names it (`areas/stem.md`, `CREATE.md`).
 

@@ -367,8 +367,18 @@ def book_rows(books, settings, lab, link, site=False):
 SITE_PLACEHOLDER = re.compile(r'`https://<[^>`]+>\.github\.io/<[^>`]+>/`')
 
 
-def track_lines(books, settings, lab, link):
-    """The library by track: each track's books in reading order, then the books in no track. [] if no track."""
+def book_links(settings, lab):
+    """For the front page: each book followed by its page on the website and its EPUB."""
+    def extra(b):
+        links = [(lab['Read online'], book_site_url(settings, b)), ('EPUB', epub_url(settings, b['data']['slug']))]
+        shown = [f'[{name}]({url})' for name, url in links if url]
+        return f' ({" · ".join(shown)})' if shown else ''
+    return extra
+
+
+def track_lines(books, settings, lab, link, extra=lambda b: ''):
+    """The library by track: each track's books in reading order, then the books in no track. [] if no track.
+    extra(book) adds text after each book's link (the website and EPUB links on the front page)."""
     books = [b for b in books if not b['data'].get('translation_of')]
     tracks = {}
     for b in books:
@@ -380,11 +390,13 @@ def track_lines(books, settings, lab, link):
     names = settings.get('tracks') or {}
     lines = [f'## 🧭 {lab["Tracks"]}', '']
     for name in sorted(tracks, key=lambda n: str(names.get(n, n)).lower()):
-        chain = ' → '.join(f'[{b["data"]["title"]}]({link(b)})' for _, b in sorted(tracks[name], key=lambda t: t[0]))
+        chain = ' → '.join(f'[{b["data"]["title"]}]({link(b)}){extra(b)}'
+                           for _, b in sorted(tracks[name], key=lambda t: t[0]))
         lines.append(f'- **{names.get(name) or name.replace("-", " ").capitalize()}:** {chain}')
     others = [b for b in books if not (b['data'].get('track') or {}).get('name')]
     if others:
-        lines.append(f'- **{lab["Other books"]}:** ' + ' · '.join(f'[{b["data"]["title"]}]({link(b)})' for b in others))
+        lines.append(f'- **{lab["Other books"]}:** '
+                     + ' · '.join(f'[{b["data"]["title"]}]({link(b)}){extra(b)}' for b in others))
     return lines
 
 
@@ -413,7 +425,14 @@ def cmd_lists(args):
         if site:
             # the template ships the address as a placeholder; once the repository is known it becomes a link
             text = SITE_PLACEHOLDER.sub(f'[{site}]({site})', text)
-        lines = track_lines(books, settings, labels(lang), lambda b: f'{b["folder"]}/{os.path.basename(b["dir"])}/')
+        lab = labels(lang)
+        link, extra = (lambda b: f'{b["folder"]}/{os.path.basename(b["dir"])}/'), book_links(settings, lab)
+        lines = track_lines(books, settings, lab, link, extra)
+        originals = [b for b in books if not b['data'].get('translation_of')]
+        if not lines and originals:
+            # no tracks yet: still list every book on the front page, with its website and EPUB
+            lines = [f'## 📚 {lab["Books"]}', '']
+            lines += [f'- [{b["data"]["title"]}]({link(b)}){extra(b)}' for b in originals]
         if lines:
             text = set_block(text, 'tracks', '\n'.join(lines))
         if text != before:

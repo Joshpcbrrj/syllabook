@@ -2,7 +2,6 @@
 import json
 import os
 import re
-import subprocess
 import urllib.parse
 
 import common
@@ -32,8 +31,9 @@ def test_scrub_shortens_the_skill_folder():
 
 
 def test_report_prints_title_body_and_a_prefilled_link_without_sending(cli, monkeypatch):
+    # watch the sending itself: platform also calls subprocess.run on some Windows Pythons
     calls = []
-    monkeypatch.setattr(subprocess, 'run', lambda *a, **k: calls.append(a))
+    monkeypatch.setattr(report, 'send', lambda *a: calls.append(a))
     code, res = cli('report', '--what', 'audit.py flags a valid link as broken', '--file', 'audit.py',
                     '--command', 'python scripts/audit.py 3', '--error', 'Traceback\nKeyError: x',
                     '--expected', 'no warning')

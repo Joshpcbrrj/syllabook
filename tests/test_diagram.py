@@ -154,6 +154,18 @@ def test_contact_sheet_of_a_chapter(cli, book):
     assert 'png' in r or 'note' in r
 
 
+def test_png_of_an_svg_such_as_the_cover(cli, book, monkeypatch):
+    import diagram
+    monkeypatch.setattr(diagram, 'to_png', lambda svg, png: open(png, 'wb').write(b'\x89PNG') > 0)
+    code, r = cli('diagram', '--png', book / 'img' / 'c01-lista.svg')
+    assert code == 0 and r['png'].endswith('c01-lista.png') and (book / 'img' / 'c01-lista.png').exists()
+    code, r = cli('diagram', '--png', book / 'nope.svg')
+    assert code == 1 and 'not found' in r['error']
+    monkeypatch.setattr(diagram, 'to_png', lambda svg, png: False)
+    code, r = cli('diagram', '--png', book / 'img' / 'c01-lista.svg')
+    assert code == 1 and 'no SVG to PNG converter' in r['error']
+
+
 def test_contact_sheet_of_a_chapter_without_images(cli, book):
     code, r = cli('diagram', '--sheet', 2, '--book', book)
     assert code == 0 and r['images'] == 0

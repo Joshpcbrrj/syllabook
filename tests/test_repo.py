@@ -56,6 +56,26 @@ def test_every_script_is_taught_somewhere_in_the_skill():
     assert not untaught
 
 
+def test_every_script_command_and_option_in_the_instructions_exists():
+    """An instruction must never send Claude to a command or option the script does not have."""
+    scripts = {os.path.basename(p): read(p) for p in glob.glob(os.path.join(SKILL, 'scripts', '*.py'))}
+    problems = set()
+    for doc in skill_docs():
+        for m in re.finditer(r'`(?:python )?(?:scripts/)?([a-z]+\.py)((?: [^`\n]*)?)`', read(doc)):
+            script, rest = m.group(1), m.group(2)
+            if script not in scripts:
+                problems.add(f'{rel(doc)}: unknown script {script}')
+                continue
+            for flag in set(re.findall(r'(--[a-z][a-z-]*)', rest)) - {'--help'}:
+                if f"'{flag}'" not in scripts[script]:
+                    problems.add(f'{rel(doc)}: {script} has no option {flag}')
+            words = rest.split()
+            if script in ('book.py', 'images.py', 'build.py') and words and re.fullmatch(r'[a-z]+', words[0]):
+                if f"'{words[0]}'" not in scripts[script]:
+                    problems.add(f'{rel(doc)}: {script} has no command {words[0]}')
+    assert not problems, sorted(problems)
+
+
 def test_pending_scripts_list_is_up_to_date():
     landed = PENDING_SCRIPTS & set(os.listdir(os.path.join(SKILL, 'scripts')))
     assert not landed, f'remove from PENDING_SCRIPTS: {sorted(landed)}'

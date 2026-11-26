@@ -957,9 +957,17 @@ def main():
     p.add_argument('--sheet', type=int, metavar='CHAPTER')
     p.add_argument('--book')
     p.add_argument('--icons', action='store_true')
+    p.add_argument('--png', metavar='SVG', help='render an SVG (the cover, an illustration) to a PNG next to it')
     args = p.parse_args()
     if args.icons:
         out({'icons': icons.names()})
+    if args.png:
+        if not os.path.exists(args.png):
+            fail(f'file not found: {args.png}')
+        png = os.path.splitext(args.png)[0] + '.png'
+        if not to_png(args.png, png):
+            fail('no SVG to PNG converter available (pip install resvg-py, or rsvg-convert)')
+        out({'png': png})
     if args.sheet:
         book_dir, _ = find_book(args.book)
         contact_sheet(book_dir, args.sheet)

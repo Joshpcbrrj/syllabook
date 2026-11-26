@@ -86,14 +86,14 @@ Rules:
 
 ## 4b. Illustrations (SVG drawn by you)
 
-Draw an illustration only for an analogy (`TEACHING.md` §6) or an imagined scene that helps the reader picture an abstract idea, and only when the chapter text alone leaves it hard to picture. At most one per chapter; most chapters need none. Never draw a real person, place, object, program screen, logo or brand, and never imitate a photo: those are real images (§5) or nothing.
+Draw an illustration only for an analogy (`TEACHING.md` §6), an imagined scene that helps the reader picture an abstract idea, or **a body position** in a skills book (how to sit with the instrument, where the hands go: a simple generic figure, the `skills` profile), and only when the chapter text alone leaves it hard to picture. At most one per chapter; most chapters need none. Never draw a real, identifiable person, a real place, object, program screen, logo or brand, and never imitate a photo: those are real images (§5) or nothing.
 
 How to draw it:
 
 - Write the SVG directly to `img/c<nn>-<name>.svg`, with no spec in `img/_source/` (that is how the scripts tell it from a diagram).
 - `<title>` first: the one sentence the reader must understand. Alt text in the chapter says what it shows.
 - Flat and simple: `viewBox` as wide as the reading profile (large 960, small 480), the book background `#FAF9F6`, ink `#2B2B33`, and the diagram colors (`diagram.py` palette, same meanings). About 60 shapes at most.
-- Up to 5 short labels (5 words each at most) in the book language, naming the pairs of the analogy; no code or commands in it.
+- Up to 5 short labels (5 words each at most) in the book language, naming what matters (the pairs of an analogy, the parts of a body position); no code or commands in it.
 - Only shapes and text: no embedded images, scripts, fonts or links to other sites.
 - Run `python scripts/illustration.py img/<file>.svg` until it reports no errors, then look at it (`diagram.py --sheet <n>`) and fix what reads badly. `audit.py` runs the same checks.
 

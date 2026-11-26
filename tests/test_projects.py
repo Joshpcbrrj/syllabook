@@ -30,6 +30,22 @@ def test_a_project_is_assembled_and_runs(cli, book):
     assert read(book / 'projects' / 'calc' / 'util.py') == 'def dobro(n):\n    return n * 2\n'
 
 
+def test_one_chapter_of_a_running_project_uses_the_files_of_the_earlier_chapters(cli, book):
+    # chapter 1 writes main.py and util.py; chapter 2 changes only util.py: the project must still run
+    add(book, '01-listas.md', project_block('calc', run=True, expect='42'))
+    add(book, '02-o-laco-for.md', f'<!-- project: calc | run: "{PY}" main.py | expect: 63 -->\n\n**util.py**\n\n'
+                                  '```python\ndef dobro(n):\n    # agora é o triplo\n    return n * 3\n```')
+    code, r = cli('projects', '--book', book, '--chapter', 2)
+    assert code == 0 and r['ok'], r
+    assert r['projects'][0]['files'] == ['main.py', 'util.py'] and '63' in r['projects'][0]['output']
+
+
+def test_one_chapter_runs_only_the_projects_it_touches(cli, book):
+    add(book, '01-listas.md', project_block('calc', run=True, expect='42'))
+    code, r = cli('projects', '--book', book, '--chapter', 2)
+    assert code == 0 and r['projects'] == []
+
+
 @pytest.mark.parametrize('name', ['../chapters', '..', 'a/b', 'a\\b'])
 def test_a_project_name_that_is_a_path_never_deletes_the_book(cli, book, name):
     add(book, '01-listas.md', project_block(name))

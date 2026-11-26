@@ -20,6 +20,6 @@ A book cover, not a template: original, clean and readable as a small thumbnail.
 ## Process
 
 1. Write in one sentence the visual idea and the accent color.
-2. Build the SVG (from the cover template in `assets/` when available).
-3. Render the PNG and look at it at two sizes: full and 160 px wide.
+2. Build the SVG with a `viewBox` of 1600 × 2560. When the library already has covers, reuse the layout grid and type of one of them (`cover.svg` in another book's folder) and change only the artwork and the accent color.
+3. Render the PNG with `python scripts/diagram.py --png cover.svg` and look at it at two sizes: full and 160 px wide.
 4. Check: title readable at 160 px; nothing touching the edges; no third-party marks; author and edition correct.

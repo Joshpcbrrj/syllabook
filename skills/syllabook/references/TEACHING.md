@@ -99,7 +99,7 @@ Hidden answers always use this exact format, with the summary text in the book l
 - Comments go on the line above the code and explain **why**, not what ("keeps the total to divide at the end", not "adds the grade").
 - Line length and indentation follow the reading profile in `VISUALS.md`.
 - Anything the reader must reproduce (code, formulas, commands, chords, tabs, steps) is text, never only an image.
-- **Projects:** start each block with its file path in bold (`**app/main.py**`) so `projects.py` can assemble and run the project. Before the first block, declare the project and how to check it: `<!-- project: todo-api | run: python main.py | expect: Servidor pronto -->` (leave `run` out when it needs a service the session lacks). A later block with the same path replaces the earlier one, so the project can grow across chapters (the running project, `areas/stem.md`): show the whole file again when it changes, so the reader never has to merge pieces by hand. Final-project code goes inside `<details>`.
+- **Projects:** start each block with its file path in bold (`**app/main.py**`) so `projects.py` can assemble and run the project. Before the first block, declare the project and how to check it: `<!-- project: todo-api | run: python main.py | expect: Servidor pronto -->` (leave `run` out when it needs a service the session lacks). A later block with the same path replaces the earlier one, so the project can grow across chapters (the running project, `areas/stem.md`): show the whole file again when it changes, so the reader never has to merge pieces by hand. In the final project the reader builds first, from the steps and the checks; the reference code goes inside `<details>`.
 - **Mistakes on purpose:** mark the block as failing and show the real error message.
 - Formulas in LaTeX (`$...$`, `$$...$$`); procedures as numbered steps.
 
@@ -126,6 +126,7 @@ Write it as a note with the fixed label, in the book language: `> 💡 **<Analog
 - The central concept was checked for an analogy (§6): abstract ones have it, with the pairs and where it breaks.
 - Content from a prerequisite book is pointed to, not taught again.
 - Every piece of code and every command was run (or is marked "not run").
+- With a running project (`areas/stem.md`): the chapter ends with the files the project should now have and one command that checks it, and `projects.py --chapter <n>` passes.
 - Facts were checked against the dossier and the sources (`facts.py`), and every explanation of a command or piece of code matches its real output.
 - The text reads as written in the book language, never translated (its style file).
 - No concept is used before it is taught (the brief lists which you may use).

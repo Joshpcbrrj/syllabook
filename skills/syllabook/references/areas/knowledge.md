@@ -20,7 +20,7 @@ guiding question → context (when, where, who) → the story or explanation →
 
 ## Visuals
 
-Timelines, concept maps, cause-and-effect trees, maps (as simple SVG), real period images with credits.
+Timelines (`timeline`), concept trees with verbs in the labels and cause-and-effect trees (`tree`), real period images with credits (photos, documents, maps of the time). A free-form concept map or a drawn geographic map is not supported by `diagram.py`: use a tree, a table or a real map with a free license.
 
 ## Cautions
 

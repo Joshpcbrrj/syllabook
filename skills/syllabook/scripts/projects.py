@@ -14,6 +14,9 @@ A file block is a line with the file path in bold, followed by a code block. Blo
 to a project named after the chapter. A later block with the same path replaces the earlier
 one, so a project can evolve across chapters. Files go to projects/<name>/.
 
+`--chapter N` checks the projects chapter N writes to, assembled with every chapter up to N (the
+state the reader has at that point of the book).
+
 `run` is executed in the project folder; `expect` is a text its output must contain. A project
 without `run` is only assembled ("not run"), e.g. when it needs a service the session lacks.
 Prints JSON; exit code 1 when a project fails or a path tries to leave the project folder.
@@ -117,20 +120,21 @@ def main():
     args = p.parse_args()
     book_dir, path = find_book(args.book)
     data = load_yaml(path)
-    numbers = [args.chapter] if args.chapter else chapter_numbers(data)
+    # a project grows across chapters: chapter n is checked with everything written up to it
+    numbers = [n for n in chapter_numbers(data) if not args.chapter or n <= args.chapter]
+    if args.chapter and not chapter_path(book_dir, args.chapter):
+        fail(f'chapter {args.chapter} has no file yet')
     projects, errors = {}, []
     for n in numbers:
         file = chapter_path(book_dir, n)
         if not file:
-            if args.chapter:
-                fail(f'chapter {n} has no file yet')
             continue
         default = os.path.splitext(os.path.basename(file))[0]
         collect(open(file, encoding='utf-8').read(), default, projects, errors, n)
     results = []
     for name, spec in projects.items():
-        if not spec['files']:
-            continue
+        if not spec['files'] or (args.chapter and args.chapter not in spec['chapters']):
+            continue  # with --chapter, only the projects that chapter writes to
         folder = os.path.join(book_dir, 'projects', name)
         if os.path.isdir(folder):
             shutil.rmtree(folder)  # rebuilt from the book every time, so it never drifts from the text

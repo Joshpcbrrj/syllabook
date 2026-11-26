@@ -32,7 +32,7 @@ Never ask for tokens or passwords in the chat: connections go through Claude's c
 
 ## 2. Checkpoints during the book
 
-- **GitHub connected:** work on the `draft/<slug>` branch of the user's library repository. `book.py done` saves each chapter; commit it right away with the message `<slug>: chapter <n>`. Use `commit_name` and `commit_email` from `library.yaml`.
+- **GitHub connected:** work on the `draft/<slug>` branch of the user's library repository. `book.py done` saves each chapter; commit it right away with the message `<slug>: chapter <n>`. Use `commit_name` and `commit_email` from `library.yaml`. Say once, when the branch is created, that the drafts are saved there and that it is merged and deleted at publication; if the user asked to keep the work local (Claude Code), commit without pushing until they say so.
 - **No GitHub:** at the end of each part of the book (or every 4 chapters), offer a partial zip from `build.py --partial`, written outside the library repository (see `--out` in SKILL.md), so it is never committed with the book.
 - If the user has no library repository yet, suggest creating one from the template (https://github.com/Joshpcbrrj/syllabook-library, **Use this template**, public): each user keeps their books in a repository of their own.
 - If the library repository has no `library.yaml` or book folders yet, copy `assets/library/` into it before the first commit (everything except `SKELETON.md`, which explains each file), and fill in `library.yaml` (`build.py lists` then writes the site address on the front page and the website and EPUB links of every book).
@@ -42,7 +42,7 @@ Never ask for tokens or passwords in the chat: connections go through Claude's c
 
 At the end, ask once: "Publish the book to GitHub and create the copy in Notion?" (the default answer is yes for both). Then, for GitHub, use the first option that works:
 
-1. **Write access available:** run `build.py lists --library <repo>` so the folder lists include the book, then merge `draft/<slug>` into `branch` (from `library.yaml`), or commit straight to it if there was no draft branch. The Actions build the EPUB and the site (they come with the library skeleton in `assets/library/`).
+1. **Write access available:** run `build.py lists --library <repo>` so the folder lists include the book, then merge `draft/<slug>` into `branch` (from `library.yaml`) and delete the draft branch, or commit straight to it if there was no draft branch. The Actions build the EPUB and the site (they come with the library skeleton in `assets/library/`).
 2. **Not connected, and the user wants to connect now:** send the GitHub guide link, wait, check again, then do option 1.
 3. **The user declines or cannot connect:** run `build.py --out <outputs>` with the downloadable outputs folder (on claude.ai, `/mnt/user-data/outputs`) and deliver the EPUB and the zip. Tell them: extract it at the root of their library repository (the zip already holds `created-books/<slug>/`, `improved-materials/<slug>/` or `translated-books/<slug>/`), then upload with GitHub's website (**Add file → Upload files**, dragging the folder) or GitHub Desktop. GitHub's website takes up to 100 files per upload: if the book has more, `build.py` splits the zip into parts and you say which part goes first.
 

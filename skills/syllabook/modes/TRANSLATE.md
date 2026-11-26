@@ -28,7 +28,7 @@ Show both in one message and wait for "approved". The table goes into the new `b
 ## 3. Create the sibling book
 
 - Folder: `translated-books/<slug>-<lang>/`, whatever the original's collection (the original stays in `created-books/` or `improved-materials/`).
-- `book.yaml`: copy the original's, then set `language`, `translation_of: <slug>`, the translated titles and concept names, and an empty progress list. Add `translations: [<slug>-<lang>]` to the original.
+- `book.yaml`: copy the original's, then set `language`, `translation_of: <slug>`, the translated titles and concept names, `edition: "1.0"`, `approved_on` (today, once the glossary is approved), and empty `progress`, `changes`, `editions` and `handoff` lists (the history belongs to the original). Add `translations: [<slug>-<lang>]` to the original.
 - Run `book.py validate`.
 
 ## 4. Chapter loop

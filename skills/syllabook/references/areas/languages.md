@@ -7,7 +7,7 @@ Help a self-learner reach real use of the language, starting from what matters m
 ## Syllabus principles (check them in the research)
 
 - **Balance of the four strands** (Paul Nation): meaning-focused input (reading, listening), meaning-focused output (speaking, writing), language-focused learning (grammar, vocabulary, pronunciation) and fluency practice.
-- **Lots of comprehensible input:** graded reading and listening every chapter; point to free sources and check that they exist.
+- **Lots of comprehensible input:** graded reading and listening every chapter; point to free sources and check that they exist. The book plays no sound, so the syllabus's 🧭 block already says where the reader will listen (graded audio, dictionaries with audio, the AI tutor's voice mode) and which chapters depend on it.
 - **High-frequency vocabulary first**; words in context, not lists alone.
 - **Retrieval and spacing** for vocabulary and structures; every chapter reuses earlier words.
 - **Output with feedback:** speaking and writing tasks with a checklist the reader can use alone, plus the AI tutor prompts as a conversation partner.

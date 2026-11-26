@@ -1,6 +1,6 @@
 schema_version: "1.1"
 name: 13-traduzir
-description: Option 3, translate a finished book: glossary and adaptation notes first, nothing created before approval
+description: "Option 3, translate a finished book: glossary and adaptation notes first, nothing created before approval"
 tags: [curto]
 runs: 1
 context:

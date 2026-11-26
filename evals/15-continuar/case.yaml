@@ -1,6 +1,6 @@
 schema_version: "1.1"
 name: 15-continuar
-description: Option 7, continue a book: status first, the handoff note shown before anything else (needs a shell)
+description: "Option 7, continue a book: status first, the handoff note shown before anything else (needs a shell)"
 tags: [completo]
 runs: 1
 context:

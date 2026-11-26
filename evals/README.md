@@ -29,21 +29,23 @@ Every start option has at least one case: 1 (03–06, 12), 2 (07), 3 (13), 4 (09
 From the repository root. The short cases (tag `curto`) need no shell, so they also run on Windows:
 
 ```bash
-claude plugin eval . --tag curto --runs 2 --allow-tools Write WebSearch WebFetch --judge-model sonnet --trust-plugin --no-publish --max-cost-usd 10 --threshold 0
+claude plugin eval . --tag curto --runs 2 --scaffold --allow-tools Write WebSearch WebFetch --judge-model opus --trust-plugin --no-publish --max-cost-usd 10 --threshold 0
 ```
+
+Add `--model sonnet` (or `haiku`) to check that the instructions hold with the models people use: the skill recommends Sonnet for the chapters, and the free plan uses it.
 
 `Write` must be granted (`--allow-tools Write`), or every case that lists it is refused. Cases 03 and 10 also need `WebSearch` and `WebFetch`: without them the skill rightly refuses to build a syllabus from memory, since it must research in the session. To run some cases only, `--case` takes one glob (the last `--case` wins and `{a,b}` is not supported): `--case "*proximo*"` runs 09 and 10.
 
-Case 6 grants Bash, which the eval refuses on Windows (no sandbox there), so run it in WSL, Linux or macOS. It needs `--scaffold` to prepare the book:
+Cases with a `scaffold.sh` (06, 13, 14, 15) need `--scaffold` to prepare the book, and the scaffold runs only where `bash` takes Linux paths (WSL, Linux or macOS; on Windows it fails with exit 127). A WSL distro with Docker Desktop's integration turned on has `~/.docker/contexts` as a link to Windows, and the eval then refuses every case that grants Bash: use a distro without that integration, Linux or macOS. Cases 06, 14 and 15 (tag `completo`) grant Bash, which the eval refuses on Windows (no sandbox there), so run them in WSL, Linux or macOS:
 
 ```bash
-claude plugin eval . --case 06-escrever-capitulo --runs 1 --ablation none --scaffold \
-  --allow-tools Bash Write Edit --judge-model sonnet --trust-plugin --no-publish --max-cost-usd 6 --threshold 0
+claude plugin eval . --tag completo --runs 1 --ablation none --scaffold \
+  --allow-tools Bash Write Edit --judge-model opus --trust-plugin --no-publish --max-cost-usd 10 --threshold 0
 ```
 
 Notes:
 
 - Each case also runs once without the plugin (the "without" arm) to show the difference; `--ablation none` skips it.
-- The Sonnet judge (`--judge-model sonnet`) is stricter about the criteria and less noisy than the default Haiku.
+- Use the Opus judge (`--judge-model opus`). On 2026-11-26 the Sonnet judge failed, three votes out of three, replies that met every item of long criteria (cases 03, 16 and 17), and the Opus judge passed them; Haiku, the default, is noisier still. The judge costs little next to the runs.
 - In case 6 the sandbox may make the shell read-only in the workspace: the skill then writes the chapter with its file tools, or stops and explains, both acceptable. Read the run's last message before judging a low score.
 - Results go to `evals/results/` (ignored by git); `report.html` there shows every reply and grader verdict.

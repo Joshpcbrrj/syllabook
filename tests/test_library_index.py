@@ -52,9 +52,8 @@ def test_a_track_name_from_library_yaml(cli, tracked):
 
 
 def test_no_tracks_no_section(cli, library):
-    before = read(library / 'README.pt-BR.md')
     cli('build', 'lists', '--library', library)
-    assert read(library / 'README.pt-BR.md') == before
+    assert 'tracks:start' not in read(library / 'README.pt-BR.md')
 
 
 def test_the_website_home_shows_the_tracks(cli, tracked):

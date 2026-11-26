@@ -133,6 +133,28 @@ def test_a_split_build_says_how_to_upload(cli, book, tmp_path, monkeypatch):
     assert len(r['zips']) >= 2 and 'upload them in order' in r['note']
 
 
+def test_the_book_ends_with_the_skill_credit_in_its_language(cli, book, tmp_path):
+    import build
+    import common
+    data = load(book / 'book.yaml')
+    last = build.book_files(str(book), data, common.labels('pt-BR'))[-1]  # the glossary, last in reading order
+    cli('build', '--book', book, '--out', tmp_path / 'd', '--no-epub', '--no-zip')
+    credit = '📘 *Criado pela skill Claude Syllabook - Joshpcbrrj* · [github.com/Joshpcbrrj/syllabook]'
+    end = read(last)
+    assert credit in end and end.index('credit:start') < end.index('nav:start')  # the navigation stays last
+    assert credit in read(book / 'README.md')
+    cli('build', '--book', book, '--out', tmp_path / 'd', '--no-epub', '--no-zip')
+    assert read(last).count('Criado pela skill') == 1  # rebuilding does not repeat it
+
+
+def test_the_credit_follows_the_book_language(cli, book, tmp_path):
+    data = load(book / 'book.yaml')
+    data['language'] = 'en'
+    save(book / 'book.yaml', data)
+    cli('build', '--book', book, '--out', tmp_path / 'd', '--no-epub', '--no-zip')
+    assert 'Created by the Claude skill Syllabook - Joshpcbrrj' in read(book / 'README.md')
+
+
 def test_the_map_creates_a_readme_when_there_is_none(cli, book, tmp_path):
     os.remove(book / 'README.md')
     cli('build', '--book', book, '--out', tmp_path / 'd', '--no-epub', '--no-zip')
@@ -156,11 +178,32 @@ def test_lists_in_both_languages_for_both_collections(cli, library):
     data.update(origin='improved', slug='notas-de-aula', title='Notas de aula')
     save(improved / 'book.yaml', data)
     code, r = cli('build', 'lists', '--library', library)
-    assert code == 0 and r['books'] == 2 and len(r['updated']) == 4
-    assert '| Livro | Nível | Capítulos | Edição | EPUB |' in read(library / 'created-books' / 'README.pt-BR.md')
+    # the four collection lists, plus both front pages (their site address becomes a link)
+    assert code == 0 and r['books'] == 2 and len(r['updated']) == 6
+    assert '| Livro | Nível | Capítulos | Edição | EPUB | Site |' in read(library / 'created-books' / 'README.pt-BR.md')
     english = read(library / 'improved-materials' / 'README.md')
-    assert '| Book | Level | Chapters | Edition | EPUB |' in english and '[Notas de aula](notas-de-aula/)' in english
+    assert '| Book | Level | Chapters | Edition | EPUB | Site |' in english
+    assert '[Notas de aula](notas-de-aula/)' in english
     assert 'releases/download/epubs/notas-de-aula.epub' in english
+    assert '[Read online](https://exemplo.github.io/minha-biblioteca/improved-materials/notas-de-aula/)' in english
+
+
+def test_lists_turn_the_site_placeholder_into_a_link_once(cli, library):
+    cli('build', 'lists', '--library', library)
+    home = read(library / 'README.md')
+    assert '[https://exemplo.github.io/minha-biblioteca/](https://exemplo.github.io/minha-biblioteca/)' in home
+    assert '<user>' not in home and '<usuario>' not in read(library / 'README.pt-BR.md')
+    code, r = cli('build', 'lists', '--library', library)
+    assert 'README.md' not in r['updated']  # nothing left to change on the front page
+
+
+def test_lists_without_a_repository_keep_the_placeholder_and_have_no_site_links(cli, library):
+    settings = load(library / 'library.yaml')
+    settings['repository'] = ''
+    save(library / 'library.yaml', settings)
+    cli('build', 'lists', '--library', library)
+    assert '`https://<user>.github.io/<repository>/`' in read(library / 'README.md')
+    assert 'Read online' not in read(library / 'created-books' / 'README.md')
 
 
 def test_lists_leave_empty_collections_untouched(cli, library):

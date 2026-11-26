@@ -26,7 +26,8 @@ import zipfile
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from common import (SKILL, chapter_numbers, chapter_path, fail, find_book, first_h1, labels, library_book,
-                    library_root, load_yaml, need_yaml, next_steps, out, pandoc_path, review_due, slugify)
+                    library_root, load_yaml, need_yaml, next_steps, out, pandoc_path, review_due, site_url,
+                    slugify)
 
 COLLECTIONS = {'created': 'created-books', 'improved': 'improved-materials', 'translated': 'translated-books'}
 COLLECTION_TITLES = {'created': 'Created books', 'improved': 'Improved materials',
@@ -138,6 +139,22 @@ def update_next_steps(book_dir, data, lab):
     write(last, set_block(text, 'next-steps', '\n'.join(lines)))
 
 
+SKILL_REPO = 'https://github.com/Joshpcbrrj/syllabook'
+
+
+def credit_line(lab):
+    return f'📘 *{lab["Created by"]} - Joshpcbrrj* · [{SKILL_REPO.split("//")[1]}]({SKILL_REPO})'
+
+
+def update_credit(files, lab):
+    """The skill's credit at the very end of the book: the last file in reading order, before the navigation."""
+    last = files[-1]
+    text = read(last)
+    if '<!-- credit:start -->' not in text and '<!-- nav:start -->' in text:
+        text = text.replace('<!-- nav:start -->', '<!-- credit:start -->\n<!-- credit:end -->\n\n<!-- nav:start -->', 1)
+    write(last, set_block(text, 'credit', '---\n\n' + credit_line(lab)))
+
+
 def update_map(book_dir, data, files, lab):
     minutes = {c['n']: c.get('minutes') for c in data['chapters']}
     lines = [f'## 🗺️ {lab["Book map"]}', '']
@@ -153,7 +170,7 @@ def update_map(book_dir, data, files, lab):
         history = [f'## 🗒️ {lab["Editions"]}', '']
         history += [f'- **{e["edition"]}** ({e["date"]}): {e["summary"]}' for e in reversed(data['editions'])]
         text = set_block(text, 'editions', '\n'.join(history))
-    write(readme, text)
+    write(readme, set_block(text, 'credit', credit_line(lab)))
 
 
 def update_index(book_dir, data, files, lab):
@@ -284,6 +301,7 @@ def cmd_book(args):
     if files:
         update_next_steps(book_dir, data, lab)
         update_navigation(files, lab)
+        update_credit(files, lab)
         update_map(book_dir, data, files, lab)
         update_index(book_dir, data, files, lab)
     if args.partial:
@@ -320,19 +338,33 @@ def epub_url(settings, slug):
     return f'https://github.com/{repo}/releases/download/{tag}/{slug}.epub' if repo else ''
 
 
-def book_rows(books, settings, lab, link):
-    rows = [f'| {lab["Book"]} | {lab["Level"]} | {lab["Chapters"]} | {lab["Edition"]} | EPUB |',
-            '| --- | --- | --- | --- | --- |']
+def book_site_url(settings, book):
+    """The book's page on the library website: <site>/<collection folder>/<book folder>/."""
+    site = site_url(settings.get('repository'))
+    return f'{site}{book["folder"]}/{os.path.basename(book["dir"])}/' if site else ''
+
+
+def book_rows(books, settings, lab, link, site=False):
+    """The table of books; site=True adds a column with each book's page on the website (not needed on the site)."""
+    head = [lab['Book'], lab['Level'], lab['Chapters'], lab['Edition'], 'EPUB'] + (['Site'] if site else [])
+    rows = ['| ' + ' | '.join(head) + ' |', '|' + ' --- |' * len(head)]
     for b in books:
         d = b['data']
         level = d.get('level') or {}
         url = epub_url(settings, d['slug'])
-        rows.append(f'| [{d["title"]}]({link(b)}) ({d.get("language", "")}) | {level.get("start", "")} → '
-                    f'{level.get("end", "")} | {len(d.get("chapters") or [])} | '
-                    f'{d.get("edition", "1.0")} · {d.get("reviewed_on") or d.get("approved_on", "")}'
-                    f'{" ⏰" if review_due(d) else ""} | '
-                    + (f'[{lab["Download EPUB"]}]({url})' if url else '') + ' |')
+        cells = [f'[{d["title"]}]({link(b)}) ({d.get("language", "")})',
+                 f'{level.get("start", "")} → {level.get("end", "")}', str(len(d.get('chapters') or [])),
+                 f'{d.get("edition", "1.0")} · {d.get("reviewed_on") or d.get("approved_on", "")}'
+                 f'{" ⏰" if review_due(d) else ""}',
+                 f'[{lab["Download EPUB"]}]({url})' if url else '']
+        if site:
+            page = book_site_url(settings, b)
+            cells.append(f'[{lab["Read online"]}]({page})' if page else '')
+        rows.append('| ' + ' | '.join(cells) + ' |')
     return '\n'.join(rows)
+
+
+SITE_PLACEHOLDER = re.compile(r'`https://<[^>`]+>\.github\.io/<[^>`]+>/`')
 
 
 def track_lines(books, settings, lab, link):
@@ -368,14 +400,24 @@ def cmd_lists(args):
         for readme, lang in (('README.md', 'en'), ('README.pt-BR.md', 'pt-BR')):
             path = os.path.join(root, folder, readme)
             if os.path.exists(path):
-                table = book_rows(group, settings, labels(lang), lambda b: os.path.basename(b['dir']) + '/')
+                table = book_rows(group, settings, labels(lang), lambda b: os.path.basename(b['dir']) + '/',
+                                  site=True)
                 write(path, set_block(read(path), 'list', table))
                 updated.append(os.path.relpath(path, root).replace(os.sep, '/'))
+    site = site_url(settings.get('repository'))
     for readme, lang in (('README.md', 'en'), ('README.pt-BR.md', 'pt-BR')):
         path = os.path.join(root, readme)
+        if not os.path.exists(path):
+            continue
+        text = before = read(path)
+        if site:
+            # the template ships the address as a placeholder; once the repository is known it becomes a link
+            text = SITE_PLACEHOLDER.sub(f'[{site}]({site})', text)
         lines = track_lines(books, settings, labels(lang), lambda b: f'{b["folder"]}/{os.path.basename(b["dir"])}/')
-        if lines and os.path.exists(path):
-            write(path, set_block(read(path), 'tracks', '\n'.join(lines)))
+        if lines:
+            text = set_block(text, 'tracks', '\n'.join(lines))
+        if text != before:
+            write(path, text)
             updated.append(readme)
     out({'books': len(books), 'updated': updated})
 

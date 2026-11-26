@@ -2,7 +2,8 @@
 
 ## Practice
 
-- **Programming and technology:** a hands-on lab in every chapter (`🧪 Lab`), done step by step with the real output; the practice ladder with code to complete, to write and to change; a final project that uses the whole book, split into files.
+- **Programming and technology:** a hands-on lab in every chapter (`🧪 Lab`), done step by step with the real output; the practice ladder with code to complete, to write and to change.
+- **Running project (the default for programming, infrastructure and code):** one project that grows across the chapters, as in a real job (an API that gains a database, then a proxy, then a production setup). Each chapter's lab adds one step to it, and the final project closes it. Every step is a tutorial the reader can replicate alone: complete, copyable blocks with the file path in bold (`TEACHING.md` §5), the command to run, its real output and what to observe; at the end of the chapter, the files the project should now have and one command that checks it works. Exercises outside the project still practice each idea. Use a separate final project only when the topics share no natural project; say which in the syllabus.
 - **Math and statistics:** worked examples with every step justified; exercises from mechanical to word problems; at least one proof or "why it works" per key result, at the reader's level; a final set of mixed problems.
 
 ## Verification

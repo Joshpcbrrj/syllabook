@@ -21,10 +21,10 @@ Cases for `claude plugin eval`: each one sends a real request to Claude with the
 From the repository root. The short cases (tag `curto`) need no shell, so they also run on Windows:
 
 ```bash
-claude plugin eval . --tag curto --runs 2 --allow-tools Write --judge-model sonnet --trust-plugin --no-publish --max-cost-usd 10 --threshold 0
+claude plugin eval . --tag curto --runs 2 --allow-tools Write WebSearch WebFetch --judge-model sonnet --trust-plugin --no-publish --max-cost-usd 10 --threshold 0
 ```
 
-`Write` must be granted (`--allow-tools Write`), or every case that lists it is refused. To run some cases only, `--case` takes one glob (the last `--case` wins and `{a,b}` is not supported): `--case "*proximo*"` runs 09 and 10.
+`Write` must be granted (`--allow-tools Write`), or every case that lists it is refused. Cases 03 and 10 also need `WebSearch` and `WebFetch`: without them the skill rightly refuses to build a syllabus from memory, since it must research in the session. To run some cases only, `--case` takes one glob (the last `--case` wins and `{a,b}` is not supported): `--case "*proximo*"` runs 09 and 10.
 
 Case 6 grants Bash, which the eval refuses on Windows (no sandbox there), so run it in WSL, Linux or macOS. It needs `--scaffold` to prepare the book:
 

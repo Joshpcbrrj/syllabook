@@ -56,6 +56,8 @@ Write as a patient mentor talking to one reader, in plain international English.
 | See the image on the website | See the image on the website |
 | Other books | Other books |
 | Download EPUB | Download EPUB |
+| Read online | Read online |
+| Created by | Created by the Claude skill Syllabook |
 | Chapters | Chapters |
 | Index | Index |
 | Book | Book |

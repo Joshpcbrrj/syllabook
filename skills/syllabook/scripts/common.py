@@ -101,6 +101,14 @@ def labels(language):
     return found or parse('en')
 
 
+def site_url(repository):
+    """The library's GitHub Pages address (https://<owner>.github.io/<name>/), or '' without a repository."""
+    if not repository or '/' not in repository:
+        return ''
+    owner, name = repository.split('/', 1)
+    return f'https://{owner.lower()}.github.io/{name}/'
+
+
 def remember(book_yaml):
     """Saves the current book for the next commands; a read-only home (a sandbox) only loses the shortcut."""
     try:

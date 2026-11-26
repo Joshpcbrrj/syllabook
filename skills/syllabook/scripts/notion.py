@@ -26,7 +26,7 @@ import re
 import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from common import chapter_path, fail, find_book, first_h1, labels, load_yaml, out
+from common import chapter_path, fail, find_book, first_h1, labels, load_yaml, out, site_url
 
 IMAGE = re.compile(r'^!\[([^\]]*)\]\(\.\./img/([^)\s]+)\)\s*$')
 CHAPTER_LINK = re.compile(r'\[([^\]]+)\]\((?!https?:)[^)\s]+\.md(#[^)\s]*)?\)')
@@ -141,13 +141,6 @@ def convert(text, book_dir, page_url='', see_label='See the image on the website
 
 def title_of(text):
     return first_h1(text)
-
-
-def site_url(repository):
-    if not repository or '/' not in repository:
-        return ''
-    owner, name = repository.split('/', 1)
-    return f'https://{owner.lower()}.github.io/{name}/'
 
 
 def chapter_url(book_dir, data, file):

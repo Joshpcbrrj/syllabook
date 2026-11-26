@@ -112,7 +112,7 @@ Syllabus rules:
 - **Progression:** each chapter uses only concepts from earlier ones (`book.py validate` checks the concept graph).
 - **One goal per chapter**, with a verb that can be checked ("build", "translate", "play at 80 bpm"), never "understand" or "know".
 - **Chapter 1 delivers a concrete win** (something that works, is said or is played on day one).
-- **Practice in every chapter**, of the kind defined by the profile.
+- **Practice in every chapter**, of the kind defined by the profile. For programming, infrastructure or code, the chapters build one **running project** (`areas/stem.md`): name it in the 🧭 block ("Practice: one project that grows, <what it is>"), and let the chapter goals say what each chapter adds to it.
 - **Explicit scope:** what does not fit goes to "Next steps".
 
 ## 5. Adjust until "approved"

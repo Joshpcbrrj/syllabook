@@ -59,6 +59,8 @@ Write as a patient Brazilian mentor talking to one reader. The text must read as
 | See the image on the website | Ver a imagem no site |
 | Other books | Outros livros |
 | Download EPUB | Baixar EPUB |
+| Read online | Ler no site |
+| Created by | Criado pela skill Claude Syllabook |
 | Chapters | Capítulos |
 | Index | Índice remissivo |
 | Book | Livro |

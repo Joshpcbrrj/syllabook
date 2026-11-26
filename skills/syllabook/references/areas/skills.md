@@ -15,7 +15,7 @@
 
 ## Visuals
 
-Chord diagrams (`chord`), the fretboard with notes (`fretboard`), tablature (`tab`), rhythm patterns, circuit schematics, breadboard layouts, pinouts, step-by-step sequences. Real images only for what something looks like (an instrument, a component), with credits.
+Chord diagrams (`chord`), the fretboard with notes (`fretboard`), tablature (`tab`), rhythm patterns, circuit schematics, breadboard layouts, pinouts, step-by-step sequences. Real images only for what something looks like (an instrument, a component), with credits. **Posture and hand positions are shown on a body**, never as a list of dos and don'ts: a simple illustration (`VISUALS.md` §4b) or a free-license photo.
 
 ## Safety (mandatory when there is risk)
 
@@ -23,5 +23,5 @@ Before the first hands-on step, a `⚠️ Safety` box: mains voltage, lithium ba
 
 ## Cautions
 
-- No song lyrics or protected scores: public-domain songs or exercises written for the book.
+- No song lyrics or protected scores: public-domain songs or exercises written for the book. Do suggest real repertoire to apply each chapter (title and artist only, in the reader's taste, using only the chords taught so far, checked against a source), so the reader plays music they like early on.
 - The book has no audio or video: say how to hear or see the result (metronome, tuner, recording yourself) without inventing links.

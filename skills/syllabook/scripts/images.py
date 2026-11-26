@@ -102,11 +102,18 @@ def plain(value):
     return re.sub(r'\s+', ' ', html.unescape(re.sub(r'<[^>]+>', ' ', value or ''))).strip()
 
 
+def author_name(value):
+    """A readable author: Commons often says "The original uploader was X at Italian Wikipedia ."."""
+    author = re.sub(r'\s+\.$', '', plain(value)).strip()
+    m = re.match(r'^The original uploader was (.+?) at (.+?)\.?$', author)
+    return f'{m.group(1)} ({m.group(2)})' if m else author
+
+
 def describe(page):
     info = (page.get('imageinfo') or [{}])[0]
     meta = info.get('extmetadata') or {}
     value = lambda key: (meta.get(key) or {}).get('value', '')  # noqa: E731
-    return {'title': page.get('title'), 'author': plain(value('Artist')) or 'unknown author',
+    return {'title': page.get('title'), 'author': author_name(value('Artist')) or 'unknown author',
             'license': plain(value('LicenseShortName')), 'license_url': value('LicenseUrl'),
             'source': info.get('descriptionurl'), 'url': info.get('thumburl') or info.get('url'),
             'mime': info.get('mime'), 'size': f'{info.get("width")}x{info.get("height")}',

@@ -50,6 +50,16 @@ def test_only_free_licenses_are_accepted(license_name, free):
     assert images.free_license(license_name) is free
 
 
+@pytest.mark.parametrize('raw, author', [
+    ('The original uploader was <a href="x">Piero Sagnibene</a> at Italian Wikipedia .',
+     'Piero Sagnibene (Italian Wikipedia)'),
+    ('<a href="x">U.S. Army</a> Photo', 'U.S. Army Photo'),
+    ('Jane Doe .', 'Jane Doe'),
+])
+def test_the_author_of_a_commons_image_reads_well_in_a_caption(raw, author):
+    assert images.author_name(raw) == author
+
+
 def test_search_lists_only_free_images_with_their_credit(cli, commons):
     commons['pages'] = [ENIAC, LOGO, HOPPER]
     code, r = cli('images', 'search', 'eniac')

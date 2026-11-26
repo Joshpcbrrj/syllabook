@@ -10,6 +10,8 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 - The book lists have a **Site** column with each book's page on the library website, next to the EPUB link, and `build.py lists` turns the website placeholder on the library's front page into a link once `repository` is set in `library.yaml`. The collection pages no longer point to the website's source folder. On the front page, every book has its website page and EPUB next to it, by track or, in a library with no tracks yet, in a plain list of books.
 - Every book ends with the skill's credit, in the book language ("Criado pela skill Claude Syllabook - Joshpcbrrj" / "Created by the Claude skill Syllabook - Joshpcbrrj", with the link to the repository): `build.py` writes it at the end of the last file in reading order and in the book map, so it reaches the website, the EPUB and the Notion copy.
+- Skills profile (music, electronics, hands-on work): posture and hand positions are shown on a body, never as a list of dos and don'ts, and each chapter suggests real repertoire (title and artist only, with the chords taught so far). Found by comparing a guitar book written with and without the skill (`plano/pilotos/05-violao-com-e-sem-skill.md`).
+- `images.py`: Commons authors read well in captions ("Piero Sagnibene (Italian Wikipedia)" instead of "The original uploader was Piero Sagnibene at Italian Wikipedia .").
 - Programming, infrastructure and code books build one **running project** by default: each chapter's lab adds a step to it, with complete, copyable files, the command, its real output and a check at the end of the chapter; the syllabus names it (`areas/stem.md`, `CREATE.md`).
 
 ### Security

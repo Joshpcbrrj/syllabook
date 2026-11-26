@@ -46,6 +46,16 @@ def test_lists_write_the_tracks_on_the_front_page(cli, tracked):
     assert '## 🧭 Tracks' in read(tracked / 'README.md')
 
 
+def test_the_front_page_opens_with_a_link_to_each_folder_and_its_book_count(cli, tracked):
+    cli('build', 'lists', '--library', tracked)
+    block = read(tracked / 'README.pt-BR.md').split('<!-- tracks:start -->')[1].split('<!-- tracks:end -->')[0]
+    assert block.index('## 📂 Pastas') < block.index('## 🧭 Trilhas')
+    assert '| [📗 Livros criados](created-books/README.pt-BR.md) | 2 |' in block
+    assert '| [🔁 Materiais aprimorados](improved-materials/README.pt-BR.md) | 1 |' in block
+    assert '| [🌐 Livros traduzidos](translated-books/README.pt-BR.md) | 1 |' in block
+    assert '| [📗 Created books](created-books/) | 2 |' in read(tracked / 'README.md')
+
+
 def test_a_track_name_from_library_yaml(cli, tracked):
     settings = load(tracked / 'library.yaml')
     settings['tracks'] = {'python': 'Programação em Python'}

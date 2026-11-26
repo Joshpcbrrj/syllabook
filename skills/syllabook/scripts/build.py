@@ -400,6 +400,20 @@ def track_lines(books, settings, lab, link, extra=lambda b: ''):
     return lines
 
 
+COLLECTION_ICONS = {'created': '📗', 'improved': '🔁', 'translated': '🌐'}
+
+
+def folder_lines(books, lab, readme):
+    """The front page's first section: one link per collection folder (to its list in the page's language),
+    with how many books it holds."""
+    lines = [f'## 📂 {lab["Folders"]}', '', f'| {lab["Folder"]} | {lab["Books"]} |', '| --- | --- |']
+    for key, folder in COLLECTIONS.items():
+        count = sum(1 for b in books if b['folder'] == folder)
+        target = f'{folder}/' if readme == 'README.md' else f'{folder}/{readme}'
+        lines.append(f'| [{COLLECTION_ICONS[key]} {lab[COLLECTION_TITLES[key]]}]({target}) | {count} |')
+    return lines
+
+
 def cmd_lists(args):
     root = os.path.abspath(args.library)
     settings, _ = library_settings(root)
@@ -433,7 +447,9 @@ def cmd_lists(args):
             # no tracks yet: still list every book on the front page, with its website and EPUB
             lines = [f'## 📚 {lab["Books"]}', '']
             lines += [f'- [{b["data"]["title"]}]({link(b)}){extra(b)}' for b in originals]
-        if lines:
+        if books:
+            # the folders first, so each kind of book is one click away; then the books by track
+            lines = folder_lines(books, lab, readme) +([''] + lines if lines else [])
             text = set_block(text, 'tracks', '\n'.join(lines))
         if text != before:
             write(path, text)

@@ -54,6 +54,8 @@ Write as a patient Brazilian mentor talking to one reader. The text must read as
 | Improved materials | Materiais aprimorados |
 | Translated books | Livros traduzidos |
 | Tracks | Trilhas |
+| Folders | Pastas |
+| Folder | Pasta |
 | Edition | Edição |
 | Editions | Edições |
 | See the image on the website | Ver a imagem no site |

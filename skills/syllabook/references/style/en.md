@@ -51,6 +51,8 @@ Write as a patient mentor talking to one reader, in plain international English.
 | Improved materials | Improved materials |
 | Translated books | Translated books |
 | Tracks | Tracks |
+| Folders | Folders |
+| Folder | Folder |
 | Edition | Edition |
 | Editions | Editions |
 | See the image on the website | See the image on the website |

@@ -139,9 +139,11 @@ COPY_WORDS = 12  # this many words in a row, the same as in the original, is a c
 
 
 def prose_words(text):
-    """The words of a Markdown text, outside code blocks and inline code: commands may match, prose may not."""
+    """The words of a Markdown text, outside code blocks, inline code and links: commands and sources may match,
+    prose may not."""
     text = re.sub(r'^(`{3,}|~{3,}).*?^\1\s*$', ' ', text, flags=re.S | re.M)
     text = re.sub(r'`[^`\n]*`', ' ', text)
+    text = re.sub(r'(?:https?://|www\.)[^\s<>()\[\]]+', ' ', text)
     return re.findall(r'\w+', text.lower())
 
 

@@ -116,6 +116,16 @@ def test_code_and_short_overlaps_are_not_copies(cli, improved):
     assert not any('copied from the original' in e for e in r['errors']), r
 
 
+def test_the_same_source_link_is_not_a_copy(cli, improved):
+    book, source = improved
+    url = 'https://docs.docker.com/get-started/docker-concepts/the-basics/what-is-a-container/'
+    with open(source / '01-aula-1.md', 'a', encoding='utf-8') as f:
+        f.write(f'\nFonte: <{url}> e [o guia]({url}).\n')
+    edit(book / 'chapters' / '01-listas.md', '## Listas', f'## Listas\n\nVeja [a documentação]({url}) e {url}.')
+    code, r = cli('audit', '--book', book, '--original', source)
+    assert not any('copied from the original' in e for e in r['errors']), r
+
+
 def test_an_improved_book_audited_without_the_original_gets_a_reminder(cli, improved):
     book, _ = improved
     code, r = cli('audit', '--book', book)

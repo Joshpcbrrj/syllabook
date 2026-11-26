@@ -10,7 +10,7 @@ The documentation follows the [Diátaxis](https://diataxis.fr/) model: each part
 | [**FAQ**](faq.md) | get a quick answer: plans, cost, privacy, languages, images | done |
 | [**Integrations**](integrations/) | connect or install something separately: GitHub, Notion, Google Drive, Docling, GitHub Pages, WSL 2 | done |
 | **Guides** | do a task: create your library, publish a finished book, continue a book | to be written |
-| [**Reference**](reference.md) | look up a detail: folder layout, `book.yaml`, `library.yaml` | done (scripts: to be written) |
+| [**Reference**](reference.md) | look up a detail: folder layout, `book.yaml`, `library.yaml` | done (for the scripts, run any of them with `--help`) |
 | **Explanation** | understand the why: how the skill works, the teaching approach, token savings | to be written |
 | [**Testing**](testing.md) | change the skill or its scripts: how the tests work and how to add one | done |
 | [**Changelog**](../CHANGELOG.md) | see what changed in each version | kept up to date |

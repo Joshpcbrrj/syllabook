@@ -225,6 +225,22 @@ def test_fetch_from_openverse_of_a_missing_image(cli, book, commons, openverse):
 
 # --- editor: screenshots of VS Code (code-server) ---
 
+class PaletteRows:
+    """The palette's list as Playwright sees it: rows with a label, the ones a click would run."""
+    def __init__(self, labels, log):
+        self.labels, self.log = labels, log
+
+    def count(self):
+        return len(self.labels)
+
+    def nth(self, i):
+        label, log = self.labels[i], self.log
+        text = types.SimpleNamespace(inner_text=lambda: label)
+        return types.SimpleNamespace(
+            locator=lambda sel: types.SimpleNamespace(count=lambda: 1, first=text),
+            click=lambda: log.append(('click', label)))
+
+
 def fake_playwright(monkeypatch, log):
     class Keyboard:
         def press(self, key):
@@ -236,6 +252,9 @@ def fake_playwright(monkeypatch, log):
     class Page:
         keyboard = Keyboard()
         mouse = types.SimpleNamespace(move=lambda x, y: None)
+
+        def locator(self, selector):
+            return PaletteRows([], log)
 
         def goto(self, url, **kw):
             log.append(('goto', url))
@@ -519,13 +538,20 @@ def test_drive_editor_opens_files_runs_commands_and_shows_the_view():
         def type(self, text):
             log.append(('type', text))
 
+    # the real palette lists "Git: Open All Changes" first for "Git: Open Changes": Enter would run the wrong one
+    rows = {'Git: Open Changes': ['Git: Open All Changes', 'Git: Open Changes', 'Git: Open Staged Changes']}
+    typed_last = lambda: [t for k, t in log if k == 'type'][-1]  # noqa: E731
     page = types.SimpleNamespace(keyboard=Keyboard(), mouse=types.SimpleNamespace(move=lambda x, y: None),
                                  goto=lambda url, **kw: log.append(('goto', url)),
+                                 locator=lambda sel: PaletteRows(rows.get(typed_last(), []), log),
                                  wait_for_selector=lambda s, **kw: None, wait_for_timeout=lambda ms: None)
     images.drive_editor(page, 'http://x', ['a.md'], ['Git: Open Changes'], 'scm')
     typed = [t for k, t in log if k == 'type']
     assert typed == ['a.md', 'Git: Open Changes', 'View: Show Source Control', 'Notifications: Clear All Notifications']
     assert log.index(('press', 'Backspace')) < log.index(('type', 'a.md'))  # Quick Open, not a command
+    assert ('click', 'Git: Open Changes') in log and ('click', 'Git: Open All Changes') not in log
+    after = log[log.index(('type', 'Git: Open Changes')):]
+    assert ('press', 'Enter') not in after[:after.index(('click', 'Git: Open Changes'))]
 
 
 # ---------- images of official documentation repositories on GitHub ----------

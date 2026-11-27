@@ -24,7 +24,7 @@ Syllabook is a Claude skill for self-learners. It writes course-books on any top
 
 To update or remove it, see the [FAQ](docs/faq.md#how-do-i-update-or-remove-syllabook).
 
-👀 **See it working:** the [demo library](https://github.com/Joshpcbrrj/syllabook-demo) and its [searchable website](https://joshpcbrrj.github.io/syllabook-demo/), built by the same workflows every library gets.
+👀 **See it working:** a [real library](https://github.com/Joshpcbrrj/biblioteca-syllabook) with four books in Portuguese (Git, Docker, Docker Compose, WSL), its [searchable website](https://joshpcbrrj.github.io/biblioteca-syllabook/) and the EPUBs, built by the same workflows every library gets.
 
 ### 🔌 Integrations
 

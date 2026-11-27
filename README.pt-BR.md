@@ -1,4 +1,4 @@
-<!-- translation-of: README.md sha256:9fcbfb84c837 -->
+<!-- translation-of: README.md sha256:2857e8252948 -->
 # <img src="docs/img/syllabook-icon.svg" alt="" height="40"> Syllabook
 
 [English](README.md) | **Português**
@@ -25,7 +25,7 @@ Syllabook é uma skill do Claude para quem estuda sozinho. Ela cria livros-curso
 
 Para atualizar ou remover, veja as [perguntas frequentes](docs/faq.pt-BR.md#como-atualizo-ou-removo-o-syllabook).
 
-👀 **Veja funcionando:** a [biblioteca de demonstração](https://github.com/Joshpcbrrj/syllabook-demo) e o [site com busca](https://joshpcbrrj.github.io/syllabook-demo/) dela, gerados pelos mesmos workflows que toda biblioteca recebe.
+👀 **Veja funcionando:** uma [biblioteca de verdade](https://github.com/Joshpcbrrj/biblioteca-syllabook) com quatro livros (Git, Docker, Docker Compose, WSL), o [site com busca](https://joshpcbrrj.github.io/biblioteca-syllabook/) dela e os EPUBs, gerados pelos mesmos workflows que toda biblioteca recebe.
 
 ### 🔌 Integrações
 

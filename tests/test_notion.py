@@ -119,7 +119,7 @@ def test_index_page_without_a_library_has_no_links(cli, book):
 
 
 def test_site_url():
-    assert notion.site_url('Joshpcbrrj/syllabook-demo') == 'https://joshpcbrrj.github.io/syllabook-demo/'
+    assert notion.site_url('Joshpcbrrj/biblioteca-syllabook') == 'https://joshpcbrrj.github.io/biblioteca-syllabook/'
     assert notion.site_url('') == ''
 
 

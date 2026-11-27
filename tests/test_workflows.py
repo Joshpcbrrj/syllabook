@@ -4,7 +4,7 @@ Each `run:` step of the real workflow file runs in bash, as on GitHub, with its 
 conditions, step outputs and GITHUB_ENV. `gh` and `pip` are fakes that only log what
 they would do, so nothing is published; `actions/*` steps (Pages upload and deploy)
 are skipped. What this cannot cover, the real release and Pages deploy, runs in the
-public demo repository (syllabook-demo).
+public library biblioteca-syllabook.
 """
 import os
 import re

@@ -1,4 +1,4 @@
-<!-- translation-of: testing.md sha256:bd8044bad280 -->
+<!-- translation-of: testing.md sha256:675486a323cf -->
 # Como os testes funcionam
 
 [English](testing.md) | **Português**
@@ -103,7 +103,7 @@ def test_a_chapter_without_its_research_dossier_is_a_warning(cli, book):
 ## O que os testes não cobrem
 
 - **O que o Claude escreve.** Os testes conferem os scripts, não a qualidade de um capítulo. Isso é trabalho das [avaliações de comportamento](../evals/README.md) e dos livros-piloto de verdade.
-- **Serviços de verdade.** A publicação no GitHub, no Notion e no GitHub Pages, a release real e o deploy do Pages rodam na biblioteca pública de demonstração, a [syllabook-demo](https://github.com/Joshpcbrrj/syllabook-demo).
+- **Serviços de verdade.** A publicação no GitHub, no Notion e no GitHub Pages, a release real e o deploy do Pages rodam numa biblioteca pública de verdade, a [biblioteca-syllabook](https://github.com/Joshpcbrrj/biblioteca-syllabook).
 - **Um navegador de verdade.** O `images.py screenshot` é testado com um Playwright falso.
 
 ## Problemas comuns

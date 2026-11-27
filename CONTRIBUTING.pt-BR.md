@@ -1,4 +1,4 @@
-<!-- translation-of: CONTRIBUTING.md sha256:657a8d982065 -->
+<!-- translation-of: CONTRIBUTING.md sha256:a8afb01554b2 -->
 # Como contribuir
 
 [English](CONTRIBUTING.md) | **Português**
@@ -46,7 +46,7 @@ pytest -m "not slow"      # pula os testes que geram um EPUB ou um site de verda
 
 Há um arquivo de teste para cada parte do kit. [Como os testes funcionam](docs/testing.pt-BR.md) explica cada arquivo, as fixtures compartilhadas, o que os testes não cobrem e como acrescentar um teste.
 
-O `ruff check .` tem um parceiro para os workflows do GitHub: `actionlint .github/workflows/*.yml skills/syllabook/assets/library/.github/workflows/*.yml`. A release e a publicação no GitHub Pages de verdade rodam na biblioteca pública de demonstração, [syllabook-demo](https://github.com/Joshpcbrrj/syllabook-demo).
+O `ruff check .` tem um parceiro para os workflows do GitHub: `actionlint .github/workflows/*.yml skills/syllabook/assets/library/.github/workflows/*.yml`. A release e a publicação no GitHub Pages de verdade rodam numa biblioteca pública de verdade, a [biblioteca-syllabook](https://github.com/Joshpcbrrj/biblioteca-syllabook).
 
 **Avaliações de comportamento:** além desses testes, a pasta [`evals/`](evals/README.md) tem casos para o `claude plugin eval`, que conferem o que a skill faz numa conversa de verdade. Eles rodam na sua própria conta do Claude, nunca no CI.
 

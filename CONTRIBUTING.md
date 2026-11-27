@@ -45,7 +45,7 @@ pytest -m "not slow"      # skip the tests that build a real EPUB or website
 
 There is one test file per part of the kit. [How the tests work](docs/testing.md) explains each file, the shared fixtures, what the tests do not cover and how to add a test.
 
-`ruff check .` also has a partner for the GitHub workflows: `actionlint .github/workflows/*.yml skills/syllabook/assets/library/.github/workflows/*.yml`. The real release and GitHub Pages deploy run in the public demo library, [syllabook-demo](https://github.com/Joshpcbrrj/syllabook-demo).
+`ruff check .` also has a partner for the GitHub workflows: `actionlint .github/workflows/*.yml skills/syllabook/assets/library/.github/workflows/*.yml`. The real release and GitHub Pages deploy run in a real public library, [biblioteca-syllabook](https://github.com/Joshpcbrrj/biblioteca-syllabook).
 
 **Behavior evals:** besides these tests, [`evals/`](evals/README.md) has cases for `claude plugin eval`, which check what the skill does in a real conversation. They run on your own Claude account, never in CI.
 

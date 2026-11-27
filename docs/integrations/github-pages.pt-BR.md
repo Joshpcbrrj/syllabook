@@ -1,11 +1,11 @@
-<!-- translation-of: github-pages.md sha256:cf38f8b26d70 -->
+<!-- translation-of: github-pages.md sha256:bdcb598c3075 -->
 # GitHub Pages: o site com todos os livros
 
 [English](github-pages.md) | **Português**
 
 ## Para que serve
 
-Um site com todos os seus livros: busca instantânea em todos eles, capítulos num menu lateral, código com botão de copiar, respostas que abrem ao clicar, modo escuro e link para cada EPUB. Ele funciona bem no computador, no celular e no navegador do leitor digital. Veja o [site de demonstração](https://joshpcbrrj.github.io/syllabook-demo/).
+Um site com todos os seus livros: busca instantânea em todos eles, capítulos num menu lateral, código com botão de copiar, respostas que abrem ao clicar, modo escuro e link para cada EPUB. Ele funciona bem no computador, no celular e no navegador do leitor digital. Veja o [site de uma biblioteca de verdade](https://joshpcbrrj.github.io/biblioteca-syllabook/).
 
 ## O que você precisa
 

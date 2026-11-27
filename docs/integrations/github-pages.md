@@ -4,7 +4,7 @@
 
 ## What it is for
 
-A website with all your books: instant search across every book, chapters in a side menu, code with a copy button, answers that open on click, dark mode and a link to each EPUB. It reads well on a computer, a phone and an e-reader's browser. See the [demo website](https://joshpcbrrj.github.io/syllabook-demo/).
+A website with all your books: instant search across every book, chapters in a side menu, code with a copy button, answers that open on click, dark mode and a link to each EPUB. It reads well on a computer, a phone and an e-reader's browser. See a [real library website](https://joshpcbrrj.github.io/biblioteca-syllabook/).
 
 ## What you need
 

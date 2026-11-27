@@ -102,7 +102,7 @@ def test_a_chapter_without_its_research_dossier_is_a_warning(cli, book):
 ## What the tests do not cover
 
 - **What Claude writes.** The tests check the scripts, not the quality of a chapter. That is the job of the [behavior evals](../evals/README.md) and of real pilot books.
-- **Real services.** Publishing to GitHub, Notion and GitHub Pages, the real release and the Pages deploy run in the public demo library, [syllabook-demo](https://github.com/Joshpcbrrj/syllabook-demo).
+- **Real services.** Publishing to GitHub, Notion and GitHub Pages, the real release and the Pages deploy run in a real public library, [biblioteca-syllabook](https://github.com/Joshpcbrrj/biblioteca-syllabook).
 - **A real browser.** `images.py screenshot` is tested with a fake Playwright.
 
 ## Common problems

@@ -32,7 +32,7 @@ Then, inside Claude Code, type `/mcp`, choose **notion** and sign in. Start a ne
 
 ## How to check that it worked
 
-Ask Claude to "fetch my Notion page <link>". It should show the page's title and content. The first time Syllabook publishes, it asks for the link of the page where books go and saves it in `library.yaml` (`notion_page`).
+Ask Claude to "fetch my Notion page <link>". It should show the page's title and content. The first time Syllabook publishes, it asks for the link of the page where books go and saves it in `library.yaml` (`notion_page`). Before every copy it says which page that is, with its link, so you can pick another one for that book; at the end it gives you the link of the book in Notion and saves it in `book.yaml` (`notion_url`). Asked to copy the same book again, it offers to update that copy instead of making a second one.
 
 ## Common problems
 

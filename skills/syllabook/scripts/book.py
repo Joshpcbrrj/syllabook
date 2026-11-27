@@ -35,6 +35,7 @@ CHOICES = {'images': {'real', 'svg'}, 'reading': {'large', 'small'}}
 LABEL_RE = re.compile(r'^[a-z0-9]+(-[a-z0-9]+)*$')
 CONCEPT_FIELDS = ('id', 'name', 'chapter', 'depends')
 DATE_RE = re.compile(r'^\d{4}-\d{2}-\d{2}$')
+NOTION_URL = re.compile(r'^https://([\w-]+\.)?notion\.(so|site|com)/\S+$')
 MONTH_RE = re.compile(r'^\d{4}-\d{2}$')
 EDITION_RE = re.compile(r'^\d+\.\d+(\.\d+)?$')  # 1.3 for a review, 1.3.1 for errata only
 STALE_DAYS = 365  # a source not reopened for a year is checked again in a review
@@ -138,6 +139,8 @@ def validate(path):
     for key, rule, form in (('reviewed_on', DATE_RE, 'a YYYY-MM-DD date'), ('review_by', MONTH_RE, 'a YYYY-MM month')):
         if data.get(key) and not rule.match(str(data[key])):
             errors.append(f'{key}: must be {form}')
+    if data.get('notion_url') and not NOTION_URL.match(str(data['notion_url'])):
+        errors.append('notion_url: must be the link of the book page in Notion (https://www.notion.so/...)')
     for i, e in enumerate(data.get('editions') or [], 1):
         if not isinstance(e, dict) or not all(e.get(k) for k in ('edition', 'date', 'summary')):
             errors.append(f'editions[{i}]: needs edition, date and summary')

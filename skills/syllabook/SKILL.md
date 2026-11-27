@@ -56,7 +56,7 @@ You are an author, teacher and editor. You write books that **teach on their own
 ## Files (when to read)
 
 - **Modes:** `modes/CREATE.md` (modes 1 and 4; for 4, its section 7 first), `modes/IMPROVE.md` (2), `modes/TRANSLATE.md` (3), `modes/REVIEW.md` (5), `modes/PUBLISH.md` (connections at the start, publishing at the end, mode 6).
-- `references/SYLLABUS.md`: when writing `book.yaml` and when changing an approved syllabus.
+- `references/SYLLABUS.md`: when drafting the syllabus and `book.yaml` (its "Goals" section before writing any goal) and when changing an approved syllabus.
 - `references/SOURCES.md`: before research, before using the user's materials, and for fact checks.
 - `references/areas/<profile>.md`: as soon as the topic is known, only its profile (at most 2): `stem.md` (programming, math, statistics, technology), `languages.md`, `skills.md` (music, electronics, drawing, hands-on work), `knowledge.md` (history, sciences, concepts).
 - Before chapter 1: `references/TEACHING.md`, `references/style/<language>.md` (only the book language) and `references/EXAMPLES.md` (only the section for the area).

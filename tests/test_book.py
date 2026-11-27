@@ -70,6 +70,16 @@ def test_each_validation_error(cli, tmp_path, case, change, message):
 WARNINGS = [
     ('no sources', lambda d: d.update(sources=[]), 'sources: empty'),
     ('goal that cannot be checked', lambda d: d['chapters'][0].update(goal='Entender listas'), 'cannot be checked'),
+    # an eval syllabus had "entender, resolver e evitar conflitos": the weak verb led a list of verbs
+    ('weak verb first in a list', lambda d: d['chapters'][0].update(goal='Entender, resolver e evitar conflitos'),
+     'cannot be checked'),
+    ('weak verb later in a list', lambda d: d['chapters'][0].update(goal='Criar listas e entender índices'),
+     'cannot be checked'),
+    ('weak verb in English', lambda d: d['chapters'][0].update(goal='Build a list and understand indexes'),
+     'cannot be checked'),
+    ('weak verb in Spanish', lambda d: d['chapters'][0].update(goal='Crear listas y conocer los índices'),
+     'cannot be checked'),
+    ('weak book goal', lambda d: d.update(goal='Entender Python e criar scripts'), 'goal: uses a verb'),
     ('no topics', lambda d: d['chapters'][0].pop('topics'), 'no topics'),
     ('no minutes', lambda d: d['chapters'][0].pop('minutes'), 'minutes missing'),
     ('chapter without concepts', lambda d: d['concepts'].pop(), 'teaches no concept'),
@@ -93,6 +103,15 @@ def test_the_notion_copy_link_is_kept(cli, tmp_path, url):
 def test_image_choices_real_images_by_context_or_diagrams_only(cli, tmp_path, images):
     code, r = validate_with(cli, tmp_path, lambda d: d['choices'].update(images=images))
     assert code == 0 and r['ok'], r
+
+
+@pytest.mark.parametrize('goal', ['Calcular a média de uma lista e explicar o resultado',
+                                  'Resolver um conflito de merge e evitar os mais comuns',
+                                  'Tocar a batida do samba a 80 bpm, sabendo onde cai o tempo forte',
+                                  'Explain what a commit records, then make three'])
+def test_checkable_goals_get_no_warning(cli, tmp_path, goal):
+    code, r = validate_with(cli, tmp_path, lambda d: d['chapters'][0].update(goal=goal))
+    assert code == 0 and not any('cannot be checked' in w for w in r['warnings']), r['warnings']
 
 
 @pytest.mark.parametrize('case, change, message', WARNINGS, ids=[w[0] for w in WARNINGS])

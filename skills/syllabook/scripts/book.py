@@ -41,9 +41,10 @@ NOTION_URL = re.compile(r'^https://([\w-]+\.)?notion\.(so|site|com)/\S+$')
 MONTH_RE = re.compile(r'^\d{4}-\d{2}$')
 EDITION_RE = re.compile(r'^\d+\.\d+(\.\d+)?$')  # 1.3 for a review, 1.3.1 for errata only
 STALE_DAYS = 365  # a source not reopened for a year is checked again in a review
-# goals must be checkable (references/SYLLABUS.md); these openings are not
-WEAK_GOALS = re.compile(r'^(understand|know|learn about|be familiar|entender|compreender|conhecer|saber|'
-                        r'aprender sobre|comprender|conocer)\b', re.I)
+# goals must be checkable (references/SYLLABUS.md): none of these verbs, at the start of the goal or of any
+# item in its list of verbs ("criar listas e entender índices", "entender, resolver e evitar conflitos")
+WEAK_GOALS = re.compile(r'(^|[,;:]|\b(and|then|e|depois|y|luego)\s)\s*(understand|know|learn about|be familiar|'
+                        r'entender|compreender|conhecer|saber|aprender sobre|comprender|conocer)\b', re.I)
 TODO = '<!-- TODO'
 
 
@@ -84,13 +85,17 @@ def validate(path):
     numbers = chapter_numbers(data)
     if numbers != list(range(1, len(chapters) + 1)):
         errors.append('chapters: n must go 1, 2, 3... in order, with no gaps')
+    if WEAK_GOALS.search(str(data['goal']).strip()):
+        warnings.append(f'goal: uses a verb that cannot be checked ("{data["goal"]}"): say what the reader '
+                        'will be able to do (SYLLABUS.md, goals)')
     for ch in chapters:
         n = ch.get('n', '?')
         for key in ('title', 'goal'):
             if not ch.get(key):
                 errors.append(f'chapter {n}: missing {key}')
-        if ch.get('goal') and WEAK_GOALS.match(str(ch['goal']).strip()):
-            warnings.append(f'chapter {n}: goal starts with a verb that cannot be checked ("{ch["goal"]}")')
+        if ch.get('goal') and WEAK_GOALS.search(str(ch['goal']).strip()):
+            warnings.append(f'chapter {n}: goal has a verb that cannot be checked ("{ch["goal"]}"): rewrite it '
+                            'with verbs the reader can show they did (SYLLABUS.md, goals)')
         if not ch.get('topics'):
             warnings.append(f'chapter {n}: no topics')
         if not isinstance(ch.get('minutes'), int) or ch['minutes'] <= 0:

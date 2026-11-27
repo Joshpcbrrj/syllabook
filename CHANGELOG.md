@@ -12,6 +12,8 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 - `SKILL.md` frontmatter carries `license: MIT` and `metadata.version` (accepted by claude.ai's skill upload, tested; a test keeps it equal to the scripts' version).
 - `facts.py`: a name the chapter repeats three times or more is its subject (Linux, Ubuntu, Git) and is no longer listed as a claim to check; in a WSL chapter the list went from 42 sentences to 11.
 - `projects.py`: in a chapter that declares a project, file blocks before its marker are loose examples, not a project named after the chapter.
+- `images.py editor --command` runs the palette row whose name is exactly the command: the palette matches loosely, and for "Git: Open Changes" its first row is "Git: Open All Changes", so the diff never opened (a known bug since the Git book).
+- `diagram.py` (1,000 lines) is split into `diagram_draw.py` (colors, profiles, canvas), `diagram_layouts.py` (the general types and cards) and `diagram_music.py` (chords, fretboard, tab); the command line and the drawings are unchanged (checked byte for byte on published diagrams).
 - The Notion copy costs a fraction of before: it is made last, after GitHub, in a conversation of its own (every Notion call rereads the whole conversation; a copy at the end of a book's conversation cost US$ 9.50 for 11 pages), `notion.py all --out <dir>` writes every page to a file and prints only the list, and the pages go several per `notion-create-pages` call, without fetching each one back.
 
 ### Fixed

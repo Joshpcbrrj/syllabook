@@ -54,7 +54,8 @@ def test_every_path_cited_in_the_skill_exists():
 def test_every_script_is_taught_somewhere_in_the_skill():
     """SKILL.md lists only the everyday scripts; each of the others must be taught in a mode or reference."""
     text = '\n'.join(read(path) for path in skill_docs())
-    modules = {'common.py', 'icons.py'}  # imported by the scripts, not commands
+    # imported by the scripts, not commands; diagram_*.py are the parts of diagram.py
+    modules = {'common.py', 'icons.py', 'diagram_draw.py', 'diagram_layouts.py', 'diagram_music.py'}
     scripts = {n for n in os.listdir(os.path.join(SKILL, 'scripts')) if n.endswith('.py')} - modules
     untaught = sorted(n for n in scripts if f'scripts/{n}' not in text and f'`{n}' not in text)
     assert not untaught

@@ -1,0 +1,622 @@
+title: WSL do zero
+subtitle: Linux no Windows para programar
+slug: wsl-do-zero
+origin: improved
+language: pt-BR
+conversation_language: pt-BR
+profiles:
+- stem
+level:
+  start: iniciante
+  end: intermediário
+audience: Quem usa Windows e quer um ambiente Linux de desenvolvimento, sem máquina virtual nem dual boot
+goal: Montar, personalizar, fazer backup e restaurar um ambiente de desenvolvimento completo no WSL, com
+  Claude Code e Spec Kit
+prerequisites:
+- Usar o Windows com conta de administrador
+- Abrir o PowerShell e digitar comandos
+track:
+  name: ferramentas-do-dev
+  order: 1
+reference_version: WSL 3.0.5 (kernel 6.18.58.1) com Ubuntu 26.04.1 LTS
+review_by: 2027-05
+original:
+  title: WSL do zero (versão anterior da skill)
+  kind: markdown
+  where: C:\Users\joshp\syllabook-pilotos\wsl-do-zero-original
+promise:
+  goal: Montar, personalizar, fazer backup e restaurar um ambiente de desenvolvimento completo no WSL,
+    com Claude Code e Spec Kit
+  audience: Quem usa Windows e quer um ambiente Linux de desenvolvimento, sem máquina virtual nem dual
+    boot
+  level: iniciante
+  sequence: o que é o WSL, instalação, primeiros passos no Ubuntu, arquivos entre os dois lados, terminal,
+    ferramentas de dev e WSLg, gerenciamento, backup e restauração, Claude Code, projeto final com Spec
+    Kit
+new_content_pct: 15
+sources:
+- title: Install WSL
+  url: https://learn.microsoft.com/windows/wsl/install
+  checked: '2026-11-27'
+- title: Basic commands for WSL
+  url: https://learn.microsoft.com/windows/wsl/basic-commands
+  checked: '2026-11-27'
+- title: Advanced settings configuration in WSL
+  url: https://learn.microsoft.com/windows/wsl/wsl-config
+  checked: '2026-11-27'
+- title: Comparing WSL versions
+  url: https://learn.microsoft.com/windows/wsl/compare-versions
+  checked: '2026-11-27'
+- title: Working across file systems
+  url: https://learn.microsoft.com/windows/wsl/filesystems
+  checked: '2026-11-27'
+- title: Use systemd to manage Linux services with WSL
+  url: https://learn.microsoft.com/windows/wsl/systemd
+  checked: '2026-11-27'
+- title: Set up a WSL development environment
+  url: https://learn.microsoft.com/windows/wsl/setup/environment
+  checked: '2026-11-27'
+- title: Run Linux GUI apps on WSL
+  url: https://learn.microsoft.com/windows/wsl/tutorials/gui-apps
+  checked: '2026-11-27'
+- title: WSL releases (GitHub)
+  url: https://github.com/microsoft/WSL/releases
+  checked: '2026-11-27'
+- title: Windows Terminal releases
+  url: https://github.com/microsoft/terminal/releases
+  checked: '2026-11-27'
+- title: Nerd Fonts
+  url: https://www.nerdfonts.com/font-downloads
+  checked: '2026-11-27'
+- title: Starship
+  url: https://starship.rs
+  checked: '2026-11-27'
+- title: nvm
+  url: https://github.com/nvm-sh/nvm
+  checked: '2026-11-27'
+- title: SDKMAN! install
+  url: https://sdkman.io/install
+  checked: '2026-11-27'
+- title: uv installation
+  url: https://docs.astral.sh/uv/getting-started/installation/
+  checked: '2026-11-27'
+- title: Claude Code setup
+  url: https://code.claude.com/docs/en/setup
+  checked: '2026-11-27'
+- title: Claude Code permission modes
+  url: https://code.claude.com/docs/en/permission-modes
+  checked: '2026-11-27'
+- title: Claude Code plugins
+  url: https://code.claude.com/docs/en/discover-plugins
+  checked: '2026-11-27'
+- title: Claude Code MCP
+  url: https://code.claude.com/docs/en/mcp
+  checked: '2026-11-27'
+- title: Spec Kit
+  url: https://github.com/github/spec-kit
+  checked: '2026-11-27'
+- title: Ubuntu 26.04.1 WSL image
+  url: https://releases.ubuntu.com/26.04.1/
+  checked: '2026-11-27'
+choices:
+  images: real
+  reading: large
+approved_on: '2026-11-27'
+edition: '2.0'
+human_review: false
+concepts:
+- id: wsl
+  name: WSL
+  chapter: 1
+  depends: []
+- id: wsl1-wsl2
+  name: WSL 1 × WSL 2
+  chapter: 1
+  depends:
+  - wsl
+- id: wsl-kernel
+  name: kernel do WSL 2
+  chapter: 1
+  depends:
+  - wsl1-wsl2
+- id: wsl-vs-vm
+  name: WSL × VM × dual boot
+  chapter: 1
+  depends:
+  - wsl
+- id: virtualization
+  name: virtualização no firmware
+  chapter: 2
+  depends:
+  - wsl-kernel
+- id: wsl-install
+  name: wsl --install
+  chapter: 2
+  depends:
+  - virtualization
+- id: distro
+  name: distribuição (distro)
+  chapter: 2
+  depends:
+  - wsl-install
+- id: linux-user
+  name: usuário e senha do Linux
+  chapter: 2
+  depends:
+  - distro
+- id: shell-prompt
+  name: terminal e prompt
+  chapter: 3
+  depends:
+  - distro
+- id: apt
+  name: apt
+  chapter: 3
+  depends:
+  - shell-prompt
+- id: sudo-root
+  name: sudo × root
+  chapter: 3
+  depends:
+  - linux-user
+  - apt
+- id: systemd
+  name: systemd no WSL
+  chapter: 3
+  depends:
+  - sudo-root
+- id: project-repo
+  name: repositório meu-ambiente
+  chapter: 3
+  depends:
+  - shell-prompt
+- id: linux-fs
+  name: sistema de arquivos do Linux
+  chapter: 4
+  depends:
+  - shell-prompt
+- id: mnt-c
+  name: /mnt/c e \\wsl$
+  chapter: 4
+  depends:
+  - linux-fs
+- id: cross-perf
+  name: desempenho entre sistemas
+  chapter: 4
+  depends:
+  - mnt-c
+- id: line-endings
+  name: CRLF × LF
+  chapter: 4
+  depends:
+  - mnt-c
+  - project-repo
+- id: windows-terminal
+  name: Windows Terminal e perfis
+  chapter: 5
+  depends:
+  - shell-prompt
+- id: nerd-font
+  name: Nerd Font
+  chapter: 5
+  depends:
+  - windows-terminal
+- id: starship
+  name: prompt Starship
+  chapter: 5
+  depends:
+  - nerd-font
+- id: locale
+  name: locale e teclado
+  chapter: 5
+  depends:
+  - sudo-root
+- id: dotfiles
+  name: dotfiles versionados
+  chapter: 5
+  depends:
+  - project-repo
+  - starship
+- id: path
+  name: PATH e ordem de busca
+  chapter: 6
+  depends:
+  - shell-prompt
+- id: version-managers
+  name: gerenciadores de versão (nvm, SDKMAN, uv)
+  chapter: 6
+  depends:
+  - path
+  - apt
+- id: wslg
+  name: WSLg
+  chapter: 6
+  depends:
+  - wsl-kernel
+  - apt
+- id: bootstrap
+  name: script de instalação (bootstrap)
+  chapter: 6
+  depends:
+  - version-managers
+  - dotfiles
+- id: wslconfig
+  name: .wslconfig
+  chapter: 7
+  depends:
+  - wsl-kernel
+- id: wsl-conf
+  name: wsl.conf
+  chapter: 7
+  depends:
+  - systemd
+- id: wsl-commands
+  name: comandos de gerenciamento
+  chapter: 7
+  depends:
+  - distro
+- id: terminate-shutdown
+  name: terminate × shutdown
+  chapter: 7
+  depends:
+  - wsl-commands
+- id: wsl-export
+  name: wsl --export
+  chapter: 8
+  depends:
+  - terminate-shutdown
+- id: wsl-import
+  name: wsl --import e usuário padrão
+  chapter: 8
+  depends:
+  - wsl-export
+  - wsl-conf
+- id: test-distro
+  name: distro de teste
+  chapter: 8
+  depends:
+  - wsl-import
+- id: claude-code
+  name: Claude Code
+  chapter: 9
+  depends:
+  - path
+- id: permission-modes
+  name: modos de permissão
+  chapter: 9
+  depends:
+  - claude-code
+- id: plugins-mcp
+  name: plugins e MCPs
+  chapter: 9
+  depends:
+  - claude-code
+- id: sdd
+  name: Spec-Driven Development
+  chapter: 10
+  depends:
+  - claude-code
+- id: spec-kit
+  name: Spec Kit e specify
+  chapter: 10
+  depends:
+  - sdd
+  - version-managers
+chapters:
+- n: 1
+  title: O que é o WSL e quando usar
+  goal: Comparar WSL, máquina virtual e dual boot e criar o verificador do projeto meu-ambiente
+  topics:
+  - por que Linux no Windows
+  - WSL 1 × WSL 2
+  - o kernel do WSL 2
+  - WSL × VM × dual boot
+  - PC pronto para o WSL 2
+  minutes: 35
+  sources_original:
+  - Por que um Linux dentro do Windows?
+  - 'WSL 1 × WSL 2: tradução ou kernel de verdade'
+  - O kernel do WSL 2 tem nome próprio
+  - WSL, máquina virtual ou dual boot?
+  - '🧪 Laboratório: o seu PC está pronto para o WSL 2?'
+- n: 2
+  title: Instalação do WSL e do Ubuntu
+  goal: Instalar o Ubuntu 26.04 e provar que roda no WSL 2
+  topics:
+  - requisitos e virtualização
+  - wsl --install
+  - imagem .wsl
+  - usuário e senha
+  - wsl -l -v e wsl --version
+  - erros comuns
+  minutes: 45
+  sources_original:
+  - 'Requisitos: Windows e virtualização'
+  - O comando `wsl --install`
+  - Usuário e senha do Linux
+  - 'Conferir: `wsl -l -v` e `wsl --version`'
+  - Erros de instalação mais comuns
+  - '🧪 Laboratório: instalar e provar que é WSL 2'
+- n: 3
+  title: Primeiros passos no Ubuntu
+  goal: Atualizar pacotes, usar sudo sem trabalhar como root e criar o repositório meu-ambiente
+  topics:
+  - terminal e prompt
+  - comandos de sobrevivência
+  - apt
+  - sudo × root
+  - systemd
+  - repositório do projeto
+  minutes: 50
+  sources_original:
+  - O terminal e o prompt
+  - Comandos de sobrevivência
+  - 'apt: atualizar e instalar programas'
+  - sudo x root
+  - systemd no WSL
+- n: 4
+  title: Arquivos entre Linux e Windows
+  goal: Guardar projetos no lugar certo, trocar arquivos entre os dois lados e fixar LF no projeto
+  topics:
+  - dois sistemas de arquivos
+  - /mnt/c e \\wsl$
+  - wslpath e explorer.exe
+  - desempenho
+  - CRLF × LF e .gitattributes
+  minutes: 45
+  sources_original:
+  - Dois discos, dois jeitos de escrever o caminho
+  - Abrir pastas e converter caminhos
+  - 'Desempenho: o projeto mora no Linux'
+  - 'Quebras de linha: CRLF × LF'
+- n: 5
+  title: O terminal do seu jeito
+  goal: Configurar Windows Terminal, Nerd Font, Starship, idioma e teclado, guardando os dotfiles no projeto
+  topics:
+  - camadas da aparência
+  - perfis e esquema de cores
+  - Nerd Font
+  - Starship
+  - locale
+  - teclado ABNT2
+  - voltar ao padrão
+  minutes: 50
+  sources_original:
+  - As quatro camadas da aparência
+  - 'Windows Terminal: configurações e perfis'
+  - Um esquema de cores seu, pelo JSON
+  - 'Nerd Font: letras e ícones'
+  - Prompt com o Starship
+  - Idioma do Ubuntu (locale)
+  - Teclado ABNT2
+  - Tema do Claude Code
+  - Voltar ao padrão
+- n: 6
+  title: Ferramentas de desenvolvimento e programas com janela
+  goal: Instalar git, Node, Java e Python do Linux, abrir apps pelo WSLg e escrever o bootstrap.sh do
+    projeto
+  topics:
+  - pacotes básicos e git
+  - PATH
+  - nvm
+  - SDKMAN
+  - uv
+  - WSLg
+  - script de instalação
+  minutes: 60
+  sources_original:
+  - Pacotes básicos e o git
+  - Node.js com o nvm
+  - Java (Temurin) com o SDKMAN
+  - Python e o uv
+  - 'Programas com janela: o WSLg'
+  - Resumo das ferramentas
+- n: 7
+  title: Gerenciar o WSL
+  goal: Limitar memória e CPU, ajustar a distro, trocar de distro e resolver erros comuns sem derrubar
+    o que está rodando
+  topics:
+  - .wslconfig × wsl.conf
+  - terminate × shutdown
+  - comandos de gerenciamento
+  - mover e trocar distro
+  - problemas comuns
+  minutes: 50
+  sources_original:
+  - 'Dois arquivos de configuração: .wslconfig × wsl.conf'
+  - Comandos de gerenciamento
+  - Problemas comuns
+- n: 8
+  title: Backup e restauração
+  goal: Exportar uma distro, restaurá-la com o seu usuário e provar o backup numa distro de teste
+  topics:
+  - wsl --export
+  - wsl --import
+  - usuário padrão
+  - distro de teste
+  - projetos × distro inteira
+  - backup.ps1
+  minutes: 55
+  sources_original:
+  - Exportar a distro inteira
+  - Restaurar com wsl --import
+  - Clonar uma distro para testes
+  - Projetos ou distro inteira?
+- n: 9
+  title: Claude Code no WSL
+  goal: Instalar o Claude Code como usuário, usar os modos de permissão, plugins e MCPs no projeto meu-ambiente
+  topics:
+  - WSL ou Windows
+  - instalar como usuário
+  - login
+  - comandos e atalhos
+  - modos de permissão
+  - plugins
+  - MCPs
+  - idioma das respostas
+  minutes: 55
+  sources_original:
+  - WSL ou Windows?
+  - Pré-requisitos
+  - Instalar como usuário
+  - Login e a tela de confiança
+  - Comandos e atalhos da sessão
+  - Modos de permissão
+  - Plugins
+  - MCPs
+  - Idioma das respostas
+- n: 10
+  title: 'Projeto final: um app com Spec Kit'
+  goal: Criar um app no fluxo specify, plan, tasks e implement dentro do meu-ambiente e provar o ambiente
+    inteiro restaurando-o
+  topics:
+  - Spec-Driven Development
+  - Specify CLI
+  - specify init
+  - comandos /speckit-*
+  - app de tarefas
+  - boas práticas
+  - ambiente completo
+  minutes: 70
+  sources_original:
+  - Spec-Driven Development e o Spec Kit
+  - Pré-requisitos e instalação do Specify CLI
+  - Criar o projeto com specify init
+  - Os comandos /speckit-*
+  - 'O projeto guiado: tarefas no terminal'
+  - Boas práticas
+  - Extensões e atualização
+  - 'Encerramento: o ambiente completo'
+next_steps:
+- title: VS Code com WSL
+  why: Para editar no Windows o código que mora no Linux
+  topics:
+  - Remote - WSL
+  - extensões no lado Linux
+- title: Contêineres no WSL
+  why: Para rodar Docker sobre o WSL 2
+  topics:
+  - Docker Desktop
+  - Docker Engine no Ubuntu
+  book: docker-do-zero
+- title: GPU no WSL
+  why: Para usar CUDA e IA local
+  topics:
+  - drivers
+  - CUDA no WSL
+- title: Engenharia reversa com Ghidra
+  why: Era o próximo livro planejado na trilha
+  topics:
+  - Ghidra
+  - REA
+covers:
+- wsl
+- ubuntu-wsl
+- windows-terminal
+- ferramentas-dev-linux
+- wslg
+- backup-wsl
+- claude-code
+- spec-kit
+progress:
+- n: 1
+  done: '2026-11-27'
+  summary: 'Definiu WSL, WSL 1 × 2 (tradução × kernel; versão do pacote 3.0.5 × arquitetura 2), kernel
+    microsoft-standard-WSL2 (uname -r real 6.18.58.1), WSL × VM × dual boot com analogia do apartamento.
+    Lab: criou o projeto meu-ambiente com verificar.ps1 (Windows; pegadinha: VirtualizationFirmwareEnabled=False
+    com hipervisor em uso) e verificar.sh (Linux, rodado na wz-teste). Termos: kernel, distro, hipervisor.'
+- n: 2
+  done: '2026-11-27'
+  summary: 'Requisitos e virtualização (firmware × componentes do Windows), wsl --install -d Ubuntu-26.04,
+    distro (analogia da mobília no apartamento), imagem .wsl com SHA256 conferido, usuário/senha (ana,
+    uid 1000, grupo sudo), wsl -l -v e --version, tabela de erros (0x80370102, 0.0%). Lab: passos 1-3
+    não executados (PC do autor já tem Ubuntu); passos 4-6 na wz-teste; verificar.sh rodou OK com saída
+    0.'
+- n: 3
+  done: '2026-11-27'
+  summary: Prompt (ana@PC:~$), comandos básicos, apt update × upgrade/install/remove (apt 3.2.0, 163 pacotes),
+    erro de lock sem sudo, sudo-rs 0.2.13 × root (arquivo rascunho.txt do root, sudo -i, root bloqueado),
+    systemd (wsl.conf, PID 1, serviços; experimento com systemd=false e --terminate), repositório meu-ambiente
+    com git 2.53.0 e verificar.sh v2 com 7 testes (falha antes do git init, OK depois). Analogia do síndico.
+    Todos os comandos rodaram na wz-teste como ana.
+- n: 4
+  done: '2026-11-27'
+  summary: 'Dois sistemas de arquivos (ext4 em / e 9p em /mnt/c e /mnt/d), caminhos \wsl$ e /mnt, wslpath
+    -w/-u, explorer.exe (não executado), medição de 2.000 arquivos (0,136 s no ~ x 5,323 s no /mnt/d),
+    permissões 777/100755 vindas de /mnt, CRLF x LF com erro $''\r'', .gitattributes (* text=auto, *.sh
+    eol=lf, *.ps1 eol=crlf), verificar.sh com 8 testes. Analogia: dois bairros e a ponte com tradutor
+    (9p). Rodou na wz-teste como ana.'
+- n: 5
+  done: '2026-11-27'
+  summary: 'Quatro camadas da aparência (janela/cores e fonte no Windows; prompt e locale no Ubuntu; teclado
+    no Windows). Windows Terminal: perfil, schemes/colorScheme (JSON validado, aplicação não executada;
+    imagem One Half Dark da MicrosoftDocs). Nerd Font 3.5.1 (não executado; teste printf \ue0a0). Starship
+    1.27.0 instalado em ~/.local/bin após ler o script de 554 linhas. dotfiles/ no meu-ambiente: starship.toml,
+    bashrc.meu, instalar.sh idempotente (link simbólico + linha no .bashrc). locale: language-pack-pt,
+    LC_ALL, update-locale. ABNT2 (não executado). Voltar ao padrão. verificar.sh com 9 testes.'
+- n: 6
+  done: '2026-11-27'
+  summary: PATH e ordem de busca (51 entradas, 42 do Windows; which -a; npm do Windows aparece antes do
+    nvm). nvm 0.41.0 + Node v26.13.1 (PROFILE=/dev/null), SDKMAN + Java 25.0.5.1 Temurin (rcupdate=false,
+    auto_answer), uv 0.13.10, WSLg 1.0.79 (DISPLAY, x11-apps; janela não executada). bootstrap.sh idempotente
+    testado do zero com usuário bia (50 s) e de novo (3,7 s); bashrc.meu com PATH/nvm/SDKMAN; verificar.sh
+    com 10 testes. Todos os comandos rodaram na wz-teste.
+- n: 7
+  done: '2026-11-27'
+  summary: 'Dois arquivos: .wslconfig (Windows, todas as distros, exige --shutdown; chaves memory/processors/swap/vmIdleTimeout/networkingMode)
+    x wsl.conf (por distro, --terminate). Nesta máquina Ubuntu vê 15 GiB, 4 GiB swap, 6 CPUs. Modelo windows/wslconfig.modelo
+    + windows/conferir-wslconfig.ps1 (testado em pasta temporária, bom e ruim; .wslconfig do autor intocado),
+    verificar.ps1 com 4 testes. Experimento appendWindowsPath=false: PATH 51 (42 Windows) -> 9, cmd.exe
+    some, restaurado. terminate x shutdown (wsl -l -v real, só wz-teste parou; shutdown não executado);
+    analogia apartamento x prédio. Comandos de gerenciamento (wsl --help), export 3,16 GB em 1m24, import,
+    --manage --move falhou (WSL_E_DISTRO_NOT_STOPPED; precisa de shutdown, não executado), problemas comuns
+    da documentação.'
+- n: 8
+  done: '2026-11-27'
+  summary: 'Backup e restauração: wsl --export (1.237,7 MB na distro de teste; 3,16 GB com ferramentas)
+    e --import com outro nome (clone teste-...); distro importada abre como root, [user] default= no wsl.conf,
+    usuário precisa existir (erro real getpwnam). SHA-256 (Get-FileHash x sha256sum -c, FAILED real).
+    Projetos x distro inteira (analogia caderno de receitas x refeição congelada), backup-projetos.sh
+    (5,0 MB -> 12 KB). backup.ps1 com -Testar e prefixo teste-; verificar.ps1 com 5 testes. Não executado:
+    --vhd, --import-in-place.'
+- n: 9
+  done: '2026-11-27'
+  summary: 'Claude Code no WSL (2.1.332 instalado de verdade na wz-teste): WSL x Windows independentes;
+    install.sh lido antes (grep), recusa sudo, confere SHA-256, 384 MB em ~/.local; PATH via ~/.profile
+    (shell de login), claude doctor; comandos e atalhos verificados nos docs; CLAUDE.md escrito à mão
+    (/init não executado); modos de permissão (default/acceptEdits/plan/auto/dontAsk/bypass), defaultMode
+    e language no settings.json (auto/bypass só no arquivo do usuário), json.tool; plugins (marketplace
+    add manual, commit-commands sem hooks, escopos); MCP docling falhou por falta de uvx (campo Issue).
+    verificar.sh com 11 testes. Não executado: login, tela de confiança, comandos dentro da sessão.'
+- n: 10
+  done: '2026-11-27'
+  summary: 'Projeto final: SDD e Spec Kit 1.4.5 (instalado e specify init rodados de verdade: nove skills
+    /speckit-* com hífen, árvore .specify/.claude, init não cria git); fluxo constitution/specify/plan/tasks/implement/converge
+    e prompts do app de tarefas (não executados: exigem login); app de referência escrito à mão (Typer+SQLite+pytest,
+    6 testes, falha real do teste por y/N); extensões/atualização (specify self check 1.4.5). Restauração
+    do zero em distro nova: git clone + bootstrap.sh (1m17) + verificar.sh achou lacuna (Claude Code)
+    -> bootstrap ganhou o passo, 11/11 OK; backup.ps1 -Testar do ambiente completo (2,6 GB) restaura como
+    ana.'
+handoff:
+- 'Estado: livro completo (caps. 0 a 11 e glossário, capa, README, 3 folhas-resumo). Releitura em separado
+  feita nesta sessão (caps. 8, 9, 10, simulado e glossário, um commit cada, só ajustes pequenos). audit.py
+  do livro inteiro (com a comparação com o original) e projects.py sem erros nem avisos. Nada foi enviado
+  ao GitHub; build.py lists não foi rodado.'
+- 'Próximo passo: publicar (modes/PUBLISH.md): build.py lists, EPUB em release, push. Notion por último,
+  em conversa nova. Antes, o autor deve ler o livro (revisão humana: não).'
+- 'Não executado e sem passo de leitor (acumulado): cap. 2 passos 1 a 3 (wsl --install); cap. 5 (Nerd
+  Font, perfil do Windows Terminal, ABNT2); cap. 6 (janela do WSLg); cap. 7 (wsl --shutdown, --set-default,
+  --update, --unregister, --manage --move); cap. 8 (--export --vhd, --import-in-place, restaurar num Windows
+  recém-formatado); cap. 9 (login, tela de confiança, /init, comandos dentro da sessão, Shift+Tab, plugins
+  @synced); cap. 10 (todos os /speckit-* dentro do Claude Code). Nenhuma captura de tela baixada.'
+- 'Labs não rodados de novo (só releitura de texto): a wz-teste não existe e as distros do autor ficaram
+  intocadas; .wslconfig nunca tocado. Para recriar a distro de teste: wsl --import wz-teste D:/wz-temp/wz-teste
+  D:/wz-temp/dl/u.wsl --version 2; rode D:/wz-temp/lab/c8setup.sh e depois wsl --terminate wz-teste (nunca
+  --shutdown). No Git Bash use MSYS_NO_PATHCONV=1.'
+- 'Para o report.py da skill: (1) projects.py reescrevia arquivos de projects/ sem avisar (agora recusa);
+  (2) o regex de título de arquivo do projects.py não aceita \_ escapado: o arquivo é ignorado em silêncio
+  e depois acusado como ''editado à mão''; (3) audit.py exige comentário # em blocos longos de toml/python
+  mesmo com docstring; (4) audit.py --original mostra só a primeira cópia de cada arquivo, então corrigir
+  uma revela a próxima; (5) build.py site só gera o fonte (zensical build não foi rodado); (6) audit.py
+  11 (simulado) acusa seções ausentes, que só valem para capítulos comuns, enquanto o audit do livro inteiro
+  passa.'

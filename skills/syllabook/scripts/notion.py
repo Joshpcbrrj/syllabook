@@ -24,12 +24,14 @@ What changes on the way:
 """
 import argparse
 import glob
+import json
 import os
 import re
 import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from common import chapter_path, fail, find_book, first_h1, labels, load_yaml, out, site_url
+from projects import ESCAPED, FILE_LINE  # the file title of a code block, read as projects.py reads it
 
 # the alt text may hold brackets of its own ([user] default=, [7, 8, 9]): the line is the whole image
 IMAGE = re.compile(r'^!\[(.*)\]\(\.\./img/([^)\s]+)\)\s*$')
@@ -138,6 +140,14 @@ def convert(text, book_dir, page_url='', see_label='See the image on the website
                 result.append(f'<image source="{placeholder}">{alt}</image>')
             i += 1
             continue
+        title = FILE_LINE.match(ESCAPED.sub(r'\1', stripped))
+        nxt = next((n.strip() for n in lines[i + 1:] if n.strip()), '')
+        if title and nxt.startswith('```'):
+            # the file title of a code block, as code: Notion makes README.md, db.py and verificar.sh links
+            # to http://README.md (.md, .py and .sh are internet domains)
+            result.append(f'**`{title.group(1)}`**')
+            i += 1
+            continue
         result.append(inline(CHAPTER_LINK.sub(r'\1', line)))
         i += 1
     content = re.sub(r'\n{3,}', '\n\n', '\n'.join(result)).strip() + '\n'
@@ -198,6 +208,32 @@ def page(book_dir, data, file):
     return {'title': title, 'content': content, 'uploads': uploads, 'left_out': left_out}
 
 
+SOURCE_LINE = re.compile(r'^- \[[^\]*`<>]+\]\(https?://[^)\s]+\)( \([^)*`<>]*\))?$')
+MAX_CHECKS = 40
+
+
+def checks(content):
+    """Lines the page must hold exactly as written, to check the copy without fetching it back: the last line of
+    every code block (code reaches Notion verbatim, and a cut or mistyped page fails there first) and the last
+    source line (a page cut short loses its end). Short lines like "}" match anywhere and are skipped."""
+    found, block, fence = [], [], None
+    for line in content.splitlines():
+        if fence:
+            if line.strip().startswith(fence):
+                long_lines = [b for b in block if len(b.strip()) >= 12]
+                if long_lines:
+                    found.append(long_lines[-1].rstrip())
+                fence, block = None, []
+            else:
+                block.append(line)
+        elif line.strip().startswith('```'):
+            fence = '```'
+    sources = [line for line in content.splitlines() if SOURCE_LINE.match(line.strip())]
+    if sources:
+        found.append(sources[-1].strip())
+    return list(dict.fromkeys(found))[-MAX_CHECKS:]
+
+
 def whole_book(book_dir, data, out_dir):
     """Every page in reading order, each written to its own file; prints only the list, never the text."""
     os.makedirs(out_dir, exist_ok=True)
@@ -208,12 +244,17 @@ def whole_book(book_dir, data, out_dir):
         target = os.path.join(out_dir, f'{k:02d}-{os.path.splitext(name)[0]}.md')
         with open(target, 'w', encoding='utf-8', newline='\n') as f:
             f.write(part['content'])
-        parts.append({'title': part['title'], 'file': target, 'chars': len(part['content']),
-                      'uploads': part['uploads']})
+        entry = {'title': part['title'], 'file': target, 'chars': len(part['content']), 'uploads': part['uploads']}
+        lines = checks(part['content'])
+        if lines:
+            entry['checks'] = os.path.splitext(target)[0] + '.checks.json'
+            with open(entry['checks'], 'w', encoding='utf-8', newline='\n') as f:
+                json.dump(lines, f, ensure_ascii=False, indent=1)
+        parts.append(entry)
         left_out += part['left_out']
     out({'parent_first': parts[0]['title'], 'parts': parts, 'left_out': left_out,
-         'note': 'create the index page first, then the other parts under it, several per create call, '
-                 'in this order; read each file only when you send it'})
+         'note': 'create the index page first, then the other parts under it, in this order; read each file '
+                 'only when you send it, copy it exactly, then check the page with its checks file'})
 
 
 def main():

@@ -71,6 +71,32 @@ def test_notion_gets_only_svg_diagrams(book):
     assert [u['kind'] for u in uploads] == ['svg'] and '<image source="UPLOAD:c01-lista.svg">A lista</image>' in content
 
 
+@pytest.mark.parametrize('title, shown', [
+    ('**README.md**', '**`README.md`**'),
+    ('**exemplos/tarefas/src/tarefas/db.py**', '**`exemplos/tarefas/src/tarefas/db.py`**'),
+    ('**`exemplos/tarefas/src/tarefas/__init__.py`**', '**`exemplos/tarefas/src/tarefas/__init__.py`**'),
+    ('**tests/test\\_tarefas.py**', '**`tests/test_tarefas.py`**'),
+])
+def test_a_file_title_is_code_so_notion_does_not_link_it(book, title, shown):
+    # Notion turns README.md, db.py and verificar.sh into links to http://README.md (.md, .py, .sh are domains)
+    content, _, _ = convert(f'{title}\n\n```python\nx = 1\n```\n', book)
+    assert content.startswith(shown + '\n'), content
+
+
+def test_checks_are_the_last_line_of_each_code_block_and_the_last_source():
+    content = ('Texto.\n\n```bash\n# atualiza a lista\nsudo apt update\n}\n```\n\n```txt\nok\n```\n\n'
+               '## 📚 Fontes\n\n'
+               '- [Comandos do WSL](https://learn.microsoft.com/windows/wsl/basic-commands) (27/11/2026)\n'
+               '- [Usar o systemd](https://learn.microsoft.com/windows/wsl/systemd)\n')
+    assert notion.checks(content) == ['sudo apt update',
+                                      '- [Usar o systemd](https://learn.microsoft.com/windows/wsl/systemd)']
+
+
+def test_a_bold_line_that_is_not_a_file_title_stays_as_it_is(book):
+    content, _, _ = convert('**Passo 2. Atualizar a lista.**\n\n```bash\nsudo apt update\n```\n', book)
+    assert content.startswith('**Passo 2. Atualizar a lista.**\n'), content
+
+
 def test_a_chapter_link_inside_a_callout_is_removed(book):
     content, _, _ = convert('> ➡️ **Próximo passo:** o [Glossário](glossario.md) reúne os termos.\n', book)
     assert 'o Glossário reúne' in content and 'glossario.md' not in content

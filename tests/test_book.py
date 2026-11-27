@@ -160,13 +160,45 @@ def test_brief_for_a_chapter_not_in_the_syllabus(cli, book):
     assert code == 1 and 'chapter 9 is not in book.yaml' in r['error']
 
 
+def done(cli, book, n, summary):
+    """The end of the chapter loop: the native reread, then done."""
+    cli('book', 'reread', n, '--book', book)
+    return cli('book', 'done', n, '--summary', summary, '--book', book)
+
+
 def test_done_records_progress_and_points_to_the_next_step(cli, book):
-    code, r = cli('book', 'done', 1, '--summary', 'Listas e len.', '--book', book)
+    code, r = done(cli, book, 1, 'Listas e len.')
     assert code == 0 and r == {'saved': True, 'progress': '1/2', 'next': 'book.py brief 2'}
-    code, r = cli('book', 'done', 1, '--summary', 'Listas, len e índices.', '--book', book)
+    code, r = done(cli, book, 1, 'Listas, len e índices.')
     assert [p['summary'] for p in load(book / 'book.yaml')['progress']] == ['Listas, len e índices.']
-    code, r = cli('book', 'done', 2, '--summary', 'Laço for.', '--book', book)
+    code, r = done(cli, book, 2, 'Laço for.')
     assert r['progress'] == '2/2' and 'fixed parts' in r['next']
+
+
+def test_reread_prints_the_prose_with_line_numbers_and_the_style_file(cli, book):
+    edit(book / 'chapters' / '01-listas.md', '## Listas', '## Listas\n\n```python\nnums = [1]\n```')
+    code, r = cli('book', 'reread', 1, '--book', book)
+    assert code == 0 and r['style'] == 'references/style/pt-BR.md' and r['file'] == 'chapters/01-listas.md'
+    lines = r['lines']
+    assert any(line.endswith(': ## Listas') for line in lines), lines
+    assert not any('nums = [1]' in line for line in lines), 'code is run, not reread'
+    number, text = lines[0].split(': ', 1)
+    assert read(book / r['file']).splitlines()[int(number) - 1] == text
+    assert load(book / 'book.yaml')['reread'] == [1]
+
+
+def test_done_refuses_a_chapter_that_was_not_reread(cli, book):
+    code, r = cli('book', 'done', 1, '--summary', 'Listas.', '--book', book)
+    assert code == 1 and 'book.py reread 1' in r['error']
+
+
+def test_done_uses_up_the_reread(cli, book):
+    """Done again later (after a fix) needs a new reread; the date of the last one stays in progress."""
+    done(cli, book, 1, 'Listas.')
+    data = load(book / 'book.yaml')
+    assert 'reread' not in data and data['progress'][0]['reread'] == data['progress'][0]['done']
+    code, r = cli('book', 'done', 1, '--summary', 'Listas de novo.', '--book', book)
+    assert code == 1 and 'reread' in r['error']
 
 
 @pytest.mark.parametrize('setup, message', [

@@ -26,6 +26,7 @@ Anything that can change over time (commands, options, defaults, limits, version
 - Search with a specific question; read only the part of a page that answers it.
 - Stop as soon as you have what the step asks for (`modes/CREATE.md` §3).
 - Record every source in `book.yaml` (`sources`: title, URL, checked date).
+- **A checked date means you opened the page in this session and it says what the book uses it for.** A link seen only in search results is not checked: open it before giving it a date (in a dossier, `book.yaml` or a chapter's Sources), or leave it out. If it cannot be opened, cite it without a date and say so in the final summary.
 
 **Research dossiers** (step 3 of the flow in `SKILL.md`, before writing any chapter): open every source in `book.yaml` once in this session and update its checked date; then, for **every** chapter of the book, write `research/c<nn>.md` (e.g. `research/c03.md`), even when the user asked to write only some chapters now: the dossiers are the judgment of the whole book, made before any chapter:
 

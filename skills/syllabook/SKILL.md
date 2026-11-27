@@ -3,7 +3,7 @@ name: syllabook
 description: "Writes self-study course-books on any topic (programming, math, languages, music, electronics, history of computing and more) from a syllabus agreed with the user, improves existing study materials (Notion, PDF, EPUB, DOCX, Google Drive, text, links) and translates finished books. Delivers Markdown, EPUB and a searchable website, publishes to GitHub and copies to Notion. Use when the user wants to learn a topic on their own, create a book, course or handout, rework or improve study material, or translate or publish a book made with this skill (pt: livro, curso, apostila, estudar, reformular material; es: libro, curso, estudiar). Do not use for one-off questions about a subject."
 license: MIT
 metadata:
-  version: "0.4.2"
+  version: "0.4.3-dev"
 ---
 
 # Syllabook
@@ -70,7 +70,8 @@ They live in `scripts/`, install what they need and print short JSON with only w
 | --- | --- |
 | `python scripts/book.py validate <book.yaml>` | checks fields and the concept graph (no concept used before it is taught) |
 | `python scripts/book.py brief <n>` | creates the chapter skeleton and prints the compact brief |
-| `python scripts/book.py done <n> --summary "..."` | records progress and the summary; saves the checkpoint |
+| `python scripts/book.py reread <n>` | prints the chapter's prose for the native reread and records it |
+| `python scripts/book.py done <n> --summary "..."` | records progress and the summary (only after `reread`); saves the checkpoint |
 | `python scripts/book.py status` | where the book stopped, the handoff note and the next step |
 | `python scripts/facts.py <n>` | lists the chapter's sentences with dates, numbers, names and quotations |
 | `python scripts/projects.py [--chapter <n>]` | assembles the projects from the code blocks and runs them |
@@ -101,7 +102,7 @@ The other scripts are taught where they are used: `ingest.py` (`IMPROVE.md`, `SO
    - A lab that creates or changes credentials or user settings (SSH keys, `~/.gitconfig`, tokens, shell profiles) runs with `HOME` (and `USERPROFILE` on Windows) pointing to a temporary folder; list the real ones before and after, and undo anything that changed.
    - On native Windows, when Linux commands cannot run, recommend WSL 2 once per book: https://github.com/Joshpcbrrj/syllabook/blob/main/docs/integrations/wsl.md
 4. `facts.py <n>`: check each listed sentence against the dossier and the sources (`SOURCES.md` §5), and that every explanation of a command or piece of code matches its real output.
-5. Reread the chapter once as a native reader of the book language, following its style file: fix any sentence that sounds translated. Never skip this step, not even to save tokens.
+5. `book.py reread <n>`: it prints the chapter's prose, line by line. Read every line as a native reader of the book language, following its style file, and fix any sentence that sounds translated. `done` refuses a chapter without it. Never skip this step, not even to save tokens.
 6. `audit.py <n>`: fix the errors it reports; repeat until there are none.
 7. `book.py done <n> --summary "<3 to 5 lines: what it taught, terms, examples used>"`.
 8. To the user, one line: `✅ Ch. <n>/<total>: <title>`.

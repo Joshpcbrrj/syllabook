@@ -74,7 +74,8 @@ Edit these only if you know why:
 
 | Field | Written by |
 | --- | --- |
-| `progress` | `book.py done`: each finished chapter, with its date and summary |
+| `progress` | `book.py done`: each finished chapter, with its date, the date of its native reread and its summary |
+| `reread` | `book.py reread`: chapters reread and not yet marked done (it disappears once they are) |
 | `changes` | the skill, for every change after approval: `{date, what, why}` |
 | `handoff` | `book.py handoff`: what is pending for the next conversation |
 | `editions`, `reviewed_on` | `book.py edition`, at the end of a review |

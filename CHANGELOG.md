@@ -6,6 +6,11 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ## [Unreleased]
 
+### Changed
+
+- The native reread of each chapter is a step of its own: `book.py reread <n>` prints the chapter's prose line by line (no code blocks, images or HTML) with the style file to follow, and records it; `book.py done` refuses a chapter that was not reread since its last `done`, and keeps the reread date in `progress`. In the English-book pilot and in a WSL book session, the reread was skipped whenever the message did not ask for it.
+- `SOURCES.md`: a checked date means the page was opened in the session. A link seen only in search results gets no date until it is opened. In the English-book pilot, two links found by search and never opened were listed as "checked on" the day.
+
 ## [0.4.2] - 2026-11-27
 
 ### Changed

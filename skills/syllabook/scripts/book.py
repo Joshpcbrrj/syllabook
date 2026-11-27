@@ -4,7 +4,8 @@
 Usage:
   python scripts/book.py validate <book.yaml>     check fields and the concept graph; selects the book
   python scripts/book.py brief <n> [--book B]     create the chapter skeleton and print its brief
-  python scripts/book.py done <n> --summary "..." [--book B]   record the chapter as done
+  python scripts/book.py reread <n> [--book B]    print the chapter's prose for the native reread and record it
+  python scripts/book.py done <n> --summary "..." [--book B]   record the chapter as done (after reread)
   python scripts/book.py status [--book B]        where the book stopped and the next step
   python scripts/book.py handoff ["item"...] [--book B]   save what the next conversation must know (none = clear)
   python scripts/book.py base <slug-or-folder> [--library L]   summary of a library book to plan the next one
@@ -302,6 +303,44 @@ def cmd_brief(args):
     out(brief)
 
 
+SKIP_REREAD = re.compile(r'^\s*(!\[|</?(details|summary)\b|\|?\s*:?-{3,})')
+
+
+def prose(text):
+    """The lines a native reader rereads, numbered as in the file: no code blocks, images or HTML tags."""
+    lines, fenced = [], False
+    for number, line in enumerate(text.splitlines(), 1):
+        if line.lstrip().startswith(('```', '~~~')):
+            fenced = not fenced
+            continue
+        if fenced or not line.strip() or SKIP_REREAD.match(line):
+            continue
+        lines.append(f'{number}: {line}')
+    return lines
+
+
+def cmd_reread(args):
+    """Step 5 of the chapter loop, done for real: the chapter's prose comes back to be read as a native
+    reader would, and the reread is recorded, since `done` refuses a chapter without one."""
+    book_dir, path = find_book(args.book)
+    data = load_yaml(path)
+    chapter(data, args.n)
+    file = chapter_path(book_dir, args.n)
+    if not file:
+        fail(f'chapter {args.n} has no file yet: run "book.py brief {args.n}" first')
+    language = data.get('language', 'en')
+    style = f'references/style/{language}.md'
+    if not os.path.exists(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), style)):
+        style = 'references/style/en.md (the general rules; adapt them to the book language)'
+    data['reread'] = sorted(set(data.get('reread') or []) | {args.n})
+    save_yaml(path, data)
+    out({'file': os.path.relpath(file, book_dir).replace(os.sep, '/'), 'style': style,
+         'do': 'Read every line below as a native reader of the book language, following the style file: '
+               'fix (Edit) each sentence that sounds translated, unnatural or unclear; then run '
+               f'audit.py {args.n} and book.py done {args.n}.',
+         'lines': prose(open(file, encoding='utf-8').read())})
+
+
 def cmd_done(args):
     book_dir, path = find_book(args.book)
     data = load_yaml(path)
@@ -315,8 +354,15 @@ def cmd_done(args):
     summary = (args.summary or '').strip()
     if not summary:
         fail('--summary is required (3 to 5 lines: what it taught, terms, examples used)')
+    if args.n not in (data.get('reread') or []):
+        fail(f'chapter {args.n} was not reread: run "book.py reread {args.n}", read every line it prints as '
+             'a native reader and fix what sounds translated, then audit.py and done again')
+    today = datetime.date.today().isoformat()
+    data['reread'] = [k for k in data['reread'] if k != args.n]
+    if not data['reread']:
+        del data['reread']
     progress = [p for p in data.get('progress') or [] if p.get('n') != args.n]
-    progress.append({'n': args.n, 'done': datetime.date.today().isoformat(), 'summary': summary[:800]})
+    progress.append({'n': args.n, 'done': today, 'reread': today, 'summary': summary[:800]})
     data['progress'] = sorted(progress, key=lambda p: p['n'])
     save_yaml(path, data)
     total = len(data['chapters'])
@@ -503,6 +549,8 @@ def main():
     v.add_argument('path')
     b = sub.add_parser('brief')
     b.add_argument('n', type=int)
+    w = sub.add_parser('reread')
+    w.add_argument('n', type=int)
     d = sub.add_parser('done')
     d.add_argument('n', type=int)
     d.add_argument('--summary')
@@ -518,10 +566,10 @@ def main():
     e.add_argument('edition')
     e.add_argument('--summary')
     e.add_argument('--review-by')
-    for q in (b, d, s, h, k, r, e):
+    for q in (b, w, d, s, h, k, r, e):
         q.add_argument('--book')
     args = p.parse_args()
-    {'validate': cmd_validate, 'brief': cmd_brief, 'done': cmd_done, 'status': cmd_status,
+    {'validate': cmd_validate, 'brief': cmd_brief, 'reread': cmd_reread, 'done': cmd_done, 'status': cmd_status,
      'handoff': cmd_handoff, 'base': cmd_base, 'link': cmd_link,
      'review': cmd_review, 'edition': cmd_edition}[args.cmd](args)
 

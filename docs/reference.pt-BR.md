@@ -1,4 +1,4 @@
-<!-- translation-of: reference.md sha256:0ac7cb6ddc91 -->
+<!-- translation-of: reference.md sha256:c3ae9e6ed9ab -->
 # Referência: `book.yaml` e `library.yaml`
 
 [English](reference.md) | **Português**
@@ -75,7 +75,8 @@ Só edite estes se souber por quê:
 
 | Campo | Quem escreve |
 | --- | --- |
-| `progress` | `book.py done`: cada capítulo terminado, com a data e o resumo |
+| `progress` | `book.py done`: cada capítulo terminado, com a data, a data da releitura nativa e o resumo |
+| `reread` | `book.py reread`: capítulos relidos e ainda não marcados como prontos (some quando eles são) |
 | `changes` | a skill, a cada mudança depois da aprovação: `{date, what, why}` |
 | `handoff` | `book.py handoff`: o que ficou pendente para a próxima conversa |
 | `editions`, `reviewed_on` | `book.py edition`, no fim de uma revisão |

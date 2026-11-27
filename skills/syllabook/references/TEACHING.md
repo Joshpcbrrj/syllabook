@@ -129,6 +129,6 @@ Write it as a note with the fixed label, in the book language: `> 💡 **<Analog
 - Every piece of code and every command was run (or is marked "not run").
 - With a running project (`areas/stem.md`): the chapter ends with the files the project should now have and one command that checks it, and `projects.py --chapter <n>` passes.
 - Facts were checked against the dossier and the sources (`facts.py`), and every explanation of a command or piece of code matches its real output.
-- The text reads as written in the book language, never translated (its style file).
+- The text reads as written in the book language, never translated (its style file): reread with `book.py reread <n>`.
 - No concept is used before it is taught (the brief lists which you may use).
 - `audit.py` passes.

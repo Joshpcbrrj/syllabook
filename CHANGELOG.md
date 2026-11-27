@@ -6,6 +6,8 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ## [Unreleased]
 
+## [0.4.2] - 2026-11-27
+
 ### Changed
 
 - Notion copy, after copying a whole book: the file title over a code block goes as code (`**README.md**` became a link to `http://README.md` in Notion, and so did `db.py` and `verificar.sh`: `.md`, `.py` and `.sh` are internet domains). Each page comes with a `checks` file, the lines it must hold exactly, and `PUBLISH.md` checks every page right after creating it with a no-change `update_content` call (success means every line is there; an error lists the missing ones), without fetching it back. The content is copied character for character, at most ~30,000 characters per call: a copy written from memory had typos, a Cyrillic letter inside a script and chapters cut short. Image uploads may expire within minutes, so each one is made right before its page.
@@ -205,7 +207,8 @@ First release of the rebuilt skill.
 - The old skills `revisar-curso-biblioteca` and `criar-livro-tecnologia`, the scripts in `ferramentas/` and the tests, to be replaced by the new skill.
 - The courses and books published with the old skills (they will be rebuilt with the new one), and the `epubs` and `skill` releases.
 
-[Unreleased]: https://github.com/Joshpcbrrj/syllabook/compare/v0.4.1...HEAD
+[Unreleased]: https://github.com/Joshpcbrrj/syllabook/compare/v0.4.2...HEAD
+[0.4.2]: https://github.com/Joshpcbrrj/syllabook/compare/v0.4.1...v0.4.2
 [0.4.1]: https://github.com/Joshpcbrrj/syllabook/compare/v0.4.0...v0.4.1
 [0.4.0]: https://github.com/Joshpcbrrj/syllabook/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/Joshpcbrrj/syllabook/compare/v0.2.0...v0.3.0

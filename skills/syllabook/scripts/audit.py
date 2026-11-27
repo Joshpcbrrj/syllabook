@@ -17,7 +17,7 @@ import sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import diagram
 import illustration
-from common import (READING, chapter_numbers, chapter_path, find_book, labels, load_yaml, out, placeholders,
+from common import (READING, chapter_numbers, chapter_path, fail, find_book, labels, load_yaml, out, placeholders,
                     research_path, slugify)
 
 # blocks that hold program output or data, not code: no comment required
@@ -228,6 +228,10 @@ def main():
     limits = READING[reading]
     errors, warnings, used = [], [], set()
 
+    if args.n and args.n not in chapter_numbers(data):
+        # 11-simulado-final.md has a number too, but the fixed parts have no chapter sections
+        fail(f'{args.n} is not a chapter of book.yaml: the fixed parts (chapter 0, mock exam, glossary) '
+             'are checked by the whole book audit, audit.py without a number')
     numbers = [args.n] if args.n else chapter_numbers(data)
     for n in numbers:
         file = chapter_path(book_dir, n)

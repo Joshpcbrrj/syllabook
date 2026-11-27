@@ -54,6 +54,12 @@ ERRORS = [
 ]
 
 
+def test_the_mock_exam_is_not_audited_as_a_chapter(cli, book):
+    # 03-simulado-final.md has a number, but it is a fixed part: the whole-book audit checks it
+    code, r = audit(cli, book, 3)
+    assert code == 1 and 'not a chapter' in r['error'] and 'whole book' in r['error'], r
+
+
 def test_a_python_docstring_explains_the_block_like_a_comment(cli, book):
     edit(book / CHAPTER, '## 🏋️ Pratique', BLOCK.replace('```python\n', '```python\n"""O maior e o menor."""\n'))
     code, r = audit(cli, book, 1)

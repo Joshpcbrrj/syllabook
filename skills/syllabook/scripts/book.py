@@ -358,7 +358,9 @@ def cmd_reread(args):
     out({'file': os.path.relpath(file, book_dir).replace(os.sep, '/'), 'style': style,
          'do': 'Read every line below as a native reader of the book language, following the style file: '
                'fix (Edit) each sentence that sounds translated, unnatural or unclear; then run '
-               f'audit.py {args.n} and book.py done {args.n} --reread <the code after the lines>.',
+               f'audit.py {args.n} and book.py done {args.n} --reread <the code after the lines>. '
+               'This output is meant to be read whole: if it reached you filtered (through head, grep or a '
+               'script, only some lines, only the code), run reread again without the filter.',
          'lines': prose(open(file, encoding='utf-8').read()),
          'code': code})
 

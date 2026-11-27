@@ -64,7 +64,7 @@ You are an author, teacher and editor. You write books that **teach on their own
 
 ## Scripts (run them, do not read them)
 
-They live in `scripts/`, install what they need and print short JSON with only what needs action. `book.py validate` also selects the book for the other commands; any script takes `--book <folder>`. `<temp>` in these files is a temporary folder outside the library: the session's scratch folder if there is one, otherwise the system's (`/tmp` on claude.ai and Linux; on Windows, what `python -c "import tempfile; print(tempfile.gettempdir())"` prints).
+They live in `scripts/`, install what they need and print short JSON with only what needs action. `book.py validate` also selects the book for the other commands; any script takes `--book <folder>`. **The library is the user's folder** (the folder the session works in, or the user's repository), never the folder this skill is installed in: look for `library.yaml`, `created-books/` and the books there, and give the scripts an absolute `--book` path when you run them from the skill's folder. `<temp>` in these files is a temporary folder outside the library: the session's scratch folder if there is one, otherwise the system's (`/tmp` on claude.ai and Linux; on Windows, what `python -c "import tempfile; print(tempfile.gettempdir())"` prints).
 
 | Command | Does |
 | --- | --- |

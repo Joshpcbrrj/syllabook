@@ -65,6 +65,9 @@ The book's `goal` and each chapter's `goal` say what the reader **will be able t
 | entender, compreender, conhecer, saber, aprender sobre | explicar, distinguir, prever, escolher, usar |
 | comprender, conocer | explicar, distinguir, elegir, usar |
 
+Every goal **starts with a verb** (infinitive in Portuguese and Spanish: "Clonar", "Explicar"). A list of commands or topics is not a goal: it says what the chapter covers, not what the reader will do.
+
+- "`clone`, `push`, `pull` e `fetch`, com autenticação segura" → "Clonar um repositório, enviar e receber mudanças com `push` e `pull`, e autenticar por SSH".
 - "Entender, resolver e evitar conflitos" → "Resolver um conflito de merge e evitar os mais comuns".
 - "Declarar volume nomeado e entender a diferença entre down e down -v" → "Declarar um volume nomeado e prever o que `down` e `down -v` apagam".
 - "Know the main battles of the war" → "Place the main battles on a map and a timeline".

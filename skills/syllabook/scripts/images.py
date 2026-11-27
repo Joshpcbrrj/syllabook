@@ -407,6 +407,18 @@ def start_editor(folder, user_data):
     return url, stop
 
 
+def exact_row(page, text):
+    """The palette row whose label is exactly `text`, or None. The palette matches loosely: for "Git: Open Changes"
+    its first row is "Git: Open All Changes", so Enter alone would run another command."""
+    rows = page.locator('.quick-input-list .monaco-list-row')
+    for i in range(rows.count()):
+        row = rows.nth(i)
+        labels = row.locator('.label-name')
+        if labels.count() and labels.first.inner_text().strip() == text:
+            return row
+    return None
+
+
 def palette(page, text, quick_open=False):
     """Runs a command (or opens a file) through VS Code's command palette."""
     page.keyboard.press('F1')
@@ -415,7 +427,11 @@ def palette(page, text, quick_open=False):
         page.keyboard.press('Backspace')  # drop the ">" prefix: the palette becomes Quick Open
     page.keyboard.type(text)
     page.wait_for_timeout(800)
-    page.keyboard.press('Enter')
+    row = None if quick_open else exact_row(page, text)
+    if row is not None:
+        row.click()
+    else:
+        page.keyboard.press('Enter')
     page.wait_for_timeout(1200)
 
 

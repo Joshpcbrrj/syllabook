@@ -6,6 +6,8 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ## [Unreleased]
 
+## [0.4.1] - 2026-11-27
+
 ### Changed
 
 - Without GitHub, the book leaves each conversation as a partial zip (`build.py --partial`, one script call) in the outputs folder: on claude.ai the session's folder is lost when the conversation ends, and a test there showed a chapter written and audited that the user could not download. The start explains that GitHub keeps the book between conversations, asks even when the user did not mention it, and never says the user declined what they did not.
@@ -189,7 +191,8 @@ First release of the rebuilt skill.
 - The old skills `revisar-curso-biblioteca` and `criar-livro-tecnologia`, the scripts in `ferramentas/` and the tests, to be replaced by the new skill.
 - The courses and books published with the old skills (they will be rebuilt with the new one), and the `epubs` and `skill` releases.
 
-[Unreleased]: https://github.com/Joshpcbrrj/syllabook/compare/v0.4.0...HEAD
+[Unreleased]: https://github.com/Joshpcbrrj/syllabook/compare/v0.4.1...HEAD
+[0.4.1]: https://github.com/Joshpcbrrj/syllabook/compare/v0.4.0...v0.4.1
 [0.4.0]: https://github.com/Joshpcbrrj/syllabook/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/Joshpcbrrj/syllabook/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/Joshpcbrrj/syllabook/compare/v0.1.0...v0.2.0

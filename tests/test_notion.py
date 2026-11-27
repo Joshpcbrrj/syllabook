@@ -71,6 +71,11 @@ def test_notion_gets_only_svg_diagrams(book):
     assert [u['kind'] for u in uploads] == ['svg'] and '<image source="UPLOAD:c01-lista.svg">A lista</image>' in content
 
 
+def test_a_chapter_link_inside_a_callout_is_removed(book):
+    content, _, _ = convert('> ➡️ **Próximo passo:** o [Glossário](glossario.md) reúne os termos.\n', book)
+    assert 'o Glossário reúne' in content and 'glossario.md' not in content
+
+
 def test_an_image_whose_alt_text_has_brackets_is_uploaded(book):
     # the book on one page lists chapters, and one said "[user] default= no wsl.conf"
     text = '![O livro: 8. Backup: [user] default= no wsl.conf.](../img/c01-lista.svg)\n'

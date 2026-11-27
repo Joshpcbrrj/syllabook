@@ -63,7 +63,8 @@ def callout(lines):
         text = (text[:m.start(1)] + text[m.end(1):]).lstrip()
         text = re.sub(r'^\*\*\s+', '**', text)
     color = CALLOUT_COLORS.get(icon, 'gray_bg')
-    return [f'<callout icon="{icon}" color="{color}">', inline(text), '</callout>']
+    # a link to another chapter file means nothing in Notion, inside a callout as anywhere else
+    return [f'<callout icon="{icon}" color="{color}">', inline(CHAPTER_LINK.sub(r'\1', text)), '</callout>']
 
 
 def convert(text, book_dir, page_url='', see_label='See the image on the website'):

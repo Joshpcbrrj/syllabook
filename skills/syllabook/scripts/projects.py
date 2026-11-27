@@ -10,8 +10,9 @@ How a chapter declares a project (references/TEACHING.md §5):
   ...
   ```
 A file block is a line with the file path in bold, followed by a code block. Blocks after a
-`project:` marker belong to that project until the next marker; without a marker they belong
-to a project named after the chapter. A later block with the same path replaces the earlier
+`project:` marker belong to that project until the next marker; in a chapter with no marker they
+belong to a project named after the chapter, and in a chapter with one, the blocks before it are
+left out (loose examples). A later block with the same path replaces the earlier
 one, so a project can evolve across chapters. Files go to projects/<name>/.
 
 `--chapter N` checks the projects chapter N writes to, assembled with every chapter up to N (the
@@ -65,7 +66,8 @@ def safe_path(path):
 def collect(text, default_name, projects, errors, chapter):
     """Reads one chapter: markers and file blocks, in order."""
     lines = [QUOTE.sub('', line) for line in text.splitlines()]
-    current = default_name
+    # in a chapter that declares a project, file blocks before its marker are loose examples, not a project
+    current = None if MARKER.search(text) else default_name
     i = 0
     while i < len(lines):
         marker = MARKER.search(lines[i])

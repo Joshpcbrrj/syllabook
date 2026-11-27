@@ -1,6 +1,9 @@
 ---
 name: syllabook
 description: "Writes self-study course-books on any topic (programming, math, languages, music, electronics, history of computing and more) from a syllabus agreed with the user, improves existing study materials (Notion, PDF, EPUB, DOCX, Google Drive, text, links) and translates finished books. Delivers Markdown, EPUB and a searchable website, publishes to GitHub and copies to Notion. Use when the user wants to learn a topic on their own, create a book, course or handout, rework or improve study material, or translate or publish a book made with this skill (pt: livro, curso, apostila, estudar, reformular material; es: libro, curso, estudiar). Do not use for one-off questions about a subject."
+license: MIT
+metadata:
+  version: "0.4.1-dev"
 ---
 
 # Syllabook
@@ -20,6 +23,7 @@ You are an author, teacher and editor. You write books that **teach on their own
 - Chapter text goes straight to its file. **Never repeat in the chat** what is already in a file. Once a chapter is done, work from the files and `book.yaml`, not from the conversation's memory.
 - Keep messages to the user short: what was done, what comes next, what you need from them. Fix only the passage the audit points to; never rewrite a whole chapter to fix it.
 - **Long books:** every turn rereads the whole conversation. After about 3 chapters in one conversation, or as soon as the user or the app says the context is running out, end your message suggesting a new one ("to save your usage limit, continue in a new conversation: say 'continue my book <title>'"). Progress is in `book.yaml`, so nothing is lost.
+- **Without GitHub, the work leaves the conversation as a zip:** at the end of each conversation, deliver `build.py --partial` in the outputs folder (`modes/PUBLISH.md` §2); on claude.ai the session's folder is lost with the conversation. With GitHub connected, the chapters are already in the library and no zip is needed.
 - **Handoff note:** before suggesting a new conversation, run `book.py handoff "<item>" ...` with what is pending and is not in `progress` or `changes` (screenshots asked of the user, approved additions not written yet, commands "not run" waiting for a setup, open decisions, the next step), one short sentence per item; with no items it clears the note.
 
 ## Languages

@@ -42,6 +42,16 @@ def test_the_command_lists_the_dated_sentence(cli, book):
     assert any('1991' in s['sentence'] and 'date' in s['kinds'] for s in r['sentences'])
 
 
+def test_a_name_the_chapter_repeats_is_its_subject_not_a_claim(cli, book):
+    from conftest import edit
+    edit(book / 'chapters' / '02-o-laco-for.md', '## 📚 Fontes',
+         'No terminal do Ubuntu, rode o teste.\n\nO pacote do Ubuntu atualiza sozinho.\n\n'
+         'Depois, no Ubuntu, confira a versão.\n\nO laço foi descrito por Dijkstra num artigo.\n\n## 📚 Fontes')
+    code, r = cli('facts', 2, '--book', book)
+    named = [s['sentence'] for s in r['sentences'] if 'name' in s['kinds']]
+    assert any('Dijkstra' in s for s in named) and not any('Ubuntu' in s and 'Dijkstra' not in s for s in named)
+
+
 def test_the_command_reports_a_chapter_without_a_file(cli, book):
     code, r = cli('facts', 9, '--book', book)
     assert code == 1 and 'no file yet' in r['error']

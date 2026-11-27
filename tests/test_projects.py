@@ -112,6 +112,13 @@ def test_files_without_an_extension_and_dotfiles_belong_to_the_project(cli, book
     assert code == 0 and r['projects'][0]['files'] == ['.dockerignore', 'Dockerfile', 'app/Makefile'], r
 
 
+def test_blocks_before_the_marker_of_a_chapter_are_loose_examples(cli, book):
+    add(book, '01-listas.md', '**~/.bashrc**\n\n```bash\n# exemplo solto\nalias ll="ls -l"\n```\n\n'
+                              + project_block('calc', run=True, expect='42'))
+    code, r = cli('projects', '--book', book)
+    assert code == 0 and [p['name'] for p in r['projects']] == ['calc'], r
+
+
 def test_without_a_marker_the_project_is_named_after_the_chapter_and_not_run(cli, book):
     add(book, '02-o-laco-for.md', '**media.py**\n\n```python\n# calcula a média\nprint(7.33)\n```')
     code, r = cli('projects', '--book', book)

@@ -6,6 +6,7 @@ import urllib.parse
 
 import common
 import report
+import yaml
 from conftest import ROOT, SKILL, read
 
 
@@ -127,3 +128,6 @@ def test_version_follows_the_changelog():
         assert common.VERSION == released[0]
     plugin = json.load(open(os.path.join(ROOT, '.claude-plugin', 'plugin.json'), encoding='utf-8'))
     assert plugin['version'] == released[0], 'plugin.json must carry the latest released version'
+    # the version uploaded with the skill (claude.ai shows the frontmatter) is the scripts' version
+    head = read(os.path.join(ROOT, 'skills', 'syllabook', 'SKILL.md')).split('\n---\n', 1)[0].lstrip('-\n')
+    assert yaml.safe_load(head)['metadata']['version'] == common.VERSION

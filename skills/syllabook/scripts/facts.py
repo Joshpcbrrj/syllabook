@@ -4,7 +4,8 @@
 Usage:  python scripts/facts.py <n> [--book B]
 
 A sentence is listed when it has a year or date, a number with a unit or a
-percentage, a quotation, or a proper name in the middle of the sentence.
+percentage, a quotation, or a proper name in the middle of the sentence (names the chapter
+repeats 3 times or more are its subject, such as Linux or Git, and are not listed).
 Code blocks are skipped (code is verified by running it). Check each
 sentence against the sources (references/SOURCES.md §5).
 """
@@ -12,6 +13,7 @@ import argparse
 import os
 import re
 import sys
+from collections import Counter
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from common import chapter_path, fail, find_book, out
@@ -25,6 +27,7 @@ PATTERNS = {
     # a capitalized word that does not start the sentence: likely a person, place or product
     'name': re.compile(r'(?<=[a-zà-ÿ,;:)] )[A-ZÀ-Ý][\w-]+'),
 }
+TOPIC_NAME = 3  # a name this many times in the chapter is the chapter's subject
 MARKUP = re.compile(r'`[^`]*`|!\[[^\]]*\]\([^)]*\)|\]\([^)]*\)|<[^>]+>|[*_#>|]')
 
 
@@ -59,8 +62,13 @@ def main():
     if not path:
         fail(f'chapter {args.n} has no file yet')
     found = []
-    for line, s in sentences(open(path, encoding='utf-8').read()):
-        kinds = [k for k, rx in PATTERNS.items() if rx.search(s)]
+    listed = list(sentences(open(path, encoding='utf-8').read()))
+    # a name the chapter repeats is its subject (Linux, Ubuntu, Git), not a claim to check: only rarer names count
+    seen = Counter(w for _, s in listed for w in PATTERNS['name'].findall(s))
+    for line, s in listed:
+        kinds = [k for k, rx in PATTERNS.items() if k != 'name' and rx.search(s)]
+        if any(seen[w] < TOPIC_NAME for w in PATTERNS['name'].findall(s)):
+            kinds.append('name')
         if kinds:
             found.append({'line': line, 'kinds': kinds, 'sentence': s[:220]})
     out({'chapter': args.n, 'to_check': len(found), 'sentences': found})

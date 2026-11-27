@@ -23,7 +23,7 @@ Check the available tools without asking the user:
 
 If **GitHub** or **Notion** is missing:
 
-1. Say in one or two lines what it is for (GitHub: save progress and publish the book and site; Notion: a copy of the book to take notes in).
+1. Say in one or two lines what it is for (GitHub: the book is saved in the user's library after every chapter, so it survives the conversation, and it is published with its site; without it, the book leaves each conversation only as a zip to download. Notion: a copy of the book to take notes in). Ask even when the user did not mention GitHub, and never say the user declined something they did not decline.
 2. Send the guide link and wait for "done" or "skip".
 3. After "done", check again. If it still fails, say what you saw and offer to continue without it.
 4. After "skip", continue: the book is made the same way, and you ask again at the end.
@@ -33,7 +33,7 @@ Never ask for tokens or passwords in the chat: connections go through Claude's c
 ## 2. Checkpoints during the book
 
 - **GitHub connected:** work on the `draft/<slug>` branch of the user's library repository. `book.py done` saves each chapter; commit it right away with the message `<slug>: chapter <n>`. Use `commit_name` and `commit_email` from `library.yaml`. Say once, when the branch is created, that the drafts are saved there and that it is merged and deleted at publication; if the user asked to keep the work local (Claude Code), commit without pushing until they say so.
-- **No GitHub:** at the end of each part of the book (or every 4 chapters), offer a partial zip from `build.py --partial`, written outside the library repository (see `--out` in SKILL.md), so it is never committed with the book.
+- **No GitHub:** the book lives only in the session's folder, which on claude.ai is lost when the conversation ends. So, **once, at the end of each conversation** (when you stop, when the user asks to stop, or when you suggest a new conversation), deliver a partial zip from `build.py --partial` in the downloadable outputs folder (claude.ai: `/mnt/user-data/outputs`), never inside the library repository, and say in one line that it holds the book so far and that option 7 continues from it. It is one script call: the text never passes through you. This is why GitHub is the main path: with it, every chapter is already saved in the library.
 - If the user has no library repository yet, suggest creating one from the template (https://github.com/Joshpcbrrj/syllabook-library, **Use this template**, public): each user keeps their books in a repository of their own.
 - If the library repository has no `library.yaml` or book folders yet, copy `assets/library/` into it before the first commit (everything except `SKELETON.md`, which explains each file), and fill in `library.yaml` (`build.py lists` then writes the site address on the front page and the website and EPUB links of every book).
 - "GitHub connected" means write access to the repository: repository access with push permission in the Claude app, or `git` in Claude Code. GitHub's own MCP server as a custom connector needs an OAuth app set up by hand; do not suggest it to beginners.

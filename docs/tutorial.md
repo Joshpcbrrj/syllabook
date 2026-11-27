@@ -19,7 +19,7 @@ In this tutorial you create a book from a topic, from the first message to the p
 
 ## Before you start
 
-- **Syllabook installed** in the Claude app or in Claude Code: see [Install](../README.md#install).
+- **Syllabook installed** in the Claude app or in Claude Code: see [Install](../README.md#install). In Claude Code, turn on auto-update for the `syllabook` marketplace there, so new versions arrive by themselves; in the Claude app, upload the new zip at each release.
 - **Optional:** GitHub and Notion connected ([integrations](integrations/README.md)). Without them you still get the whole book as a zip; Syllabook asks again at the end.
 - For a technology book, Claude Code gives better results: it runs the commands on your computer. On Windows, use it inside [WSL 2](integrations/wsl.md).
 

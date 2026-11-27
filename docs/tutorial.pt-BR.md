@@ -1,4 +1,4 @@
-<!-- translation-of: tutorial.md sha256:757e04cabf1d -->
+<!-- translation-of: tutorial.md sha256:9f68e0215ccb -->
 # Tutorial: seu primeiro livro
 
 [English](tutorial.md) | **Português**
@@ -20,7 +20,7 @@ Neste tutorial você cria um livro a partir de um tema, da primeira mensagem at�
 
 ## Antes de começar
 
-- **Syllabook instalado** no app do Claude ou no Claude Code: veja [Instalar](../README.pt-BR.md#instalar).
+- **Syllabook instalado** no app do Claude ou no Claude Code: veja [Instalar](../README.pt-BR.md#instalar). No Claude Code, ligue ali o auto-update do marketplace `syllabook`, para as versões novas chegarem sozinhas; no app do Claude, envie o zip novo a cada versão.
 - **Opcional:** GitHub e Notion conectados ([integrações](integrations/README.pt-BR.md)). Sem eles você recebe o livro inteiro num zip, e o Syllabook pergunta de novo no fim.
 - Para um livro de tecnologia, o Claude Code rende mais: ele roda os comandos no seu computador. No Windows, use-o dentro do [WSL 2](integrations/wsl.pt-BR.md).
 

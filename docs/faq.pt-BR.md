@@ -1,4 +1,4 @@
-<!-- translation-of: faq.md sha256:620233aeaca5 -->
+<!-- translation-of: faq.md sha256:bb5006ad114d -->
 # Perguntas frequentes
 
 [English](faq.md) | **Português**
@@ -37,8 +37,8 @@ No Windows, use o Claude Code dentro do [WSL 2](integrations/wsl.pt-BR.md), para
 
 ## Como atualizo ou removo o Syllabook?
 
-- **Claude Code:** atualize com `claude plugin marketplace update syllabook` e depois `claude plugin update syllabook@syllabook`, e reinicie o Claude Code. Para remover: `claude plugin uninstall syllabook@syllabook`.
-- **App do Claude:** baixe o `syllabook.zip` novo da [versão mais recente](https://github.com/Joshpcbrrj/syllabook/releases/latest) e envie na seção de Skills das configurações, no lugar do antigo. Para remover, apague a skill nessa mesma seção.
+- **Claude Code:** com o auto-update ligado no marketplace `syllabook` (veja [Instalar](../README.pt-BR.md#instalar)), as versões novas chegam sozinhas. Para atualizar à mão, rode `claude plugin marketplace update syllabook` e depois `claude plugin update syllabook@syllabook`, e reinicie o Claude Code. Para remover: `claude plugin uninstall syllabook@syllabook`.
+- **App do Claude:** ele não se atualiza sozinho: baixe o `syllabook.zip` novo da [versão mais recente](https://github.com/Joshpcbrrj/syllabook/releases/latest) e envie na seção de Skills das configurações, no lugar do antigo. Para remover, apague a skill nessa mesma seção.
 
 Os seus livros não são afetados: eles ficam na sua biblioteca, não na skill. O que mudou em cada versão está no [CHANGELOG](../CHANGELOG.md) (em inglês).
 

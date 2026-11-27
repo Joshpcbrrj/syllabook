@@ -36,8 +36,8 @@ On Windows, use Claude Code inside [WSL 2](integrations/wsl.md), so Linux comman
 
 ## How do I update or remove Syllabook?
 
-- **Claude Code:** update with `claude plugin marketplace update syllabook`, then `claude plugin update syllabook@syllabook`, and restart Claude Code. Remove it with `claude plugin uninstall syllabook@syllabook`.
-- **Claude app:** download the new `syllabook.zip` from the [latest release](https://github.com/Joshpcbrrj/syllabook/releases/latest) and upload it in the Skills section of the settings, in place of the old one. To remove it, delete it in the same section.
+- **Claude Code:** with auto-update on for the `syllabook` marketplace (see [Install](../README.md#install)), new versions arrive by themselves. To update by hand, run `claude plugin marketplace update syllabook`, then `claude plugin update syllabook@syllabook`, and restart Claude Code. Remove it with `claude plugin uninstall syllabook@syllabook`.
+- **Claude app:** it does not update by itself: download the new `syllabook.zip` from the [latest release](https://github.com/Joshpcbrrj/syllabook/releases/latest) and upload it in the Skills section of the settings, in place of the old one. To remove it, delete it in the same section.
 
 Your books are not touched: they live in your library, not in the skill. What changed in each version is in the [CHANGELOG](../CHANGELOG.md).
 

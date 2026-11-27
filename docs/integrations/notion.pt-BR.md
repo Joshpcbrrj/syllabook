@@ -1,4 +1,4 @@
-<!-- translation-of: notion.md sha256:060885713b46 -->
+<!-- translation-of: notion.md sha256:f9b7fecdf90f -->
 # Notion: ler seus materiais e guardar uma cópia de cada livro
 
 [English](notion.md) | **Português**
@@ -33,7 +33,7 @@ Depois, dentro do Claude Code, digite `/mcp`, escolha **notion** e entre na sua 
 
 ## Como conferir que funcionou
 
-Peça ao Claude para "abrir a minha página do Notion <link>". Devem aparecer o título e o conteúdo da página. Na primeira publicação, o Syllabook pede o link da página onde os livros vão ficar e o guarda no `library.yaml` (`notion_page`).
+Peça ao Claude para "abrir a minha página do Notion <link>". Devem aparecer o título e o conteúdo da página. Na primeira publicação, o Syllabook pede o link da página onde os livros vão ficar e o guarda no `library.yaml` (`notion_page`). Antes de cada cópia ele diz qual é essa página, com o link, e você pode escolher outra para aquele livro; no fim ele passa o link do livro no Notion e o guarda no `book.yaml` (`notion_url`). Se você pedir de novo a cópia do mesmo livro, ele oferece atualizar a cópia que já existe em vez de fazer outra.
 
 ## Problemas comuns
 

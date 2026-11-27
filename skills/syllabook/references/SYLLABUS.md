@@ -24,6 +24,7 @@ reference_version: "Docker Compose v5.6, Docker Engine 29.9"   # only if the top
 review_by: "2027-11"                 # month to review it by (modes/REVIEW.md); the library lists warn after it
 reviewed_on: ""                      # filled by book.py edition at the end of a review
 editions: []                         # filled by book.py edition: {edition, date, summary}
+notion_url: ""                       # the book's page in Notion, saved after the copy (PUBLISH.md §4)
 sources:
   - {title: "How Compose works", url: "https://docs.docker.com/compose/intro/compose-application-model/", checked: "2026-11-17"}
 approved_on: ""                      # empty while it is a draft

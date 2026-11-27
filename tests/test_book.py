@@ -45,6 +45,7 @@ ERRORS = [
     ('concept twice', lambda d: d['concepts'].append(dict(d['concepts'][0])), 'listed twice'),
     ('concept chapter', lambda d: d['concepts'][0].update(chapter=9), 'chapter 9 does not exist'),
     # {id: x, name: gerenciadores (nvm, SDKMAN, uv)}: in braces, commas split the name into fields
+    ('notion_url not a link', lambda d: d.update(notion_url='minha página de livros'), 'notion_url: must be'),
     ('concept split by commas', lambda d: d['concepts'][0].update(name='gerenciadores (nvm', SDKMAN=None),
      'unknown field "SDKMAN"'),
     ('unknown dependency', lambda d: d['concepts'][1].update(depends=['dicionario']), 'unknown concept'),
@@ -79,6 +80,13 @@ WARNINGS = [
                                                 promise={'goal': 1, 'audience': 1, 'level': 1, 'sequence': 1}),
      'above the ~20% limit'),
 ]
+
+
+@pytest.mark.parametrize('url', ['https://www.notion.so/Livro-0a1b2c3d4e5f60718293a4b5c6d7e8f9',
+                                 'https://app.notion.com/p/d7e93f537cfa49d6a160aeff28cccc5b'])
+def test_the_notion_copy_link_is_kept(cli, tmp_path, url):
+    code, r = validate_with(cli, tmp_path, lambda d: d.update(notion_url=url))
+    assert code == 0 and r['ok'], r
 
 
 @pytest.mark.parametrize('images', ['real', 'svg'])

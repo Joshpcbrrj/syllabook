@@ -22,7 +22,7 @@ from common import (READING, chapter_numbers, chapter_path, find_book, labels, l
 
 # blocks that hold program output or data, not code: no comment required
 NO_COMMENT_LANGS = {'', 'text', 'txt', 'output', 'console', 'plaintext', 'json', 'csv', 'markdown', 'md', 'diff'}
-COMMENT = re.compile(r'^\s*(#|//|--|/\*|\*|<!--|;|%|\'|rem\b)', re.I)
+COMMENT = re.compile(r'^\s*(#|//|--|/\*|\*|<!--|;|%|\'|"""|rem\b)', re.I)  # """: a Python docstring
 FILLER = {
     'en': r'\b(?:simply|just|obviously|basically)\b',
     'pt': r'\b(?:simplesmente|obviamente|basicamente|é só)\b',

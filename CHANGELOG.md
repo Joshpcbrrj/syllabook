@@ -9,6 +9,7 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 ### Changed
 
 - `projects.py` never loses a file changed by hand: it rebuilt `projects/<name>/` from the chapters and silently erased edits made in the folder (a WSL book lost two files that way and the session had to recover them). Now a project with a file changed or added by hand is refused and the files listed, until the change goes into the chapter that shows the file, or `--discard` drops it; `projects/.assembled.json` records what was written and what the run created, and a checkout with Windows line endings is not a change. `TEACHING.md`: every project file is in a chapter, even a one-line `__init__.py`.
+- `projects.py` reads a file title with Markdown escapes (`**pacote/\_\_init\_\_.py**`, shown as `pacote/__init__.py`): the block was skipped silently and the file then reported as changed by hand; the message for a file changed by hand now names a title not read as a possible cause. `audit.py` takes a Python docstring as the comment that explains a block.
 - README, FAQ and tutorial: in Claude Code, turn on auto-update for the `syllabook` marketplace once (`/plugin` → Marketplaces) and each new version arrives by itself; the Claude app does not update an uploaded skill, so the new zip is uploaded at each release.
 - The documentation shows a real library, [biblioteca-syllabook](https://github.com/Joshpcbrrj/biblioteca-syllabook), with four books, in place of the demo library, which had stopped at 0.2.0 and is archived.
 

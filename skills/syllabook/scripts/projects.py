@@ -49,6 +49,8 @@ MARKER = re.compile(r'<!--\s*project:\s*(.+?)\s*-->')
 FILE_LINE = re.compile(r'^\*\*`?([\w./:-]+\.[\w]+|[\w./:-]*/[\w.-]+|\.[\w.-]+|'
                        r'(?:Docker|Container|Make|Proc|Gem|Rake|Jenkins|Vagrant)file)`?\*\*\s*$')
 QUOTE = re.compile(r'^(?:>\s?)+')
+# **pacote/\_\_init\_\_.py** shows as pacote/__init__.py: read the title as the reader sees it
+ESCAPED = re.compile(r'\\([_*.\-])')
 PROJECT_NAME = re.compile(r'^(?!\.+$)[\w.-]+$')
 
 
@@ -90,7 +92,7 @@ def collect(text, default_name, projects, errors, chapter):
             current = spec['name']
             project = projects.setdefault(current, {'files': {}, 'chapters': []})
             project.update({k: v for k, v in spec.items() if k != 'name'})
-        m = FILE_LINE.match(lines[i].strip())
+        m = FILE_LINE.match(ESCAPED.sub(r'\1', lines[i].strip()))
         if m:
             j = i + 1
             while j < len(lines) and not lines[j].strip():
@@ -220,7 +222,9 @@ def main():
             if changed:
                 errors.append(f'{name}: files changed by hand in projects/{name}/: {", ".join(changed)}. '
                               'The chapters are the source: carry each change into the chapter that shows '
-                              'the file (or add the file to it), then run again; --discard drops them')
+                              'the file (or add the file to it), then run again; --discard drops them. If a '
+                              'chapter already shows one of them, its title is not read: write the path alone '
+                              'in bold, **folder/file.ext**, on the line before the code block')
                 continue
             shutil.rmtree(folder)  # rebuilt from the book every time, so it never drifts from the text
         for rel, content in spec['files'].items():

@@ -54,6 +54,12 @@ ERRORS = [
 ]
 
 
+def test_a_python_docstring_explains_the_block_like_a_comment(cli, book):
+    edit(book / CHAPTER, '## 🏋️ Pratique', BLOCK.replace('```python\n', '```python\n"""O maior e o menor."""\n'))
+    code, r = audit(cli, book, 1)
+    assert code == 0, r['errors']
+
+
 @pytest.mark.parametrize('case, old, new, message', ERRORS, ids=[e[0] for e in ERRORS])
 def test_each_chapter_error(cli, book, case, old, new, message):
     edit(book / CHAPTER, old, new)

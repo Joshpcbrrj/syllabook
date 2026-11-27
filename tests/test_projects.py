@@ -180,6 +180,14 @@ def test_a_file_changed_by_hand_is_never_lost(cli, book, file, content):
     assert not (book / 'projects' / 'calc' / 'sobra.txt').exists()
 
 
+def test_a_file_title_with_markdown_escapes_is_read(cli, book):
+    # GitHub shows **pacote/\_\_init\_\_.py** as pacote/__init__.py: the reader sees the file, so it counts
+    add(book, '01-listas.md', project_block('calc') +
+        '\n\n**pacote/\\_\\_init\\_\\_.py**\n\n```python\n"""Um pacote."""\n```')
+    code, r = cli('projects', '--book', book)
+    assert code == 0 and 'pacote/__init__.py' in r['projects'][0]['files'], r
+
+
 def test_a_checkout_with_windows_line_endings_is_not_a_change(cli, book):
     add(book, '01-listas.md', project_block('calc'))
     cli('projects', '--book', book)

@@ -110,7 +110,7 @@ Syllabus rules:
 
 - **Beginner to intermediate**, unless the user asks otherwise.
 - **Progression:** each chapter uses only concepts from earlier ones (`book.py validate` checks the concept graph).
-- **One goal per chapter**, with a verb that can be checked ("build", "translate", "play at 80 bpm"), never "understand" or "know".
+- **One goal per chapter**, with a verb that can be checked ("build", "translate", "play at 80 bpm"), never "understand" or "know", not even as the first of several verbs ("understand, resolve and avoid conflicts" becomes "resolve a merge conflict and avoid the common ones"). `book.py validate` refuses these; without code execution, check them yourself.
 - **Chapter 1 delivers a concrete win** (something that works, is said or is played on day one).
 - **Practice in every chapter**, of the kind defined by the profile. For programming, infrastructure or code, the chapters build one **running project** (`areas/stem.md`): name it in the 🧭 block ("Practice: one project that grows, [what it is]"), and end each hands-on chapter line with the step it adds to that project, by name ("5. Loops → repeat a task for each item of a list; project: total the sales of every file"), so the reader sees the project grow chapter by chapter.
 - **Explicit scope:** what does not fit goes to "Next steps".

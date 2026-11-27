@@ -6,6 +6,10 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ## [Unreleased]
 
+### Changed
+
+- The Notion copy costs a fraction of before: it is made last, after GitHub, in a conversation of its own (every Notion call rereads the whole conversation; a copy at the end of a book's conversation cost US$ 9.50 for 11 pages), `notion.py all --out <dir>` writes every page to a file and prints only the list, and the pages go several per `notion-create-pages` call, without fetching each one back.
+
 ### Fixed
 
 - EPUBs with invalid XHTML, which strict e-readers refuse: a `<placeholder>` written outside code (`<minha resposta>` in the AI tutor prompts, as `TEACHING.md` itself showed) was an unclosed tag, and a project marker holding `--` (`run: docker compose config --services`) was an invalid comment. `build.py` now escapes placeholders and drops comments in the EPUB text (and escapes placeholders on the website, where they disappeared, as on GitHub); `audit.py` reports a placeholder outside code as an error; `TEACHING.md` writes them in square brackets, `[my answer]`. Found by opening a book in the small reading profile: all 12 chapters of a published book and 3 of another were affected.

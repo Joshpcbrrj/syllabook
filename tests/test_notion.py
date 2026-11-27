@@ -21,6 +21,21 @@ def test_a_chapter_becomes_a_notion_page(cli, book):
     assert r['uploads'][0]['placeholder'] == 'UPLOAD:c01-lista.svg' and r['uploads'][0]['kind'] == 'svg'
 
 
+def test_the_whole_book_goes_to_files_and_only_the_list_is_printed(cli, book, tmp_path):
+    code, r = cli('notion', 'all', '--out', tmp_path / 'notion', '--book', book)
+    assert code == 0 and 'content' not in str(r['parts'][0].keys())
+    titles = [p['title'] for p in r['parts']]
+    assert titles[0] == r['parent_first'] and titles[2] == '1. Listas' and len(titles) >= 5
+    first = (tmp_path / 'notion' / '02-01-listas.md').read_text(encoding='utf-8')
+    assert '<toggle>' in first and r['parts'][2]['chars'] == len(first)
+    assert r['parts'][2]['uploads'][0]['placeholder'] == 'UPLOAD:c01-lista.svg'
+
+
+def test_all_needs_a_folder(cli, book):
+    code, r = cli('notion', 'all', '--book', book)
+    assert code == 1 and '--out' in r['error']
+
+
 def test_code_passes_through_untouched(book):
     text = '````markdown\n> não é callout\n<details>\n```python\nx = 1\n```\n````\n'
     content, uploads, _ = convert(text, book)

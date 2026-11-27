@@ -85,7 +85,7 @@ The other scripts are taught where they are used: `ingest.py` (`IMPROVE.md`, `SO
 - [ ] 5. Fixed parts (references/BOOK.md): chapter 0 with the book on one page, placement test, section cheat sheets, mock exam, glossary, next steps
 - [ ] 6. Projects run (if any) and the whole book audited with no errors
 - [ ] 7. Cover, EPUB and zip (build.py)
-- [ ] 8. Publish: GitHub and Notion (modes/PUBLISH.md)
+- [ ] 8. Publish on GitHub; the Notion copy goes last, in a new conversation, to save tokens (modes/PUBLISH.md §4)
 - [ ] 9. Final summary
 ```
 

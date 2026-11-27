@@ -5,6 +5,8 @@ Usage:
   python scripts/notion.py <n> [--book B]      one chapter (0 = chapter 0; the mock exam has the next number)
   python scripts/notion.py <file.md> [--book B]  a file in chapters/ without a number, such as the glossary
   python scripts/notion.py index [--book B]    the book's index page
+  python scripts/notion.py all --out <dir> [--book B]   every page, one file each, in reading order;
+                                               prints only the list (title, file, size, uploads)
 
 Prints JSON with `content` (ready for the Notion page tools) and `uploads`: the images to
 upload first. Each upload has a `placeholder` that appears in the content as
@@ -21,6 +23,7 @@ What changes on the way:
   <!-- comments -->, navigation and the generated map -> removed
 """
 import argparse
+import glob
 import os
 import re
 import sys
@@ -181,15 +184,50 @@ def index_page(book_dir, data):
     return {'title': data['title'], 'content': '\n\n'.join(parts) + '\n', 'uploads': [], 'left_out': []}
 
 
+def page(book_dir, data, file):
+    """One file of chapters/ as a Notion page: title, content, uploads, left_out."""
+    text = open(file, encoding='utf-8').read()
+    content, uploads, left_out = convert(text, book_dir, chapter_url(book_dir, data, file),
+                                         labels(data.get('language', 'en'))['See the image on the website'])
+    # the title becomes the Notion page title, not a heading inside the page
+    title = title_of(text)
+    if title and content.startswith(f'# {title}'):
+        content = content[len(f'# {title}'):].lstrip('\n')
+    return {'title': title, 'content': content, 'uploads': uploads, 'left_out': left_out}
+
+
+def whole_book(book_dir, data, out_dir):
+    """Every page in reading order, each written to its own file; prints only the list, never the text."""
+    os.makedirs(out_dir, exist_ok=True)
+    files = sorted(glob.glob(os.path.join(book_dir, 'chapters', '*.md')))  # numbered first, then the glossary
+    parts, left_out = [], []
+    for k, (name, part) in enumerate([('index', index_page(book_dir, data))] +
+                                     [(os.path.basename(f), page(book_dir, data, f)) for f in files]):
+        target = os.path.join(out_dir, f'{k:02d}-{os.path.splitext(name)[0]}.md')
+        with open(target, 'w', encoding='utf-8', newline='\n') as f:
+            f.write(part['content'])
+        parts.append({'title': part['title'], 'file': target, 'chars': len(part['content']),
+                      'uploads': part['uploads']})
+        left_out += part['left_out']
+    out({'parent_first': parts[0]['title'], 'parts': parts, 'left_out': left_out,
+         'note': 'create the index page first, then the other parts under it, several per create call, '
+                 'in this order; read each file only when you send it'})
+
+
 def main():
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    p.add_argument('target', help='a chapter number, or "index"')
+    p.add_argument('target', help='a chapter number, "index" or "all"')
     p.add_argument('--book')
+    p.add_argument('--out', help='with "all": the folder for one file per page (outside the library)')
     args = p.parse_args()
     book_dir, path = find_book(args.book)
     data = load_yaml(path)
     if args.target == 'index':
         out(index_page(book_dir, data))
+    if args.target == 'all':
+        if not args.out:
+            fail('"all" needs --out <folder>: a temporary folder outside the library')
+        whole_book(book_dir, data, args.out)
     if args.target.endswith('.md'):
         file = os.path.join(book_dir, 'chapters', os.path.basename(args.target))
         if not os.path.exists(file):
@@ -199,15 +237,8 @@ def main():
         if not file:
             fail(f'chapter {args.target} has no file yet')
     else:
-        fail('give a chapter number, a file in chapters/ or "index"')
-    text = open(file, encoding='utf-8').read()
-    content, uploads, left_out = convert(text, book_dir, chapter_url(book_dir, data, file),
-                                         labels(data.get('language', 'en'))['See the image on the website'])
-    # the title becomes the Notion page title, not a heading inside the page
-    title = title_of(text)
-    if title and content.startswith(f'# {title}'):
-        content = content[len(f'# {title}'):].lstrip('\n')
-    out({'title': title_of(text), 'content': content, 'uploads': uploads, 'left_out': left_out})
+        fail('give a chapter number, a file in chapters/, "index" or "all"')
+    out(page(book_dir, data, file))
 
 
 if __name__ == '__main__':

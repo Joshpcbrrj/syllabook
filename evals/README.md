@@ -42,7 +42,7 @@ Cases with a `scaffold.sh` (06, 13, 14, 15) need `--scaffold` to prepare the boo
 wsl -e bash -lc "'/mnt/d/<path to the repo>/evals/wsl-eval.sh' --tag completo --runs 1 --ablation none --scaffold --allow-tools Bash Write Edit --judge-model opus --trust-plugin --no-publish --max-cost-usd 10 --threshold 0"
 ```
 
-In these cases the sandbox keeps the workspace read-only for the shell: a script that writes (`build.py`, `book.py done`) fails there, so the graders accept a reply that says so and gives the command instead of working around it. Cases 06, 14 and 15 (tag `completo`) grant Bash, which the eval refuses on Windows (no sandbox there), so run them in WSL, Linux or macOS:
+In these cases the sandbox keeps the workspace read-only for the shell: a script that writes (`build.py`, `book.py done`) fails there, so the graders accept a reply that says so and gives the command instead of working around it. Cases 14 and 15 (tag `completo`) grant Bash, which the eval refuses on Windows (no sandbox there), so run them in WSL, Linux or macOS. Case 06 (tag `capitulo`, run it with `--case '06-*'`) needs a workspace the shell can write: `book.py brief` creates the chapter file, so in this sandbox the skill stops at it, says why and offers a way out (the right behavior), and the case scores low. The chapter loop (brief, reread with its code, audit, done) is checked for real in book sessions instead:
 
 ```bash
 claude plugin eval . --tag completo --runs 1 --ablation none --scaffold \

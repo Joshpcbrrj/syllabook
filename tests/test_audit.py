@@ -161,6 +161,14 @@ def test_a_photo_without_credit_is_an_error(cli, book):
     assert code == 0, r
 
 
+def test_an_image_over_1_mb_is_a_warning(cli, book):
+    (book / 'img' / 'c01-tela.png').write_bytes(b'x' * (1024 * 1024 + 1))
+    (book / 'img' / 'CREDITS.md').write_text('# Créditos\n\n- c01-tela.png: tela, CC BY 4.0\n', encoding='utf-8')
+    edit(book / CHAPTER, 'Guardar 40 notas', '![Uma tela](../img/c01-tela.png)\n\nGuardar 40 notas')
+    code, r = audit(cli, book, 1)
+    assert code == 0 and any('c01-tela.png has 1.0 MB' in w for w in r['warnings']), r
+
+
 OPEN_PORT = [
     ('compose short syntax', '```yaml\n# a API na porta 8080\nports:\n  - "8080:80"\n```', '8080:80'),
     ('compose without quotes', '```yaml\n# a API\nports:\n  - 8080:80\n```', '8080:80'),

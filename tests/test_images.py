@@ -455,6 +455,37 @@ def test_api_calls_send_who_we_are_and_read_json(monkeypatch, tmp_path):
     assert seen[1].full_url == images.OPENVERSE + 'images/?q=eniac'
 
 
+def test_shrink_brings_a_4k_screenshot_to_1600_pixels_and_256_colors(tmp_path):
+    Image = pytest.importorskip('PIL.Image')
+    path = tmp_path / 'tela.png'
+    noise = Image.effect_noise((3840, 2160), 100).convert('RGB')  # does not compress: weighs megabytes
+    noise.save(path)
+    note = images.shrink(str(path))
+    with Image.open(path) as im:
+        assert im.size == (1600, 900) and im.mode == 'P'
+    assert note.startswith('reduced from 3840x2160') and 'to 1600x900' in note
+
+
+def test_shrink_leaves_a_small_image_and_what_is_not_an_image(tmp_path):
+    Image = pytest.importorskip('PIL.Image')
+    small = tmp_path / 'foto.jpg'
+    Image.new('RGB', (1280, 960), 'white').save(small)
+    before = small.read_bytes()
+    assert images.shrink(str(small)) is None and small.read_bytes() == before
+    fake = tmp_path / 'fake.jpg'
+    fake.write_bytes(b'\xff\xd8 fake jpeg')
+    assert images.shrink(str(fake)) is None
+
+
+def test_without_pillow_a_heavy_image_only_gets_a_note(monkeypatch, tmp_path):
+    monkeypatch.setitem(sys.modules, 'PIL', None)  # import fails as if Pillow were not installed
+    path = tmp_path / 'tela.png'
+    path.write_bytes(b'x' * (2 * 1024 * 1024))
+    assert 'Pillow' in images.shrink(str(path)) and path.stat().st_size == 2 * 1024 * 1024
+    path.write_bytes(b'x' * 1000)
+    assert images.shrink(str(path)) is None
+
+
 def test_wait_until_up(monkeypatch):
     monkeypatch.setattr(images.urllib.request, 'urlopen', lambda url, timeout: FakeResponse(b''))
     images.wait_until_up('http://127.0.0.1:9/?folder=/x')  # returns as soon as /healthz answers

@@ -195,15 +195,57 @@ def credit(book_dir, filename, line):
             f.write(text.rstrip('\n') + f'{joiner}- {filename}: {line}\n')
 
 
+MAX_WIDTH = 1600  # wide enough for the site and an e-reader; a 4K screenshot weighs megabytes
+HEAVY = 1024 * 1024
+HEAVY_PNG = 500 * 1024
+
+
+def kb(size):
+    return f'{size / 1024 / 1024:.1f} MB' if size >= HEAVY else f'{size // 1024} KB'
+
+
+def shrink(path):
+    """Brings a downloaded photo or screenshot to at most MAX_WIDTH pixels, and a heavy PNG to 256 colors.
+    Pillow is optional: without it, a heavy image only gets a note. Returns what was done, or None."""
+    before = os.path.getsize(path)
+    try:
+        from PIL import Image
+    except ImportError:
+        return f'the image has {kb(before)}: ask to shrink it (pip install Pillow)' if before > HEAVY else None
+    try:
+        with Image.open(path) as im:
+            im.load()
+            kind, size = im.format, im.size
+    except (OSError, ValueError):
+        return None
+    if kind not in ('PNG', 'JPEG', 'WEBP') or (size[0] <= MAX_WIDTH and not (kind == 'PNG' and before > HEAVY_PNG)):
+        return None
+    if size[0] > MAX_WIDTH:
+        im = im.resize((MAX_WIDTH, round(size[1] * MAX_WIDTH / size[0])), Image.LANCZOS)
+    if kind == 'JPEG':
+        im.convert('RGB').save(path, 'JPEG', quality=85, optimize=True)
+    else:
+        im.save(path, kind, optimize=True)
+        if kind == 'PNG' and os.path.getsize(path) > HEAVY_PNG:  # screenshots keep their look with 256 colors
+            im.convert('RGB').quantize(256, dither=Image.Dither.FLOYDSTEINBERG).save(path, 'PNG', optimize=True)
+    return (f'reduced from {size[0]}x{size[1]} ({kb(before)}) to {im.size[0]}x{im.size[1]} '
+            f'({kb(os.path.getsize(path))})')
+
+
 def save_image(book_dir, name, image, extension, title):
     filename = name + extension
     os.makedirs(os.path.join(book_dir, 'img'), exist_ok=True)
-    download(image['url'], os.path.join(book_dir, 'img', filename))
+    path = os.path.join(book_dir, 'img', filename)
+    download(image['url'], path)
     license_text = image['license'] + (f' ({image["license_url"]})' if image['license_url'] else '')
     credit(book_dir, filename, f'{title}, {image["author"]}, {license_text}, {image["source"]}')
-    out({'file': f'img/{filename}', 'markdown': f'![<alt text>](../img/{filename})',
-         'caption': f'{image["author"]}, {image["license"]}, via {image["via"]}',
-         'note': 'write the alt text and put the caption credit under the image'})
+    result = {'file': f'img/{filename}', 'markdown': f'![<alt text>](../img/{filename})',
+              'caption': f'{image["author"]}, {image["license"]}, via {image["via"]}',
+              'note': 'write the alt text and put the caption credit under the image'}
+    size = shrink(path)
+    if size:
+        result['size'] = size
+    out(result)
 
 
 def fetch_openverse(ident, name, book_dir):

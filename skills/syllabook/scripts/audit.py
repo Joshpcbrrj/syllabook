@@ -129,6 +129,17 @@ def uncredited(book_dir, names):
         yield name
 
 
+HEAVY_IMAGE = 1024 * 1024  # the site and the EPUB carry every image: a 4K screenshot weighs megabytes
+
+
+def heavy(book_dir, names):
+    """Images over 1 MB, with their size in MB."""
+    for name in names:
+        path = os.path.join(book_dir, 'img', name)
+        if os.path.isfile(path) and os.path.getsize(path) > HEAVY_IMAGE:
+            yield name, os.path.getsize(path) / 1024 / 1024
+
+
 def illustrations(book_dir, names):
     """SVGs drawn by hand (no spec in img/_source/): the illustrations that illustration.py checks."""
     for name in names:
@@ -214,6 +225,8 @@ def main():
         used.update(names)
         for name in uncredited(book_dir, names):
             errors.append(f'chapter {n}: img/{name} is a photo or screenshot without a line in img/CREDITS.md')
+        for name, mb in heavy(book_dir, names):
+            warnings.append(f'chapter {n}: img/{name} has {mb:.1f} MB: shrink it to at most 1600 pixels wide')
         for name, svg in illustrations(book_dir, names):
             problems, notes = illustration.check(svg, diagram.PROFILES[reading]['width'])
             errors += [f'chapter {n}: img/{name}: {p}' for p in problems]

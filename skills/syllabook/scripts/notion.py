@@ -7,6 +7,7 @@ Usage:
   python scripts/notion.py index [--book B]    the book's index page
   python scripts/notion.py all --out <dir> [--book B]   every page, one file each, in reading order;
                                                prints only the list (title, file, size, uploads)
+                                               and writes, next to each page, the lines to check it
 
 Prints JSON with `content` (ready for the Notion page tools) and `uploads`: the images to
 upload first. Each upload has a `placeholder` that appears in the content as
@@ -20,6 +21,7 @@ What changes on the way:
                             they stay in the EPUB and the site, and a line links to the chapter's page there
   inline code ending in \\   -> plain text (Notion would read "\\`" as an escaped backtick)
   links to other chapters -> plain text (the chapters are subpages in Notion)
+  **file.py** over a code block -> **`file.py`** (Notion turns README.md or db.py into links)
   <!-- comments -->, navigation and the generated map -> removed
 """
 import argparse

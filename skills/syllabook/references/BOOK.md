@@ -17,7 +17,7 @@ Every book answers the three reasons self-learners give up: no **direction** (wh
     <glossary>.md           ← glossary (§6)
   img/
     c00-<book-on-one-page>.svg  ← the book on one page (§4), from img/_source/c00-<...>.yaml
-  projects/
+  projects/               ← assembled by projects.py from the chapters; never edited by hand
 ```
 
 File slugs: lowercase ASCII, hyphens, up to ~48 characters, in the book language (`00-como-estudar-este-livro.md`).

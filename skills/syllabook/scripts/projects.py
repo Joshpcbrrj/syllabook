@@ -18,6 +18,11 @@ one, so a project can evolve across chapters. Files go to projects/<name>/.
 `--chapter N` checks the projects chapter N writes to, assembled with every chapter up to N (the
 state the reader has at that point of the book).
 
+The chapters are the source: a project folder is rebuilt from them each time. A file changed or added
+by hand in projects/<name>/ is never lost: the project is refused and the file listed, until the change
+is carried into the chapter that shows the file, or `--discard` drops it. projects/.assembled.json
+records what was written and what the run created, so neither counts as a change by hand.
+
 `run` is executed in the project folder; `expect` is a text its output must contain. A server, which
 never ends by itself, passes as soon as its output shows `expect`, and is then stopped. A project
 without `run` is only assembled ("not run"), e.g. when it needs a service the session lacks.
@@ -25,6 +30,8 @@ A file path may also be a name without an extension (Dockerfile, Makefile) or a 
 Prints JSON; exit code 1 when a project fails or a path tries to leave the project folder.
 """
 import argparse
+import hashlib
+import json
 import os
 import re
 import shutil
@@ -151,10 +158,40 @@ def run_project(folder, spec, timeout):
     return True, tail
 
 
+RECORD = '.assembled.json'
+
+
+def digest(data):
+    """A file's fingerprint; a checkout with Windows line endings (core.autocrlf) is the same file."""
+    return hashlib.sha256(data.replace(b'\r\n', b'\n')).hexdigest()[:16]
+
+
+def on_disk(folder):
+    for root, _, names in os.walk(folder):
+        for name in names:
+            yield os.path.relpath(os.path.join(root, name), folder).replace(os.sep, '/')
+
+
+def by_hand(folder, files, record):
+    """Files in the folder that are neither the book's (now or when last written) nor made by the run."""
+    written, made = record.get('files', {}), set(record.get('generated', []))
+    changed = []
+    for rel in on_disk(folder):
+        if rel in made:
+            continue
+        with open(os.path.join(folder, rel), 'rb') as f:
+            mark = digest(f.read())
+        if mark == written.get(rel) or (rel in files and mark == digest(files[rel].encode('utf-8'))):
+            continue
+        changed.append(rel)
+    return sorted(changed)
+
+
 def main():
     p = argparse.ArgumentParser(description='Assemble the projects from the code blocks and run them.')
     p.add_argument('--book')
     p.add_argument('--chapter', type=int)
+    p.add_argument('--discard', action='store_true', help='drop the files changed by hand in projects/')
     p.add_argument('--no-run', action='store_true')
     p.add_argument('--timeout', type=int, default=120, help='seconds per project run (default 120)')
     args = p.parse_args()
@@ -172,11 +209,19 @@ def main():
         default = os.path.splitext(os.path.basename(file))[0]
         collect(open(file, encoding='utf-8').read(), default, projects, errors, n)
     results = []
+    record_path = os.path.join(book_dir, 'projects', RECORD)
+    record = json.load(open(record_path, encoding='utf-8')) if os.path.exists(record_path) else {}
     for name, spec in projects.items():
         if not spec['files'] or (args.chapter and args.chapter not in spec['chapters']):
             continue  # with --chapter, only the projects that chapter writes to
         folder = os.path.join(book_dir, 'projects', name)
         if os.path.isdir(folder):
+            changed = [] if args.discard else by_hand(folder, spec['files'], record.get(name, {}))
+            if changed:
+                errors.append(f'{name}: files changed by hand in projects/{name}/: {", ".join(changed)}. '
+                              'The chapters are the source: carry each change into the chapter that shows '
+                              'the file (or add the file to it), then run again; --discard drops them')
+                continue
             shutil.rmtree(folder)  # rebuilt from the book every time, so it never drifts from the text
         for rel, content in spec['files'].items():
             target = os.path.join(folder, rel)
@@ -192,6 +237,11 @@ def main():
             ok, output = run_project(folder, spec, args.timeout)
             result.update({'status': 'ok' if ok else 'failed', 'output': output})
         results.append(result)
+        record[name] = {'files': {rel: digest(c.encode('utf-8')) for rel, c in sorted(spec['files'].items())},
+                        'generated': sorted(set(on_disk(folder)) - set(spec['files']))}
+        with open(record_path, 'w', encoding='utf-8', newline='\n') as f:
+            json.dump(record, f, indent=1, sort_keys=True)
+            f.write('\n')
     failed = [r['name'] for r in results if r['status'] == 'failed']
     out({'projects': results, 'errors': errors, 'ok': not failed and not errors},
         1 if failed or errors else 0)

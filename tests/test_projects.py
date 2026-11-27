@@ -158,9 +158,50 @@ def test_a_chapter_without_a_file(cli, book):
     assert code == 1 and 'no file yet' in r['error']
 
 
-def test_the_project_folder_is_rebuilt_from_the_book(cli, book):
+def test_the_project_folder_follows_the_chapters(cli, book):
     add(book, '01-listas.md', project_block('calc'))
     cli('projects', '--book', book)
-    (book / 'projects' / 'calc' / 'sobra.txt').write_text('não está no livro')
+    edit(book / 'chapters' / '01-listas.md', 'return n * 2', 'return n * 3')
+    code, r = cli('projects', '--book', book)
+    assert code == 0 and read(book / 'projects' / 'calc' / 'util.py') == 'def dobro(n):\n    return n * 3\n'
+
+
+@pytest.mark.parametrize('file, content', [('util.py', 'def dobro(n):\n    return n + n\n'),
+                                           ('sobra.txt', 'não está no livro\n')])
+def test_a_file_changed_by_hand_is_never_lost(cli, book, file, content):
+    add(book, '01-listas.md', project_block('calc'))
     cli('projects', '--book', book)
+    (book / 'projects' / 'calc' / file).write_text(content, encoding='utf-8')
+    code, r = cli('projects', '--book', book)
+    assert code == 1 and any(file in e and 'by hand' in e for e in r['errors']), r
+    assert read(book / 'projects' / 'calc' / file) == content
+    code, r = cli('projects', '--book', book, '--discard')
+    assert code == 0 and read(book / 'projects' / 'calc' / 'util.py') == 'def dobro(n):\n    return n * 2\n'
     assert not (book / 'projects' / 'calc' / 'sobra.txt').exists()
+
+
+def test_a_checkout_with_windows_line_endings_is_not_a_change(cli, book):
+    add(book, '01-listas.md', project_block('calc'))
+    cli('projects', '--book', book)
+    util = book / 'projects' / 'calc' / 'util.py'
+    util.write_bytes(util.read_bytes().replace(b'\n', b'\r\n'))  # git with core.autocrlf on Windows
+    code, r = cli('projects', '--book', book)
+    assert code == 0, r
+
+
+def test_what_the_run_creates_is_cleaned_without_asking(cli, book):
+    add(book, '01-listas.md', project_block('calc', run=True, expect='42'))
+    cli('projects', '--book', book)
+    assert (book / 'projects' / 'calc' / '__pycache__').is_dir()  # written by Python on the run
+    code, r = cli('projects', '--book', book)
+    assert code == 0, r
+
+
+def test_a_book_assembled_before_the_record_keeps_files_that_differ(cli, book):
+    add(book, '01-listas.md', project_block('calc'))
+    folder = book / 'projects' / 'calc'
+    folder.mkdir(parents=True)
+    (folder / 'main.py').write_text('from util import dobro\n# mostra o dobro de 21\nprint(dobro(21))\n')
+    (folder / 'util.py').write_text('def dobro(n):\n    return n + n\n')
+    code, r = cli('projects', '--book', book)
+    assert code == 1 and any('util.py' in e and 'main.py' not in e for e in r['errors']), r

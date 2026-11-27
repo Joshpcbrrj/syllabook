@@ -3,7 +3,7 @@ name: syllabook
 description: "Writes self-study course-books on any topic (programming, math, languages, music, electronics, history of computing and more) from a syllabus agreed with the user, improves existing study materials (Notion, PDF, EPUB, DOCX, Google Drive, text, links) and translates finished books. Delivers Markdown, EPUB and a searchable website, publishes to GitHub and copies to Notion. Use when the user wants to learn a topic on their own, create a book, course or handout, rework or improve study material, or translate or publish a book made with this skill (pt: livro, curso, apostila, estudar, reformular material; es: libro, curso, estudiar). Do not use for one-off questions about a subject."
 license: MIT
 metadata:
-  version: "0.4.1"
+  version: "0.4.2-dev"
 ---
 
 # Syllabook

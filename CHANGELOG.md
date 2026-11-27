@@ -8,7 +8,10 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ### Changed
 
-- The native reread of each chapter is a step of its own: `book.py reread <n>` prints the chapter's prose line by line (no code blocks, images or HTML) with the style file to follow, and records it; `book.py done` refuses a chapter that was not reread since its last `done`, and keeps the reread date in `progress`. In the English-book pilot and in a WSL book session, the reread was skipped whenever the message did not ask for it.
+- The native reread of each chapter is a step of its own: `book.py reread <n>` prints the chapter's prose line by line (no code blocks, images or HTML) with the style file to follow, then a new code; `book.py done <n> --reread <code>` refuses a chapter without that code, and keeps the reread date in `progress`. In the English-book pilot and in a WSL book session, the reread was skipped whenever the message did not ask for it; in the history pilot, a plain record was beaten by `reread 1 >/dev/null; done 1` in one command.
+- `book.py brief` refuses to start a chapter until `research/guide.md` and the dossier of every chapter exist, and lists the missing ones (a translation follows the original's research). In the history pilot, a session wrote only the dossier of chapter 1 and went on.
+- `SOURCES.md`: encyclopedias (Wikipedia, Britannica) are a map to the primary sources, not a source to cite.
+- Eval 06 checks that the reread ran and that `done` got its code.
 - `SOURCES.md`: a checked date means the page was opened in the session. A link seen only in search results gets no date until it is opened. In the English-book pilot, two links found by search and never opened were listed as "checked on" the day.
 
 ## [0.4.2] - 2026-11-27

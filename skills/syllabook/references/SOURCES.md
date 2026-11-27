@@ -18,6 +18,8 @@
 3. Recognized textbooks and courses; peer-reviewed reviews; blogs by maintainers or institutions with authority on the topic.
 4. Forums and Q&A sites **only** to learn which mistakes are common, never as the source of a fact.
 
+**Encyclopedias** (Wikipedia, Britannica) are a map, not a source: use them to find the primary sources, the dates in dispute and the names to look up, then open what they cite and cite that. If a fact appears only in an encyclopedia, say so in the text or leave it out.
+
 Anything that can change over time (commands, options, defaults, limits, versions, prices, laws) must come from levels 1–2 and be **checked in this session**. Stable concepts (what a variable is, what a verb tense is) need no source.
 
 ## 2. Research

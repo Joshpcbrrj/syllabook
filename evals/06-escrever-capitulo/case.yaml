@@ -30,6 +30,15 @@ graders:
     type: regex
     target: {source: file, path: created-books/python-do-zero-teste/book.yaml}
     pattern: "n: 2\\s+done:"
+  - name: releitura-lida
+    # done keeps the reread date only when it got the code printed after the reread's lines
+    type: regex
+    target: {source: file, path: created-books/python-do-zero-teste/book.yaml}
+    pattern: "n: 2\\s+done: \\S+\\s+reread:"
+  - name: releitura-rodada
+    type: tool_used
+    tool: Bash
+    input_match: "reread 2"
   - name: auditoria
     type: tool_used
     tool: Bash

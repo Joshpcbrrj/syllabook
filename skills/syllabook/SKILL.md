@@ -70,8 +70,8 @@ They live in `scripts/`, install what they need and print short JSON with only w
 | --- | --- |
 | `python scripts/book.py validate <book.yaml>` | checks fields and the concept graph (no concept used before it is taught) |
 | `python scripts/book.py brief <n>` | creates the chapter skeleton and prints the compact brief |
-| `python scripts/book.py reread <n>` | prints the chapter's prose for the native reread and records it |
-| `python scripts/book.py done <n> --summary "..."` | records progress and the summary (only after `reread`); saves the checkpoint |
+| `python scripts/book.py reread <n>` | prints the chapter's prose for the native reread, then the code `done` asks for |
+| `python scripts/book.py done <n> --reread <code> --summary "..."` | records progress and the summary; saves the checkpoint |
 | `python scripts/book.py status` | where the book stopped, the handoff note and the next step |
 | `python scripts/facts.py <n>` | lists the chapter's sentences with dates, numbers, names and quotations |
 | `python scripts/projects.py [--chapter <n>]` | assembles the projects from the code blocks and runs them |
@@ -96,15 +96,15 @@ The other scripts are taught where they are used: `ingest.py` (`IMPROVE.md`, `SO
 
 **Chapter loop** (one chapter at a time, never in parallel):
 
-1. `book.py brief <n>`: use only the brief (goal, topics, concepts taught and new, previous summary, sources, profile, choices, topic guide and the chapter's dossier). If it says the guide or the dossier is missing, write it first.
+1. `book.py brief <n>`: use only the brief (goal, topics, concepts taught and new, previous summary, sources, profile, choices, topic guide and the chapter's dossier). It refuses while the topic guide or the dossier of any chapter is missing: write them all first (step 3).
 2. Write the chapter in the file it created, following `TEACHING.md`, the profile adapted by the topic guide, and the style file.
 3. Run every piece of code and every command, in this order: in the session; on the user's computer, if it is linked to the app; **guided run** (give the commands, the user runs them and pastes only the lines you ask for, and you use the real output); if the user declines, mark it "not run" with a warning. Redo every calculation.
    - A lab that creates or changes credentials or user settings (SSH keys, `~/.gitconfig`, tokens, shell profiles) runs with `HOME` (and `USERPROFILE` on Windows) pointing to a temporary folder; list the real ones before and after, and undo anything that changed.
    - On native Windows, when Linux commands cannot run, recommend WSL 2 once per book: https://github.com/Joshpcbrrj/syllabook/blob/main/docs/integrations/wsl.md
 4. `facts.py <n>`: check each listed sentence against the dossier and the sources (`SOURCES.md` §5), and that every explanation of a command or piece of code matches its real output.
-5. `book.py reread <n>`: it prints the chapter's prose, line by line. Read every line as a native reader of the book language, following its style file, and fix any sentence that sounds translated. `done` refuses a chapter without it. Never skip this step, not even to save tokens.
+5. `book.py reread <n>`: it prints the chapter's prose, line by line, then a code. Read every line as a native reader of the book language, following its style file, and fix any sentence that sounds translated. `done` asks for the code: never throw the output away and never run `reread` and `done` in one command. Never skip this step, not even to save tokens.
 6. `audit.py <n>`: fix the errors it reports; repeat until there are none.
-7. `book.py done <n> --summary "<3 to 5 lines: what it taught, terms, examples used>"`.
+7. `book.py done <n> --reread <code> --summary "<3 to 5 lines: what it taught, terms, examples used>"`.
 8. To the user, one line: `✅ Ch. <n>/<total>: <title>`.
 
 If the usage limit runs out, the work is already saved: the user continues in the same chat once it resets.

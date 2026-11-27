@@ -133,6 +133,8 @@ def test_brief_spaced_review_and_previous_summary(cli, book):
     data['concepts'] = [{'id': f'c{n}', 'name': f'c{n}', 'chapter': n, 'depends': []} for n in range(1, 9)]
     data['progress'] = [{'n': 7, 'done': '2026-11-20', 'summary': 'Ensinou c7.'}]
     save(book / 'book.yaml', data)
+    for n in range(1, 9):
+        (book / 'research' / f'c{n:02d}.md').write_text(f'# Dossiê c{n:02d}\n', encoding='utf-8')
     code, r = cli('book', 'brief', 8, '--book', book)
     assert r['review_today'] == [1, 5, 7] and r['previous']['summary'] == 'Ensinou c7.'
 
@@ -161,9 +163,10 @@ def test_brief_for_a_chapter_not_in_the_syllabus(cli, book):
 
 
 def done(cli, book, n, summary):
-    """The end of the chapter loop: the native reread, then done."""
-    cli('book', 'reread', n, '--book', book)
-    return cli('book', 'done', n, '--summary', summary, '--book', book)
+    """The end of the chapter loop: the native reread, then done with the code printed after the lines."""
+    code, r = cli('book', 'reread', n, '--book', book)
+    assert code == 0, r
+    return cli('book', 'done', n, '--summary', summary, '--reread', r['code'], '--book', book)
 
 
 def test_done_records_progress_and_points_to_the_next_step(cli, book):
@@ -184,7 +187,12 @@ def test_reread_prints_the_prose_with_line_numbers_and_the_style_file(cli, book)
     assert not any('nums = [1]' in line for line in lines), 'code is run, not reread'
     number, text = lines[0].split(': ', 1)
     assert read(book / r['file']).splitlines()[int(number) - 1] == text
-    assert load(book / 'book.yaml')['reread'] == [1]
+    assert list(r)[-1] == 'code', 'the code comes after the lines: whoever drops the output has no code'
+
+
+def test_each_reread_gets_a_new_code(cli, book):
+    codes = {cli('book', 'reread', 1, '--book', book)[1]['code'] for _ in range(3)}
+    assert len(codes) == 3
 
 
 def test_done_refuses_a_chapter_that_was_not_reread(cli, book):
@@ -192,12 +200,31 @@ def test_done_refuses_a_chapter_that_was_not_reread(cli, book):
     assert code == 1 and 'book.py reread 1' in r['error']
 
 
+@pytest.mark.parametrize('given', [None, 'abc123'])
+def test_done_refuses_a_reread_without_its_code(cli, book, given):
+    """`reread >/dev/null; done` in one command: the reread ran, but nobody read its output."""
+    cli('book', 'reread', 1, '--book', book)
+    extra = ['--reread', given] if given else []
+    code, r = cli('book', 'done', 1, '--summary', 'Listas.', *extra, '--book', book)
+    assert code == 1 and 'code' in r['error']
+
+
+def test_an_old_code_does_not_work_after_a_new_reread(cli, book):
+    old = cli('book', 'reread', 1, '--book', book)[1]['code']
+    cli('book', 'reread', 1, '--book', book)
+    code, r = cli('book', 'done', 1, '--summary', 'Listas.', '--reread', old, '--book', book)
+    assert code == 1
+
+
 def test_done_uses_up_the_reread(cli, book):
     """Done again later (after a fix) needs a new reread; the date of the last one stays in progress."""
-    done(cli, book, 1, 'Listas.')
+    code, r = cli('book', 'reread', 1, '--book', book)
+    first = r['code']
+    done_code, _ = cli('book', 'done', 1, '--summary', 'Listas.', '--reread', first, '--book', book)
     data = load(book / 'book.yaml')
-    assert 'reread' not in data and data['progress'][0]['reread'] == data['progress'][0]['done']
-    code, r = cli('book', 'done', 1, '--summary', 'Listas de novo.', '--book', book)
+    assert done_code == 0 and 'reread' not in data
+    assert data['progress'][0]['reread'] == data['progress'][0]['done']
+    code, r = cli('book', 'done', 1, '--summary', 'Listas de novo.', '--reread', first, '--book', book)
     assert code == 1 and 'reread' in r['error']
 
 
@@ -237,10 +264,13 @@ def test_brief_includes_the_chapters_research_dossier(cli, book):
     assert r['research']['file'] == 'research/c01.md' and 'índice é 0' in r['research']['notes']
 
 
-def test_brief_says_when_the_research_dossier_is_missing(cli, book):
+@pytest.mark.parametrize('chapter', [1, 2])
+def test_brief_refuses_until_every_dossier_of_the_book_exists(cli, book, chapter):
+    """The dossiers are the judgment of the whole book, made before any chapter (SOURCES.md §2): a session
+    once wrote only the dossier of chapter 1 and went on writing."""
     os.remove(book / 'research' / 'c02.md')
-    code, r = cli('book', 'brief', 2, '--book', book)
-    assert code == 0 and r['research'] == {'file': 'research/c02.md', 'missing': True}
+    code, r = cli('book', 'brief', chapter, '--book', book)
+    assert code == 1 and 'research/c02.md' in r['error'] and 'every chapter' in r['error']
 
 
 def test_brief_includes_the_topic_guide(cli, book):
@@ -248,10 +278,21 @@ def test_brief_includes_the_topic_guide(cli, book):
     assert r['guide']['file'] == 'research/guide.md' and 'saída esperada' in r['guide']['notes']
 
 
-def test_brief_says_when_the_topic_guide_is_missing(cli, book):
+def test_brief_refuses_without_the_topic_guide(cli, book):
     os.remove(book / 'research' / 'guide.md')
     code, r = cli('book', 'brief', 2, '--book', book)
-    assert r['guide'] == {'file': 'research/guide.md', 'missing': True}
+    assert code == 1 and 'research/guide.md' in r['error']
+
+
+def test_a_translation_needs_no_research_of_its_own(cli, book, tmp_path):
+    import shutil
+    shutil.copytree(book, tmp_path / 'python-do-zero')
+    shutil.rmtree(book / 'research')
+    data = load(book / 'book.yaml')
+    data.update(translation_of='python-do-zero', glossary=[{'source': 'lista', 'target': 'list'}])
+    save(book / 'book.yaml', data)
+    code, r = cli('book', 'brief', 1, '--book', book)
+    assert code == 0 and r['original_chapter'], r
 
 
 @pytest.mark.parametrize('handoff', ['capturas', [''], [1], {'a': 'b'}], ids=['text', 'empty', 'number', 'map'])

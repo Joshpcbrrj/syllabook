@@ -36,7 +36,13 @@ Add `--model sonnet` (or `haiku`) to check that the instructions hold with the m
 
 `Write` must be granted (`--allow-tools Write`), or every case that lists it is refused. Cases 03 and 10 also need `WebSearch` and `WebFetch`: without them the skill rightly refuses to build a syllabus from memory, since it must research in the session. To run some cases only, `--case` takes one glob (the last `--case` wins and `{a,b}` is not supported): `--case "*proximo*"` runs 09 and 10.
 
-Cases with a `scaffold.sh` (06, 13, 14, 15) need `--scaffold` to prepare the book, and the scaffold runs only where `bash` takes Linux paths (WSL, Linux or macOS; on Windows it fails with exit 127). A WSL distro with Docker Desktop's integration turned on has `~/.docker/contexts` as a link to Windows, and the eval then refuses every case that grants Bash: use a distro without that integration, Linux or macOS. Cases 06, 14 and 15 (tag `completo`) grant Bash, which the eval refuses on Windows (no sandbox there), so run them in WSL, Linux or macOS:
+Cases with a `scaffold.sh` (06, 13, 14, 15) need `--scaffold` to prepare the book, and the scaffold runs only where `bash` takes Linux paths (WSL, Linux or macOS; on Windows it fails with exit 127). A WSL distro with Docker Desktop's integration turned on has `~/.docker/contexts` as a link to Windows, and the eval then refuses every case that grants Bash; `evals/wsl-eval.sh` runs the eval with a temporary `HOME` that links only Claude Code's own files, so those cases run there too:
+
+```bash
+wsl -e bash -lc "'/mnt/d/<path to the repo>/evals/wsl-eval.sh' --tag completo --runs 1 --ablation none --scaffold --allow-tools Bash Write Edit --judge-model opus --trust-plugin --no-publish --max-cost-usd 10 --threshold 0"
+```
+
+In these cases the sandbox keeps the workspace read-only for the shell: a script that writes (`build.py`, `book.py done`) fails there, so the graders accept a reply that says so and gives the command instead of working around it. Cases 06, 14 and 15 (tag `completo`) grant Bash, which the eval refuses on Windows (no sandbox there), so run them in WSL, Linux or macOS:
 
 ```bash
 claude plugin eval . --tag completo --runs 1 --ablation none --scaffold \

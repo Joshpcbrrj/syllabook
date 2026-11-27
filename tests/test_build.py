@@ -75,6 +75,13 @@ def test_the_epub_text_has_no_comments_or_bare_placeholders(book):
     assert '<!-- comentário do exemplo -->' in text  # code is never touched
 
 
+def test_the_website_drops_the_dash_github_puts_on_emoji_anchors():
+    text = ('[Teste](chapters/00-como-estudar.md#-teste-de-nivelamento) · [Fontes](#-fontes) · '
+            '[Sem emoji](#teste) · [Externo](https://x.org/a-b)')
+    assert build.site_anchors(text) == ('[Teste](chapters/00-como-estudar.md#teste-de-nivelamento) · '
+                                        '[Fontes](#fontes) · [Sem emoji](#teste) · [Externo](https://x.org/a-b)')
+
+
 def test_pack_splits_in_parts_by_the_upload_limit(book, tmp_path, monkeypatch):
     monkeypatch.setattr(build, 'GITHUB_UPLOAD_LIMIT', 3)
     zips = build.pack(str(book), load(book / 'book.yaml'), str(tmp_path))

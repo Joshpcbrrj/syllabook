@@ -461,6 +461,12 @@ def cmd_lists(args):
     out({'books': len(books), 'updated': updated})
 
 
+def site_anchors(text):
+    """Links to a heading with an emoji: GitHub's anchor keeps a leading "-" ("## 🎯 Teste" -> #-teste), the
+    website's drops it (#teste). The Markdown follows GitHub; the website copy loses the "-"."""
+    return re.sub(r'(\]\([^)\s]*#)-+(?=\w)', r'\1', text)
+
+
 def collapsible(text):
     """<details> answers become Zensical collapsible blocks, which keep Markdown inside them."""
     lines, kept, i = text.splitlines(), [], 0
@@ -520,7 +526,7 @@ def cmd_site(args):
             dest = os.path.join(docs, folder, os.path.basename(src))
             shutil.copytree(src, dest, ignore=shutil.ignore_patterns('_source', 'book.yaml', 'cover.svg'))
             for md in glob.glob(os.path.join(dest, '**', '*.md'), recursive=True):
-                write(md, collapsible(escape_placeholders(read(md))))
+                write(md, collapsible(site_anchors(escape_placeholders(read(md)))))
             blab = labels(d.get('language', lang))
             rel = f'{folder}/{os.path.basename(src)}'
             entries = [{blab['Book map']: f'{rel}/README.md'}]

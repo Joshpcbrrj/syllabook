@@ -57,8 +57,8 @@ The documentation is written in English, with a Portuguese version next to each 
 
 ## Releases
 
-1. Move the `[Unreleased]` notes in `CHANGELOG.md` to a new version, and set the same version in `.claude-plugin/plugin.json`.
-2. Push to `main` and wait for the tests; then tag it (`git tag vX.Y.Z && git push origin vX.Y.Z`). The "Skill release" Action publishes `syllabook.zip`.
+1. Move the `[Unreleased]` notes in `CHANGELOG.md` to a new version, and set the same version in three places: `.claude-plugin/plugin.json`, `VERSION` in `skills/syllabook/scripts/common.py` and `metadata.version` in `skills/syllabook/SKILL.md`. Between releases, while `[Unreleased]` has notes, the last two end in `-dev` (for example `0.4.3-dev`); the tests check this.
+2. Push to `main` and wait for the tests; then create an annotated tag and push it (`git tag -a vX.Y.Z -m vX.Y.Z && git push origin vX.Y.Z`). The "Skill release" Action creates the GitHub release and attaches `syllabook.zip`. Do not create the release by hand: the Action fails when the release already exists.
 3. If `skills/syllabook/assets/library/` changed, update the [library template](https://github.com/Joshpcbrrj/syllabook-library): clone it, run `python tools/sync_template.py <clone>`, then commit and push the clone.
 
 ## General rules

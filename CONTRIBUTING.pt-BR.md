@@ -1,4 +1,4 @@
-<!-- translation-of: CONTRIBUTING.md sha256:a8afb01554b2 -->
+<!-- translation-of: CONTRIBUTING.md sha256:ca64d9c0036d -->
 # Como contribuir
 
 [English](CONTRIBUTING.md) | **Português**
@@ -58,8 +58,8 @@ A documentação é escrita em inglês, com a versão em português ao lado de c
 
 ## Versões
 
-1. Passe as notas de `[Unreleased]` do `CHANGELOG.md` para uma versão nova e ponha a mesma versão no `.claude-plugin/plugin.json`.
-2. Envie para a `main` e espere os testes; depois crie a tag (`git tag vX.Y.Z && git push origin vX.Y.Z`). A Action "Skill release" publica o `syllabook.zip`.
+1. Passe as notas de `[Unreleased]` do `CHANGELOG.md` para uma versão nova e ponha a mesma versão em três lugares: `.claude-plugin/plugin.json`, `VERSION` em `skills/syllabook/scripts/common.py` e `metadata.version` em `skills/syllabook/SKILL.md`. Entre uma versão e outra, enquanto `[Unreleased]` tiver notas, os dois últimos terminam em `-dev` (por exemplo, `0.4.3-dev`); os testes cobram isso.
+2. Envie para a `main` e espere os testes; depois crie uma tag anotada e envie-a (`git tag -a vX.Y.Z -m vX.Y.Z && git push origin vX.Y.Z`). A Action "Skill release" cria a release no GitHub e anexa o `syllabook.zip`. Não crie a release à mão: a Action falha quando a release já existe.
 3. Se `skills/syllabook/assets/library/` mudou, atualize o [modelo de biblioteca](https://github.com/Joshpcbrrj/syllabook-library): clone-o, rode `python tools/sync_template.py <clone>` e depois faça o commit e envie o clone.
 
 ## Regras gerais

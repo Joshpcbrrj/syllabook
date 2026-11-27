@@ -45,7 +45,7 @@ next_steps:                          # 2–4 later books; build.py writes them a
   - {title: "Compose avançado", why: "Para levar o projeto a produção com segurança", topics: ["profiles", "secrets", "healthchecks"]}
   - {title: "Kubernetes do zero", why: "Para rodar em vários servidores", topics: ["pods", "deployments", "services"]}
 covers: [compose, compose-yaml]      # short stable labels, used to compare books in a track
-progress: []                         # filled by book.py: {n, done, summary}
+progress: []                         # filled by book.py done: {n, done, reread, summary}
 changes: []                          # changes after approval: {date, what, why}
 handoff: []                          # book.py handoff: what is pending for the next conversation
 ```
@@ -54,6 +54,23 @@ Mode-specific fields:
 
 - **Improve (mode 2):** `origin: improved`; `original: {title, kind, where}` (where it came from, never published); `promise: {goal, audience, level, sequence}`; `sources_original` in each chapter; `new_content_pct`.
 - **Translate (mode 3):** `translation_of: <slug>`; `glossary: [{source, target}]`; the original gets `translations: [<slug>-<lang>]`.
+
+## Goals
+
+The book's `goal` and each chapter's `goal` say what the reader **will be able to do**, so they and the review can check it: one or more verbs whose result can be shown or tested ("build", "calculate", "explain in two sentences", "translate", "play at 80 bpm", "order on a timeline"). `book.py validate` warns about a weak verb anywhere in the goal; fix every such warning before showing the syllabus, and check the goals yourself when code execution is not available.
+
+| Weak (never, not even as one verb of a list) | Rewrite as |
+| --- | --- |
+| understand, know, learn about, be familiar with | explain, tell apart, predict, choose, use |
+| entender, compreender, conhecer, saber, aprender sobre | explicar, distinguir, prever, escolher, usar |
+| comprender, conocer | explicar, distinguir, elegir, usar |
+
+Every goal **starts with a verb** (infinitive in Portuguese and Spanish: "Clonar", "Explicar"). A list of commands or topics is not a goal: it says what the chapter covers, not what the reader will do.
+
+- "`clone`, `push`, `pull` e `fetch`, com autenticação segura" → "Clonar um repositório, enviar e receber mudanças com `push` e `pull`, e autenticar por SSH".
+- "Entender, resolver e evitar conflitos" → "Resolver um conflito de merge e evitar os mais comuns".
+- "Declarar volume nomeado e entender a diferença entre down e down -v" → "Declarar um volume nomeado e prever o que `down` e `down -v` apagam".
+- "Know the main battles of the war" → "Place the main battles on a map and a timeline".
 
 ## Concept graph rules
 

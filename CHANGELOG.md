@@ -12,6 +12,10 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 - `book.py brief` refuses to start a chapter until `research/guide.md` and the dossier of every chapter exist, and lists the missing ones (a translation follows the original's research). In the history pilot, a session wrote only the dossier of chapter 1 and went on.
 - `SOURCES.md`: encyclopedias (Wikipedia, Britannica) are a map to the primary sources, not a source to cite.
 - Eval 06 checks that the reread ran and that `done` got its code.
+- Goals: `book.py validate` warns about a weak verb ("understand", "know", "entender", "saber", "conocer"...) anywhere in a chapter's goal or the book's goal, not only at its start; it caught "Entender, resolver e evitar conflitos" in an eval syllabus and two published chapters ("...e entender a diferença entre down e down -v", "...e saber quando usar cada uma"). `SYLLABUS.md` has a "Goals" section with the weak verbs and how to rewrite them, and `CREATE.md` asks to fix every such warning before showing the syllabus, and to check the goals by hand without code execution.
+- Every goal starts with a verb: a list of commands is not a goal (an eval syllabus had "Repositórios remotos → `clone`, `push`, `pull` e `fetch`, com autenticação segura").
+- `SKILL.md`: the library is the user's folder, never the one the skill is installed in. In an eval, the skill looked for the book to translate inside its own folder, could not read it and stopped.
+- `CREATE.md`: chapter 0 is one line in the syllabus; the book on one page and the other fixed parts are written at the end. Eval 03 now fails only a syllabus that carries the book on one page as a block of its own, not one that names it in chapter 0's line.
 - `SOURCES.md`: a checked date means the page was opened in the session. A link seen only in search results gets no date until it is opened. In the English-book pilot, two links found by search and never opened were listed as "checked on" the day.
 
 ## [0.4.2] - 2026-11-27

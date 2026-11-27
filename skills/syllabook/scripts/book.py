@@ -33,6 +33,7 @@ PROFILES = {'stem', 'languages', 'skills', 'knowledge'}
 # images: real = SVG diagrams plus real images (photos, screenshots) where they show it better; svg = diagrams only
 CHOICES = {'images': {'real', 'svg'}, 'reading': {'large', 'small'}}
 LABEL_RE = re.compile(r'^[a-z0-9]+(-[a-z0-9]+)*$')
+CONCEPT_FIELDS = ('id', 'name', 'chapter', 'depends')
 DATE_RE = re.compile(r'^\d{4}-\d{2}-\d{2}$')
 MONTH_RE = re.compile(r'^\d{4}-\d{2}$')
 EDITION_RE = re.compile(r'^\d+\.\d+(\.\d+)?$')  # 1.3 for a review, 1.3.1 for errata only
@@ -105,6 +106,10 @@ def validate(path):
             errors.append(f'concept "{cid}": listed twice')
         if c.get('chapter') not in numbers:
             errors.append(f'concept "{cid}": chapter {c.get("chapter")} does not exist')
+        for key in [k for k in c if k not in CONCEPT_FIELDS]:
+            # {id: x, name: gerenciadores (nvm, SDKMAN, uv)}: inside braces a comma starts a new field
+            errors.append(f'concept "{cid}": unknown field "{key}" (fields: {", ".join(CONCEPT_FIELDS)}); '
+                          'a name with commas inside {...} is split: write the name in quotes')
         taught[cid] = c.get('chapter')
     for c in concepts:
         for dep in c.get('depends') or []:

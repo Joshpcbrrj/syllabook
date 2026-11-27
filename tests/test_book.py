@@ -44,6 +44,9 @@ ERRORS = [
     ('concept id', lambda d: d['concepts'][0].update(id='Lista'), 'id must be lowercase'),
     ('concept twice', lambda d: d['concepts'].append(dict(d['concepts'][0])), 'listed twice'),
     ('concept chapter', lambda d: d['concepts'][0].update(chapter=9), 'chapter 9 does not exist'),
+    # {id: x, name: gerenciadores (nvm, SDKMAN, uv)}: in braces, commas split the name into fields
+    ('concept split by commas', lambda d: d['concepts'][0].update(name='gerenciadores (nvm', SDKMAN=None),
+     'unknown field "SDKMAN"'),
     ('unknown dependency', lambda d: d['concepts'][1].update(depends=['dicionario']), 'unknown concept'),
     ('used before taught', lambda d: (d['concepts'][0].update(chapter=2), d['concepts'][1].update(chapter=1)),
      'taught later'),

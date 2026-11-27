@@ -93,7 +93,7 @@ Same rules as `modes/CREATE.md` §5, plus two:
 When you hear "approved":
 
 1. Fill in `approved_on` and save to `improved-materials/<slug>/book.yaml` (on the `draft/<slug>` branch when GitHub is connected).
-2. Follow "Flow after approval" in `SKILL.md`. In each chapter, `book.py brief` also lists the original sections it maps to: read only those.
-3. At the end, the audit checks that every chapter points to where it came from. Before publishing, run `audit.py --original <temp>/sources/<slug>`: it reports any run of 12 words or more that the book (chapters, `research/`, README) shares with the original, outside code. Rewrite each one; if the original is the user's own notes and they want a passage kept, quote it as theirs.
+2. Follow "Flow after approval" in `SKILL.md`. In each chapter, `book.py brief` also lists the original sections it maps to: read only those, then close them and write from your notes, never with the original open next to the draft. The chapter audit compares the chapter and its dossier with the original by itself when `original.where` is a folder on this computer; otherwise run it as `audit.py <n> --original <temp>/sources/<slug>` while that folder exists.
+3. At the end, the audit checks that every chapter points to where it came from. Before publishing, run `audit.py` on the whole book (with `--original <temp>/sources/<slug>` when the original is not a local folder): it reports every passage of 12 words or more that the book (chapters, `research/`, README) shares with the original, outside code. Rewrite each one; if the original is the user's own notes and they want a passage kept, quote it as theirs.
 
 **Copyright:** rewrite every explanation in your own words; quote at most a short passage with its source; never copy exercises verbatim from third-party material (write new ones that train the same skill). The user's own notes are theirs and can be reused freely.

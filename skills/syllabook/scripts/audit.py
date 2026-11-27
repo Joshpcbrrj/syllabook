@@ -162,21 +162,34 @@ def prose_words(text):
     return re.findall(r'\w+', text.lower())
 
 
-def copied_from(original_dir, book_dir):
-    """(file of the book, the copied words) for each run of COPY_WORDS words that also appears in the original."""
-    seen = {}
+def copied_from(original_dir, book_dir, paths=None):
+    """(file of the book, the first copied words) for each passage that shares runs of COPY_WORDS words with the
+    original; overlapping runs are one passage, so every passage is reported once, all of them at the same time."""
+    seen = set()
     for path in glob.glob(os.path.join(original_dir, '**', '*.md'), recursive=True):
         words = prose_words(open(path, encoding='utf-8').read())
-        for i in range(len(words) - COPY_WORDS + 1):
-            seen.setdefault(tuple(words[i:i + COPY_WORDS]), True)
+        seen.update(tuple(words[i:i + COPY_WORDS]) for i in range(len(words) - COPY_WORDS + 1))
     found = []
-    for path in sorted(glob.glob(os.path.join(book_dir, '**', '*.md'), recursive=True)):
+    for path in sorted(paths if paths is not None else glob.glob(os.path.join(book_dir, '**', '*.md'),
+                                                                 recursive=True)):
         words = prose_words(open(path, encoding='utf-8').read())
+        end = -1  # where the passage being reported ends
         for i in range(len(words) - COPY_WORDS + 1):
             if tuple(words[i:i + COPY_WORDS]) in seen:
-                found.append((os.path.relpath(path, book_dir).replace(os.sep, '/'), ' '.join(words[i:i + COPY_WORDS])))
-                break
+                if i > end:
+                    found.append((os.path.relpath(path, book_dir).replace(os.sep, '/'),
+                                  ' '.join(words[i:i + COPY_WORDS])))
+                end = i + COPY_WORDS - 1
     return found
+
+
+def local_original(data, given):
+    """The folder of the original to compare with: --original, or the improved book's original.where when it is a
+    folder on this computer (a markdown original); None otherwise (Notion, a website, a file no longer here)."""
+    if given:
+        return given
+    where = str((data.get('original') or {}).get('where') or '')
+    return where if data.get('origin') == 'improved' and where and os.path.isdir(where) else None
 
 
 def book_on_one_page(book_dir, lab, readme, chapter0):
@@ -272,8 +285,12 @@ def main():
             for orphan in sorted(existing - used):
                 warnings.append(f'image not used in any chapter: img/{orphan}')
 
-    if args.original:
-        for file, words in copied_from(args.original, book_dir):
+    original = local_original(data, args.original)
+    if original:
+        # a chapter is checked as it is written: copies show up in the chapter that made them, not all at the end
+        paths = None if not args.n else [p for p in (chapter_path(book_dir, args.n), research_path(book_dir, args.n))
+                                         if p and os.path.exists(p)]
+        for file, words in copied_from(original, book_dir, paths):
             errors.append(f'{file}: text copied from the original ("{words}..."): '
                           'rewrite it in your own words or quote one short passage with its link')
     elif data.get('origin') == 'improved' and not args.n:

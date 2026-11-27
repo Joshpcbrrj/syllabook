@@ -136,6 +136,31 @@ def test_the_same_source_link_is_not_a_copy(cli, improved):
     assert not any('copied from the original' in e for e in r['errors']), r
 
 
+SECOND = ('Um repositório remoto é uma cópia do projeto guardada em outro computador, que todos da equipe '
+          'podem usar para trocar as suas mudanças.')
+
+
+def test_every_copied_passage_is_reported_once(cli, improved):
+    book, source = improved
+    (source / '01-aula-1.md').write_text(f'# Aula 1\n\n{ORIGINAL}\n\n{SECOND}\n', encoding='utf-8')
+    edit(book / 'chapters' / '01-listas.md', '## Listas', f'## Listas\n\n{ORIGINAL}\n\nOutra coisa.\n\n{SECOND}')
+    code, r = cli('audit', '--book', book, '--original', source)
+    copies = [e for e in r['errors'] if 'copied from the original' in e]
+    assert len(copies) == 2 and 'um repositório remoto' in copies[1], copies
+
+
+def test_a_local_original_is_compared_at_each_chapter(cli, improved):
+    book, source = improved
+    data = load(book / 'book.yaml')
+    data['original']['where'] = str(source)  # the original as a local folder (kind markdown)
+    save(book / 'book.yaml', data)
+    edit(book / 'chapters' / '02-o-laco-for.md', '## O laço for', f'## O laço for\n\n{ORIGINAL}')
+    code, r = cli('audit', 2, '--book', book)
+    assert code == 1 and any('02-o-laco-for.md' in e and 'copied' in e for e in r['errors']), r
+    code, r = cli('audit', 1, '--book', book)  # chapter 1 copies nothing: chapter 2 is not its problem
+    assert not any('copied' in e for e in r['errors']), r
+
+
 def test_an_improved_book_audited_without_the_original_gets_a_reminder(cli, improved):
     book, _ = improved
     code, r = cli('audit', '--book', book)

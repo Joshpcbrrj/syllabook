@@ -15,7 +15,7 @@ Translating here means **adapting**: the reader of the new version must feel the
 
 ## 1. Identify the book
 
-- Accept a book made by this skill: its folder in the user's repository, or the zip it delivered (it carries `book.yaml`). Any other material goes to mode 2 (Improve), with the target language as the book language.
+- Accept a book made by this skill: its folder in the user's library, or the zip it delivered (it carries `book.yaml`). The library is the folder the session works in (or the user's repository), never the skill's own folder, even when its name sounds like a library: look there first (`created-books/`, `improved-materials/`). Any other material goes to mode 2 (Improve), with the target language as the book language.
 - Read only `book.yaml` and the glossary. Confirm the target language and the conversation language.
 - **Language-learning books are adapted, not translated.** A book teaching English to Portuguese speakers cannot simply become a book for Spanish speakers: false friends, pronunciation traps and grammar contrasts change. Say so in one sentence and treat the examples about the learner's native language as content to rewrite.
 

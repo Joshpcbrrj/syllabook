@@ -71,6 +71,13 @@ def test_notion_gets_only_svg_diagrams(book):
     assert [u['kind'] for u in uploads] == ['svg'] and '<image source="UPLOAD:c01-lista.svg">A lista</image>' in content
 
 
+def test_an_image_whose_alt_text_has_brackets_is_uploaded(book):
+    # the book on one page lists chapters, and one said "[user] default= no wsl.conf"
+    text = '![O livro: 8. Backup: [user] default= no wsl.conf.](../img/c01-lista.svg)\n'
+    content, uploads, _ = convert(text, book)
+    assert [u['placeholder'] for u in uploads] == ['UPLOAD:c01-lista.svg'] and '../img/' not in content
+
+
 def test_links_comments_and_generated_blocks_are_removed(book):
     text = ('Veja o [capítulo 2](02-o-laco-for.md#o-laco-for) e a [doc](https://docs.python.org).\n\n'
             '<!-- project: x | run: y -->\n\n<!-- nav:start -->\n---\n[◀ anterior](00.md)\n<!-- nav:end -->\n')

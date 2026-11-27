@@ -31,7 +31,8 @@ import sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from common import chapter_path, fail, find_book, first_h1, labels, load_yaml, out, site_url
 
-IMAGE = re.compile(r'^!\[([^\]]*)\]\(\.\./img/([^)\s]+)\)\s*$')
+# the alt text may hold brackets of its own ([user] default=, [7, 8, 9]): the line is the whole image
+IMAGE = re.compile(r'^!\[(.*)\]\(\.\./img/([^)\s]+)\)\s*$')
 CHAPTER_LINK = re.compile(r'\[([^\]]+)\]\((?!https?:)[^)\s]+\.md(#[^)\s]*)?\)')
 COMMENT = re.compile(r'<!--.*?-->', re.S)
 # inline code ending in a backslash: Notion reads "\\`" as an escaped backtick and the code never closes

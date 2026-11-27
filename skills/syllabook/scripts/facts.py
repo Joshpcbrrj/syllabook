@@ -28,7 +28,7 @@ PATTERNS = {
     'name': re.compile(r'(?<=[a-zà-ÿ,;:)] )[A-ZÀ-Ý][\w-]+'),
 }
 TOPIC_NAME = 3  # a name this many times in the chapter is the chapter's subject
-MARKUP = re.compile(r'`[^`]*`|!\[[^\]]*\]\([^)]*\)|\]\([^)]*\)|<[^>]+>|[*_#>|]')
+MARKUP = re.compile(r'`[^`]*`|!\[.*?\]\([^)]*\)|\]\([^)]*\)|<[^>]+>|[*_#>|]')
 
 
 def sentences(text):

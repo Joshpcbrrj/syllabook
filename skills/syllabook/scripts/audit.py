@@ -278,11 +278,15 @@ def book_on_one_page(book_dir, lab, readme, chapter0):
     return errors
 
 
-def cover_author(book_dir):
+def cover_author(book_dir, warnings):
     """The cover says "by <author>" with the author of the library that holds the book (COVER.md). A book made
     in another library (a test folder, a zip) and published here keeps a cover without it unless redrawn."""
     cover, root = os.path.join(book_dir, 'cover.svg'), library_root(book_dir)
     author = str((load_yaml(os.path.join(root, 'library.yaml')) or {}).get('author') or '').strip() if root else ''
+    if root and not author and os.path.exists(cover):
+        # the history and English pilots, made in a test library with no author, went out with no name
+        warnings.append('library.yaml has no author, so the cover has no "by <author>": ask the user for the name, '
+                        'write it in library.yaml and add the line to cover.svg (COVER.md)')
     if not author or not os.path.exists(cover):
         return []
     text = html.unescape(re.sub(r'<[^>]+>', ' ', open(cover, encoding='utf-8', errors='replace').read()))
@@ -367,7 +371,7 @@ def main():
             chapter0 = open(os.path.join(book_dir, 'chapters', zero[0]), encoding='utf-8').read() if zero else ''
             if not bare:
                 errors += book_on_one_page(book_dir, lab, front, chapter0)
-        errors += cover_author(book_dir)
+        errors += cover_author(book_dir, warnings)
         img = os.path.join(book_dir, 'img')
         if os.path.isdir(img):
             existing = {os.path.relpath(f, img).replace(os.sep, '/')

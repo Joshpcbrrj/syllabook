@@ -83,6 +83,25 @@ def test_a_file_title_is_code_so_notion_does_not_link_it(book, title, shown):
     assert content.startswith(shown + '\n'), content
 
 
+@pytest.mark.parametrize('text, shown', [
+    ('Rode o bootstrap.sh e depois o verificar.sh.', 'Rode o `bootstrap.sh` e depois o `verificar.sh`.'),
+    ('Abra o README.md da pasta.', 'Abra o `README.md` da pasta.'),
+    ('Já em código: `db.py`.', 'Já em código: `db.py`.'),
+    ('Veja [o guia](https://exemplo.com/setup.sh).', 'Veja [o guia](https://exemplo.com/setup.sh).'),
+    ('Em https://docs.python.org/a.py não muda.', 'Em https://docs.python.org/a.py não muda.'),
+    ('Uma frase.Outra frase sem espaço.', 'Uma frase.Outra frase sem espaço.'),
+], ids=['prose', 'readme', 'inline code', 'link target', 'bare url', 'not a file'])
+def test_a_file_name_in_the_text_is_code_so_notion_does_not_link_it(book, text, shown):
+    """The WSL book's captions had bootstrap.sh and verificar.sh as links to http://bootstrap.sh."""
+    content, _, _ = convert(text + '\n', book)
+    assert content.strip() == shown, content
+
+
+def test_a_file_name_in_an_image_caption_is_code(book):
+    content, _, _ = convert('![O script bootstrap.sh cria a distro](../img/c01-lista.svg)\n', book)
+    assert 'O script `bootstrap.sh` cria a distro' in content, content
+
+
 def test_checks_are_the_last_line_of_each_code_block_and_the_last_source():
     content = ('Texto.\n\n```bash\n# atualiza a lista\nsudo apt update\n}\n```\n\n```txt\nok\n```\n\n'
                '## 📚 Fontes\n\n'

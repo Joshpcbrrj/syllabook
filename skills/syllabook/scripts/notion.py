@@ -41,6 +41,11 @@ CHAPTER_LINK = re.compile(r'\[([^\]]+)\]\((?!https?:)[^)\s]+\.md(#[^)\s]*)?\)')
 COMMENT = re.compile(r'<!--.*?-->', re.S)
 # inline code ending in a backslash: Notion reads "\\`" as an escaped backtick and the code never closes
 TRAILING_BACKSLASH = re.compile(r'`([^`\n]*\\)`')
+# a file name whose extension is also an internet domain: Notion links bootstrap.sh to http://bootstrap.sh
+FILE_NAME = re.compile(r'(?<![\w./\\-])([\w-]+(?:\.[\w-]+)*\.(?:sh|md|py|rs|pl|ps|so|zip|app|dev|mov|io|ai|ml))\b'
+                       r'(?![\w/-])')
+# what must stay as it is: inline code, link targets and bare addresses
+KEEP = re.compile(r'`[^`\n]*`|\]\([^)\s]*\)|https?://\S+')
 # the emoji a note starts with picks the callout's color
 CALLOUT_COLORS = {'⚠️': 'yellow_bg', '💡': 'blue_bg', '🛠️': 'green_bg', '🔥': 'orange_bg', '❌': 'red_bg',
                   '✅': 'green_bg', '🔎': 'purple_bg', '🧪': 'blue_bg', '🎯': 'purple_bg',
@@ -54,9 +59,19 @@ def strip_generated(text):
     return COMMENT.sub('', text)
 
 
+def file_names_as_code(text):
+    """bootstrap.sh -> `bootstrap.sh` in prose and captions, leaving inline code, link targets and URLs alone."""
+    parts, last = [], 0
+    for m in KEEP.finditer(text):
+        parts += [FILE_NAME.sub(r'`\1`', text[last:m.start()]), m.group(0)]
+        last = m.end()
+    return ''.join(parts + [FILE_NAME.sub(r'`\1`', text[last:])])
+
+
 def inline(text):
-    """Text outside code blocks: inline code that ends in a backslash becomes plain, escaped text."""
-    return TRAILING_BACKSLASH.sub(lambda m: m.group(1).replace('\\', '\\\\'), text)
+    """Text outside code blocks: inline code that ends in a backslash becomes plain, escaped text; file names
+    become code, so Notion does not turn them into links."""
+    return TRAILING_BACKSLASH.sub(lambda m: m.group(1).replace('\\', '\\\\'), file_names_as_code(text))
 
 
 def callout(lines):
@@ -140,7 +155,7 @@ def convert(text, book_dir, page_url='', see_label='See the image on the website
                 placeholder = f'UPLOAD:{name}'
                 uploads.append({'placeholder': placeholder, 'file': os.path.join(book_dir, 'img', name),
                                 'kind': 'svg'})
-                result.append(f'<image source="{placeholder}">{alt}</image>')
+                result.append(f'<image source="{placeholder}">{file_names_as_code(alt)}</image>')
             i += 1
             continue
         title = FILE_LINE.match(ESCAPED.sub(r'\1', stripped))

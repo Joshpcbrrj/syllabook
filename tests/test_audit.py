@@ -94,6 +94,17 @@ def test_the_cover_carries_the_library_author(cli, library, byline, ok):
         assert 'Teste' in missing[0] and 'library.yaml' in missing[0]
 
 
+def test_a_library_with_no_author_warns_before_the_cover_goes_without_one(cli, library):
+    """The history and English pilots, made in a test library with no author, went out with no name."""
+    settings = load(library / 'library.yaml')
+    settings['author'] = ''
+    save(library / 'library.yaml', settings)
+    book = library / 'created-books' / 'python-do-zero-teste'
+    (book / 'cover.svg').write_text(COVER.format(''), encoding='utf-8')
+    code, r = audit(cli, book)
+    assert any('no author' in w and 'ask the user' in w for w in r['warnings']), r
+
+
 def test_a_png_named_svg_is_an_error_not_a_crash(cli, book):
     (book / 'img' / 'c01-foto.svg').write_bytes(b'\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\xff\xfe')
     edit(book / CHAPTER, '## 📚 Fontes', '![Uma foto](../img/c01-foto.svg)\n\n## 📚 Fontes')

@@ -73,7 +73,7 @@ They live in `scripts/`, install what they need and print short JSON with only w
 | `python scripts/book.py reread <n>` | prints the chapter's prose for the native reread (plain text), with the code `done` asks for among the lines |
 | `python scripts/book.py done <n> --reread <code> --summary "..."` | records progress and the summary; saves the checkpoint |
 | `python scripts/book.py status` | where the book stopped, the handoff note and the next step |
-| `python scripts/facts.py <n>` | lists the chapter's sentences with dates, numbers, names and quotations |
+| `python scripts/facts.py <n>` | lists the chapter's sentences with dates, numbers, names and quotations; `--fixed` lists every item of chapter 0, the mock exam and the glossary with its chapter |
 | `python scripts/projects.py [--chapter <n>]` | assembles the projects from the code blocks and runs them |
 | `python scripts/audit.py [<n>]` | ready criteria: errors block, warnings go to the final summary |
 | `python scripts/build.py --out <dir> [--partial]` | navigation, map, concept index, EPUB and zip; `--partial` = checkpoint zip, no EPUB. `<dir>` is always outside the library repository (claude.ai: `/mnt/user-data/outputs`; Claude Code: a folder the user picks) |
@@ -87,7 +87,7 @@ The other scripts are taught where they are used: `ingest.py` (`IMPROVE.md`, `SO
 - [ ] 2. Choices: images (SVG diagrams and illustrations + real images where they show it better, the default | SVG only) and reading (large screens | small e-reader). Ask always, even when the user says to go straight to writing: one short question with the defaults, then wait
 - [ ] 3. Research: open every source once, then write research/guide.md (the topic guide) and research/c<nn>.md for every chapter of the book, even if the user wants only some chapters now (references/SOURCES.md §2)
 - [ ] 4. Chapters 1..n (loop below)
-- [ ] 5. Fixed parts (references/BOOK.md): chapter 0 with the book on one page, placement test, section cheat sheets, mock exam, glossary, next steps
+- [ ] 5. Fixed parts (references/BOOK.md): chapter 0 with the book on one page, placement test, section cheat sheets, mock exam, glossary, next steps; then `facts.py --fixed`, each item checked against its chapter
 - [ ] 6. Projects run (if any) and the whole book audited with no errors
 - [ ] 7. Cover, EPUB and zip (build.py)
 - [ ] 8. Publish on GitHub; the Notion copy goes last, in a new conversation, to save tokens (modes/PUBLISH.md §4)

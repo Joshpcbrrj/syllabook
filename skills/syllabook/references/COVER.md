@@ -5,7 +5,7 @@ A book cover, not a template: original, clean and readable as a small thumbnail.
 ## Content
 
 - Title and subtitle, in the book language.
-- "by <author>" with `author` from `library.yaml` (in the book language, e.g. "por <author>").
+- "by <author>" with `author` from `library.yaml` (in the book language, e.g. "por <author>"). With no `author` there, ask the user for the name to show and write it in `library.yaml` before drawing; a cover without it has to be redrawn when the book is published in a library that has one.
 - For improved materials, a small line under the subtitle: the kind of original ("based on course notes").
 - No third-party logos, brands, mascots or characters, ever. Represent a technology with an original abstract shape, never its logo.
 

@@ -52,6 +52,24 @@ def test_a_name_the_chapter_repeats_is_its_subject_not_a_claim(cli, book):
     assert any('Dijkstra' in s for s in named) and not any('Ubuntu' in s and 'Dijkstra' not in s for s in named)
 
 
+def test_the_fixed_parts_are_listed_item_by_item_with_the_chapter_each_points_to(cli, book):
+    """The history and English pilots: chapter 0, the glossary and the mock exam stated what no chapter said, and
+    the sessions did not check them until asked. Each item comes with the chapter to check it against."""
+    code, r = cli('facts', '--fixed', '--book', book)
+    assert code == 0 and r['to_check'] == sum(len(p['items']) for p in r['parts'])
+    glossary = next(p for p in r['parts'] if p['file'] == 'chapters/glossario.md')
+    assert [(i['chapter'], i['text'].split()[0]) for i in glossary['items']] == [(1, 'Lista'), (2, 'Laço')]
+    exam = next(p for p in r['parts'] if 'simulado' in p['file'])
+    # the question and its hidden answer are one item: the answer holds the link
+    assert exam['items'][0]['chapter'] == 2 and 'média' in exam['items'][0]['text'], exam
+    assert 'chapter' in r['note']
+
+
+def test_a_chapter_number_or_fixed_is_required(cli, book):
+    code, r = cli('facts', '--book', book)
+    assert code == 1 and '--fixed' in r['error']
+
+
 def test_the_command_reports_a_chapter_without_a_file(cli, book):
     code, r = cli('facts', 9, '--book', book)
     assert code == 1 and 'no file yet' in r['error']

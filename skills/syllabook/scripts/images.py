@@ -241,7 +241,8 @@ def save_image(book_dir, name, image, extension, title):
     credit(book_dir, filename, f'{title}, {image["author"]}, {license_text}, {image["source"]}')
     result = {'file': f'img/{filename}', 'markdown': f'![<alt text>](../img/{filename})',
               'caption': f'{image["author"]}, {image["license"]}, via {image["via"]}',
-              'note': 'write the alt text and put the caption credit under the image'}
+              'note': 'open the image (Read it) and look at it before writing the alt text: describe what it '
+                      'shows, not what the title says; then put the caption credit under the image'}
     size = shrink(path)
     if size:
         result['size'] = size
@@ -335,7 +336,11 @@ def fetch(title, name, book_dir):
     if not image['free']:
         fail(f'{title} has no free license ({image["license"] or "none"}): pick another image')
     image['via'] = 'Wikimedia Commons'
-    save_image(book_dir, name, image, EXTENSIONS.get(image['mime'], '.jpg'), image['title'])
+    # the extension of what is downloaded: for an SVG, Commons sends the PNG it renders at the width asked
+    extension = os.path.splitext(urllib.parse.urlparse(image['url'] or '').path)[1].lower().replace('.jpeg', '.jpg')
+    if extension not in EXTENSIONS.values():
+        extension = EXTENSIONS.get(image['mime'], '.jpg')
+    save_image(book_dir, name, image, extension, image['title'])
 
 
 def playwright():

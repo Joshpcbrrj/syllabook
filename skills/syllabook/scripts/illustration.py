@@ -34,7 +34,10 @@ def local(tag):
 def check(path, width):
     """Returns (errors, warnings) for one illustration."""
     errors, warnings = [], []
-    text = open(path, encoding='utf-8').read()
+    try:
+        text = open(path, encoding='utf-8').read()
+    except UnicodeDecodeError:
+        return ['not an SVG (binary file: a photo saved with the wrong extension?); rename it to its real type'], []
     try:
         root = ET.fromstring(text)
     except ET.ParseError as e:

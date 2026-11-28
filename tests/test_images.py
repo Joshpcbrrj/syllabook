@@ -80,6 +80,19 @@ def test_fetch_saves_the_image_and_its_credit(cli, book, commons):
     assert 'Jane Doe' in r['caption'] and 'CC BY-SA 4.0' in r['caption']
 
 
+def test_an_svg_comes_as_the_png_commons_renders(cli, book, commons):
+    """With a width asked, Commons gives a PNG thumbnail of an SVG: the file gets the extension of what came."""
+    diagram = {'title': 'File:Arpanet 1969.svg', 'imageinfo': [{
+        'url': 'https://upload.wikimedia.org/Arpanet_1969.svg', 'mime': 'image/svg+xml', 'width': 1280,
+        'thumburl': 'https://upload.wikimedia.org/thumb/Arpanet_1969.svg/1280px-Arpanet_1969.svg.png',
+        'height': 900, 'descriptionurl': 'https://commons.wikimedia.org/wiki/File:Arpanet_1969.svg',
+        'extmetadata': {'LicenseShortName': {'value': 'Public domain'}, 'Artist': {'value': 'X'}}}]}
+    commons['pages'] = [diagram]
+    code, r = cli('images', 'fetch', 'File:Arpanet 1969.svg', '--name', 'c10-arpanet', '--book', book)
+    assert code == 0 and r['file'] == 'img/c10-arpanet.png' and (book / 'img' / 'c10-arpanet.png').exists()
+    assert not (book / 'img' / 'c10-arpanet.svg').exists()
+
+
 def test_fetch_refuses_a_non_free_image(cli, book, commons):
     commons['pages'] = [LOGO]
     code, r = cli('images', 'fetch', 'File:Some logo.png', '--name', 'c02-logo', '--book', book)

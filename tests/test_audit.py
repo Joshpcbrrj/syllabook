@@ -61,6 +61,13 @@ ERRORS = [
 ]
 
 
+def test_a_png_named_svg_is_an_error_not_a_crash(cli, book):
+    (book / 'img' / 'c01-foto.svg').write_bytes(b'\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\xff\xfe')
+    edit(book / CHAPTER, '## 📚 Fontes', '![Uma foto](../img/c01-foto.svg)\n\n## 📚 Fontes')
+    code, r = audit(cli, book, 1)
+    assert code == 1 and any('c01-foto.svg' in e and 'not an SVG' in e for e in r['errors']), r
+
+
 def test_an_encyclopedia_named_in_the_text_as_a_map_is_fine(cli, book):
     edit(book / CHAPTER, '## 📚 Fontes', 'A [Wikipédia](https://pt.wikipedia.org/wiki/Python), usada só como mapa, '
          'aponta o tutorial oficial.\n\n## 📚 Fontes')

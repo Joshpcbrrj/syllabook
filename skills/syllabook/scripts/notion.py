@@ -43,7 +43,8 @@ COMMENT = re.compile(r'<!--.*?-->', re.S)
 TRAILING_BACKSLASH = re.compile(r'`([^`\n]*\\)`')
 # the emoji a note starts with picks the callout's color
 CALLOUT_COLORS = {'⚠️': 'yellow_bg', '💡': 'blue_bg', '🛠️': 'green_bg', '🔥': 'orange_bg', '❌': 'red_bg',
-                  '✅': 'green_bg', '🔎': 'purple_bg', '🧪': 'blue_bg', '🎯': 'purple_bg'}
+                  '✅': 'green_bg', '🔎': 'purple_bg', '🧪': 'blue_bg', '🎯': 'purple_bg',
+                  '⚖️': 'gray_bg'}
 EMOJI = re.compile(r'^\s*(?:\*\*)?\s*([\U0001F300-\U0001FAFF☀-➿][️‍\U0001F300-\U0001FAFF]*)')
 
 

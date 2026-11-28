@@ -15,7 +15,7 @@ guiding question → context (when, where, who) → the story or explanation →
 ## Verification
 
 - Every date, number, name and quotation goes through `facts.py` and the sources (`SOURCES.md` §5).
-- **Fact × interpretation × legend** are separated in the text. Popular stories are told as stories and then checked against the records.
+- **Fact × interpretation × legend** are separated in the text. Popular stories are told as stories and then checked against the records. When the separation gets a box of its own, it starts with `⚖️` (`> ⚖️ **Fato × interpretação.**`), never with `🔎`: that mark tells the reader a section is optional (`TEACHING.md` §2), and this box is essential.
 - **Curiosities only with a source**; label them as curiosities.
 
 ## Visuals

@@ -2,6 +2,8 @@
 
 Every book answers the three reasons self-learners give up: no **direction** (where to start, how much is left), no **feedback** (am I getting it right?) and no **consistency**. The parts below exist for that.
 
+**The fixed parts teach nothing new.** Every fact in chapter 0, the placement test, the cheat sheets, the mock exam and the glossary is what a chapter says, with the same date and the same doubt ("not confirmed" stays "not confirmed"); check each answer against the chapter it points to. Describe the book as it is: no feature the chapters lack ("a Brazilian milestone in almost every chapter" when six chapters have none). In the history pilot, the placement test credited the word "bit" to an article the chapter said it could not confirm.
+
 **Who does what:** `build.py` generates the map with links, the navigation between chapters, the glossary links, the answers appendix of the EPUB and the folder lists. You write the texts. Never write by hand what a script generates.
 
 ## Files
@@ -30,7 +32,7 @@ In this order: cover image; title and subtitle; one paragraph on who it is for a
 
 The book on one page (§4) near the top, then at most one page of text:
 
-- how the book is organized (parts, the `🔎` optional sections, where the answers are);
+- how the book is organized (parts, the `🔎` optional sections if the book has any, the boxes it uses, such as `⚖️` fact × interpretation, where the answers are);
 - four study techniques in one line each: answer before looking; come back on the suggested days; explain it in your own words; mix old and new exercises;
 - a table with three paces, computed from the chapter times in `book.yaml`:
 

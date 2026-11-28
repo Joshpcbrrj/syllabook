@@ -34,6 +34,7 @@ OPEN_PORT = [re.compile(r'''^\s*-\s*["']?(\d+(?:-\d+)?:\d+(?:-\d+)?(?:/(?:tcp|ud
              re.compile(r'''(?:\s-p|--publish)[ =]["']?(\d+(?:-\d+)?:\d+(?:-\d+)?)\b''')]  # docker run
 YAML_LANGS = {'yaml', 'yml'}
 LINK = re.compile(r'(?<!!)\[[^\]]*\]\(([^)\s#]+\.md)(#[^)]*)?\)')
+OPTIONAL_MARK = '🔎'  # starts the heading of a section the reader may skip, and nothing else
 # a map to the sources, never a source itself (SOURCES.md §1)
 ENCYCLOPEDIA = re.compile(r'https?://(?:[\w-]+\.)*(wikipedia\.org|britannica\.com)\b', re.I)
 
@@ -86,6 +87,13 @@ def audit_chapter(path, n, lab, limits, language, errors, warnings):
                 (warnings if unbreakable else errors).append(
                     f'{where(i)}: line with {len(line)} characters (limit {limits["code"]})')
             continue
+        opening = re.sub(r'^[#>\s*]+', '', stripped)
+        if opening.startswith(OPTIONAL_MARK) and \
+                not re.sub(r'^[\s*]+', '', opening[len(OPTIONAL_MARK):]).startswith(lab['Going deeper']):
+            errors.append(f'{where(i)}: {OPTIONAL_MARK} opens only an optional part, followed by '
+                          f'"{lab["Going deeper"]}" (a reader in a hurry may skip it, TEACHING.md §2); give this part '
+                          'another mark (a fact × '
+                          'interpretation box starts with ⚖️)')
         if stripped.startswith('<summary>') or stripped.lstrip('> ').startswith('<summary>'):
             if i < len(lines) and lines[i].lstrip('> ').strip():
                 errors.append(f'{where(i)}: blank line needed after <summary>')

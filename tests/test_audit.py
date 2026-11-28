@@ -61,6 +61,24 @@ ERRORS = [
 ]
 
 
+def test_the_optional_mark_only_starts_a_heading(cli, book):
+    """🔎 tells the reader "skip me if in a hurry": a box of essential content must not start with it."""
+    edit(book / CHAPTER, '## 📚 Fontes', '> 🔎 **Fato × interpretação.** A data é fato.\n\n## 📚 Fontes')
+    code, r = audit(cli, book, 1)
+    assert code == 1 and any('🔎' in e and 'Para ir além' in e for e in r['errors']), r['errors']
+
+
+@pytest.mark.parametrize('text', [
+    '### 🔎 Para ir além\n\nUm detalhe opcional.',
+    '> 🔎 **Para ir além:** um detalhe opcional.',
+    'As seções que começam com 🔎 são opcionais.',
+])
+def test_optional_parts_and_mentions_of_the_mark_are_fine(cli, book, text):
+    edit(book / CHAPTER, '## 📚 Fontes', text + '\n\n## 📚 Fontes')
+    code, r = audit(cli, book, 1)
+    assert code == 0, r['errors']
+
+
 def test_a_png_named_svg_is_an_error_not_a_crash(cli, book):
     (book / 'img' / 'c01-foto.svg').write_bytes(b'\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\xff\xfe')
     edit(book / CHAPTER, '## 📚 Fontes', '![Uma foto](../img/c01-foto.svg)\n\n## 📚 Fontes')

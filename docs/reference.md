@@ -66,7 +66,7 @@ Each concept the book teaches appears once: `{id, name, chapter, depends}`. `id`
 | `edition` | the current edition (`1.0`; `1.3` after a review; `1.3.1` for errata only) |
 | `human_review` | `true` when a person reviewed the content |
 
-Improved materials also have `original` (where the material came from; it is never published), `promise` (`{goal, audience, level, sequence}` of the original), `new_content_pct` and, in each chapter, `sources_original` (the sections of the original it comes from). Translations have `translation_of` (the original's slug) and `glossary`; the original gets `translations`.
+Improved materials also have `original` (where the material came from; it is never published), `promise` (`{goal, audience, level, sequence}` of the original), `new_content_pct` and, in each chapter, `sources_original` (the sections of the original it comes from). Translations have `translation_of` (the original's slug) and `glossary`; the original gets `translations`. A translation of a file the user sent (not a book of the library) also has `original` (`{title, author, where, rights}`: `where` is the folder `ingest.py` wrote the file to, `rights` is `own` or the license that allows translating it) and `sources_original` in each chapter.
 
 ### Filled in by Syllabook
 

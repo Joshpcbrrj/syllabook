@@ -13,6 +13,7 @@
 - [Are my materials private?](#are-my-materials-private)
 - [Can I edit a book by hand?](#can-i-edit-a-book-by-hand)
 - [Which topics and languages work?](#which-topics-and-languages-work)
+- [Can I translate a book?](#can-i-translate-a-book)
 - [Is the code in the books tested?](#is-the-code-in-the-books-tested)
 - [Where do the images come from?](#where-do-the-images-come-from)
 - [I found an error in a book. What now?](#i-found-an-error-in-a-book-what-now)
@@ -69,6 +70,16 @@ Yes. Chapters are plain Markdown files in `chapters/`. After editing, ask Syllab
 
 - **Topics:** any. Syllabook adapts its teaching to four profiles: programming and math, languages, practical skills (music, electronics...) and general knowledge (such as history). For a topic that fits none, it builds a method of its own and explains it in the assessment.
 - **Languages:** the conversation and the book can be in any language. Portuguese (Brazil) and English have their own style guides; in other languages it writes naturally and tells you there is no style guide yet.
+
+## Can I translate a book?
+
+Yes, into any language; the new version is adapted for its readers (names, currencies, examples), not translated word by word. The original can be:
+
+- **a book in your library** (its folder, or the library on GitHub): the best choice, because it keeps the code, the diagrams and the sources;
+- **a zip Syllabook gave you;**
+- **a file you send:** PDF, EPUB, DOCX, ODT, RTF, HTML, a web page or Markdown (PowerPoint and images through [Docling](integrations/docling.md), which also keeps the tables of a PDF). Syllabook asks first whether you wrote it or its license allows translations; a book with all rights reserved is not translated, but it can be the source of a new book of your own (Improve).
+
+A book that teaches a language, translated into that same language (a Portuguese book teaching English, into English), is a different book: Syllabook asks you who it is for before starting.
 
 ## Is the code in the books tested?
 

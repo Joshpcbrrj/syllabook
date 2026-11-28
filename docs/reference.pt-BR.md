@@ -1,4 +1,4 @@
-<!-- translation-of: reference.md sha256:c95a6b28ec7a -->
+<!-- translation-of: reference.md sha256:4a48054af0b1 -->
 # Referência: `book.yaml` e `library.yaml`
 
 [English](reference.md) | **Português**
@@ -67,7 +67,7 @@ Cada conceito que o livro ensina aparece uma vez: `{id, name, chapter, depends}`
 | `edition` | a edição atual (`1.0`; `1.3` depois de uma revisão; `1.3.1` só para errata) |
 | `human_review` | `true` quando uma pessoa revisou o conteúdo |
 
-Os materiais aprimorados também têm `original` (de onde veio o material; nunca é publicado), `promise` (`{goal, audience, level, sequence}` do original), `new_content_pct` e, em cada capítulo, `sources_original` (as seções do original de onde ele vem). As traduções têm `translation_of` (o slug do original) e `glossary`; o original ganha `translations`.
+Os materiais aprimorados também têm `original` (de onde veio o material; nunca é publicado), `promise` (`{goal, audience, level, sequence}` do original), `new_content_pct` e, em cada capítulo, `sources_original` (as seções do original de onde ele vem). As traduções têm `translation_of` (o slug do original) e `glossary`; o original ganha `translations`. A tradução de um arquivo que o usuário mandou (não de um livro da biblioteca) também tem `original` (`{title, author, where, rights}`: `where` é a pasta em que o `ingest.py` gravou o arquivo, `rights` é `own` ou a licença que permite traduzi-lo) e `sources_original` em cada capítulo.
 
 ### Preenchidos pelo Syllabook
 

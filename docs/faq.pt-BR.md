@@ -1,4 +1,4 @@
-<!-- translation-of: faq.md sha256:bb5006ad114d -->
+<!-- translation-of: faq.md sha256:a2fdd2e136f6 -->
 # Perguntas frequentes
 
 [English](faq.md) | **Português**
@@ -14,6 +14,7 @@
 - [Meus materiais ficam privados?](#meus-materiais-ficam-privados)
 - [Posso editar um livro à mão?](#posso-editar-um-livro-à-mão)
 - [Que temas e idiomas funcionam?](#que-temas-e-idiomas-funcionam)
+- [Posso traduzir um livro?](#posso-traduzir-um-livro)
 - [O código dos livros é testado?](#o-código-dos-livros-é-testado)
 - [De onde vêm as imagens?](#de-onde-vêm-as-imagens)
 - [Achei um erro num livro. E agora?](#achei-um-erro-num-livro-e-agora)
@@ -70,6 +71,16 @@ Pode. Os capítulos são arquivos Markdown comuns, em `chapters/`. Depois de edi
 
 - **Temas:** qualquer um. O Syllabook adapta a didática a quatro perfis: programação e matemática, idiomas, habilidades práticas (música, eletrônica...) e conhecimento geral (como história). Para um tema que não se encaixa em nenhum, ele monta um método próprio e o explica no parecer.
 - **Idiomas:** a conversa e o livro podem ser em qualquer idioma. Português do Brasil e inglês têm guias de estilo próprios; nos outros idiomas, ele escreve com naturalidade e avisa que ainda não há guia de estilo.
+
+## Posso traduzir um livro?
+
+Pode, para qualquer idioma; a versão nova é adaptada para quem vai ler (nomes, moedas, exemplos), não traduzida palavra por palavra. O original pode ser:
+
+- **um livro da sua biblioteca** (a pasta dele, ou a biblioteca no GitHub): a melhor escolha, porque mantém o código, os diagramas e as fontes;
+- **um zip que o Syllabook entregou;**
+- **um arquivo que você manda:** PDF, EPUB, DOCX, ODT, RTF, HTML, uma página da web ou Markdown (PowerPoint e imagens pelo [Docling](integrations/docling.pt-BR.md), que também mantém as tabelas de um PDF). O Syllabook pergunta antes se você escreveu o livro ou se a licença dele permite traduções; um livro com todos os direitos reservados não é traduzido, mas pode servir de fonte para um livro novo seu (Aprimorar).
+
+Um livro que ensina um idioma, traduzido para esse mesmo idioma (um livro em português que ensina inglês, para o inglês), é outro livro: o Syllabook pergunta para quem ele é antes de começar.
 
 ## O código dos livros é testado?
 

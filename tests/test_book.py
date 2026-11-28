@@ -187,6 +187,41 @@ def test_brief_for_a_translation_points_to_the_original_chapter(cli, book, tmp_p
     assert r['original_chapter'].endswith('python-do-zero/chapters/01-listas.md') and r['glossary']
 
 
+def from_a_file(book, **original):
+    """A translation of a book the user sent as a file (TRANSLATE.md §1): ingest.py wrote it to original/."""
+    (book / 'original').mkdir()
+    (book / 'original' / '01-listas.md').write_text('# Listas\n', encoding='utf-8')
+    data = load(book / 'book.yaml')
+    data.update(translation_of='python-from-scratch', glossary=[{'source': 'lista', 'target': 'list'}],
+                original={'title': 'Python from scratch', 'where': 'original', 'rights': 'own', **original})
+    for ch in data['chapters']:
+        ch['sources_original'] = ['01-listas.md']
+    save(book / 'book.yaml', data)
+    return data
+
+
+def test_brief_for_a_translation_of_a_file_points_to_its_ingested_sections(cli, book):
+    from_a_file(book)
+    code, r = cli('book', 'validate', book / 'book.yaml')
+    assert code == 0, r['errors']
+    code, r = cli('book', 'brief', 1, '--book', book)
+    assert code == 0 and r['original_chapter'] == ['original/01-listas.md'], r
+
+
+@pytest.mark.parametrize('change, message', [
+    (lambda d: d.pop('original'), 'original needs title, where, rights'),
+    (lambda d: d['original'].pop('rights'), 'original needs rights'),
+    (lambda d: d['original'].update(where='nao-existe'), 'is not a folder of the book'),
+    (lambda d: d['chapters'][1].pop('sources_original'), 'chapter 2: missing sources_original'),
+], ids=['no original', 'no rights', 'no ingested folder', 'chapter without its sections'])
+def test_a_translation_of_a_file_says_what_it_translates_and_by_what_right(cli, book, change, message):
+    data = from_a_file(book)
+    change(data)
+    save(book / 'book.yaml', data)
+    code, r = cli('book', 'validate', book / 'book.yaml')
+    assert code == 1 and any(message in e for e in r['errors']), r['errors']
+
+
 def test_brief_for_a_chapter_not_in_the_syllabus(cli, book):
     code, r = cli('book', 'brief', 9, '--book', book)
     assert code == 1 and 'chapter 9 is not in book.yaml' in r['error']

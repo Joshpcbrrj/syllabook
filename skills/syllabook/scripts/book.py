@@ -148,8 +148,10 @@ def validate(path):
         pct = data.get('new_content_pct')
         if isinstance(pct, (int, float)) and pct > 20:
             warnings.append(f'new content at {pct}%: above the ~20% limit, say why in the plan')
-    if data.get('translation_of') and not data.get('glossary'):
-        errors.append('translation: missing glossary')
+    if data.get('translation_of'):
+        if not data.get('glossary'):
+            errors.append('translation: missing glossary')
+        translation_source(os.path.dirname(os.path.abspath(path)), data, errors)
     for key, rule, form in (('reviewed_on', DATE_RE, 'a YYYY-MM-DD date'), ('review_by', MONTH_RE, 'a YYYY-MM month')):
         if data.get(key) and not rule.match(str(data[key])):
             errors.append(f'{key}: must be {form}')
@@ -275,6 +277,27 @@ def original_book(book_dir, slug):
     return os.path.join(os.path.dirname(book_dir), slug)
 
 
+def translation_source(book_dir, data, errors):
+    """TRANSLATE.md §1: the original is a book of this library, or a file the user sent (PDF, EPUB, DOCX...),
+    turned into sections by ingest.py in the folder original.where, with the right to translate it."""
+    if os.path.isdir(original_book(book_dir, data['translation_of'])):
+        return
+    original = data.get('original') or {}
+    missing = [k for k in ('title', 'where', 'rights') if not original.get(k)]
+    if missing:
+        errors.append(f'translation: "{data["translation_of"]}" is not in this library, so original needs '
+                      f'{", ".join(missing)}: the title of the file the user sent, the folder ingest.py wrote it '
+                      'to, and rights ("own", or the license that allows translating it) (TRANSLATE.md §1)')
+        return
+    if not os.path.isdir(os.path.join(book_dir, str(original['where']))):
+        errors.append(f'translation: original.where "{original["where"]}" is not a folder of the book: run '
+                      f'ingest.py <file> --out <book>/{original["where"]}')
+    for ch in data['chapters'] or []:
+        if not ch.get('sources_original'):
+            errors.append(f'chapter {ch.get("n", "?")}: missing sources_original (the sections of the original '
+                          'it translates, as ingest.py named them)')
+
+
 def cmd_brief(args):
     book_dir, path = find_book(args.book)
     data = load_yaml(path)
@@ -319,8 +342,12 @@ def cmd_brief(args):
         brief['original_sections'] = ch['sources_original']
     if data.get('translation_of'):
         original = original_book(book_dir, data['translation_of'])
-        source = chapter_path(original, n) or original
-        brief['original_chapter'] = os.path.relpath(source, book_dir).replace(os.sep, '/')
+        if os.path.isdir(original):
+            source = chapter_path(original, n) or original
+            brief['original_chapter'] = os.path.relpath(source, book_dir).replace(os.sep, '/')
+        else:  # a file the user sent, in sections written by ingest.py (TRANSLATE.md §1)
+            where = str((data.get('original') or {}).get('where') or 'original')
+            brief['original_chapter'] = [f'{where}/{s}' for s in ch.get('sources_original') or []]
         brief['glossary'] = data.get('glossary')
     out(brief)
 

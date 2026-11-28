@@ -249,7 +249,9 @@ def skeleton(data, ch, lab, review):
               f'## 📌 {lab["Summary"]}', '', '<!-- TODO: table: item | one sentence -->', '',
               f'## 📚 {lab["Sources"]}', '', '<!-- TODO: links with the date checked -->', '']
     if review:
-        lines += [f'> 🔁 **{lab["Review today"]}:** ' + ', '.join(str(r) for r in review), '']
+        # a suggestion, not the text: the reader gets a sentence in the book language ("capítulos 4 e 6")
+        lines += [f'> 🔁 **{lab["Review today"]}:** <!-- TODO: chapters {", ".join(str(r) for r in review)}, '
+                  'written as a sentence in the book language -->', '']
     return '\n'.join(lines)
 
 

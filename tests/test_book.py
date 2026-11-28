@@ -136,8 +136,11 @@ def test_brief_creates_a_skeleton_in_the_book_language(cli, book):
     assert r['previous']['title'] == 'Listas' and r['next'] is None and r['warm_up_from'] == [1]
     text = read(book / r['file'])
     for heading in ('# 2. O laço for', '## De onde paramos', '## O laço for', '## 🏋️ Pratique',
-                    '## 🧠 Revisão rápida', '## 📚 Fontes', '🔁 **Revise hoje:** 1'):
+                    '## 🧠 Revisão rápida', '## 📚 Fontes', '🔁 **Revise hoje:** <!-- TODO'):
         assert heading in text, heading
+    # the brief suggests chapter numbers; the writer turns them into a sentence, as a TODO done refuses
+    # (the English book's chapters 8 to 11 went out with a bare "Revise hoje: 1, 5, 7")
+    assert re.search(r'Revise hoje:\*\* <!-- TODO: chapters 1\b.*-->', text), text
 
 
 def test_chapter_one_has_no_warm_up_and_no_where_we_left_off(cli, book):

@@ -64,13 +64,13 @@ You are an author, teacher and editor. You write books that **teach on their own
 
 ## Scripts (run them, do not read them)
 
-They live in `scripts/`, install what they need and print short JSON with only what needs action. `book.py validate` also selects the book for the other commands; any script takes `--book <folder>`. **The library is the user's folder** (the folder the session works in, or the user's repository), never the folder this skill is installed in: look for `library.yaml`, `created-books/` and the books there, and give the scripts an absolute `--book` path when you run them from the skill's folder. `<temp>` in these files is a temporary folder outside the library: the session's scratch folder if there is one, otherwise the system's (`/tmp` on claude.ai and Linux; on Windows, what `python -c "import tempfile; print(tempfile.gettempdir())"` prints).
+They live in `scripts/`, install what they need and print short JSON with only what needs action (`book.py reread` prints plain text). `book.py validate` also selects the book for the other commands; any script takes `--book <folder>`. **The library is the user's folder** (the folder the session works in, or the user's repository), never the folder this skill is installed in: look for `library.yaml`, `created-books/` and the books there, and give the scripts an absolute `--book` path when you run them from the skill's folder. `<temp>` in these files is a temporary folder outside the library: the session's scratch folder if there is one, otherwise the system's (`/tmp` on claude.ai and Linux; on Windows, what `python -c "import tempfile; print(tempfile.gettempdir())"` prints).
 
 | Command | Does |
 | --- | --- |
 | `python scripts/book.py validate <book.yaml>` | checks fields and the concept graph (no concept used before it is taught) |
 | `python scripts/book.py brief <n>` | creates the chapter skeleton and prints the compact brief |
-| `python scripts/book.py reread <n>` | prints the chapter's prose for the native reread, then the code `done` asks for |
+| `python scripts/book.py reread <n>` | prints the chapter's prose for the native reread (plain text), with the code `done` asks for among the lines |
 | `python scripts/book.py done <n> --reread <code> --summary "..."` | records progress and the summary; saves the checkpoint |
 | `python scripts/book.py status` | where the book stopped, the handoff note and the next step |
 | `python scripts/facts.py <n>` | lists the chapter's sentences with dates, numbers, names and quotations |
@@ -102,7 +102,7 @@ The other scripts are taught where they are used: `ingest.py` (`IMPROVE.md`, `SO
    - A lab that creates or changes credentials or user settings (SSH keys, `~/.gitconfig`, tokens, shell profiles) runs with `HOME` (and `USERPROFILE` on Windows) pointing to a temporary folder; list the real ones before and after, and undo anything that changed.
    - On native Windows, when Linux commands cannot run, recommend WSL 2 once per book: https://github.com/Joshpcbrrj/syllabook/blob/main/docs/integrations/wsl.md
 4. `facts.py <n>`: check each listed sentence against the dossier and the sources (`SOURCES.md` §5), and that every explanation of a command or piece of code matches its real output.
-5. `book.py reread <n>`: it prints the chapter's prose, line by line, then a code. Read every line as a native reader of the book language, following its style file, and fix any sentence that sounds translated. `done` asks for the code: never throw the output away and never run `reread` and `done` in one command. **Read the whole output as it comes**: never pipe it into `head`, `grep` or a script, never print only some lines (the long ones, the first ones), never pull out just the code. This step costs about one chapter of reading and that cost is the point; it is the one place where token economy does not apply.
+5. `book.py reread <n>`: it prints the chapter's prose, line by line, in plain text; the code `done` asks for is on one line at a random place among them. Read every line as a native reader of the book language, following its style file, and fix any sentence that sounds translated. Never throw the output away and never run `reread` and `done` in one command. **Read the whole output as it comes**: never pipe it into `head`, `tail`, `grep` or a script, never print only some lines (the long ones, a range), never pull out just the code. This step costs about one chapter of reading and that cost is the point; it is the one place where token economy does not apply.
 6. `audit.py <n>`: fix the errors it reports; repeat until there are none.
 7. `book.py done <n> --reread <code> --summary "<3 to 5 lines: what it taught, terms, examples used>"`.
 8. To the user, one line: `✅ Ch. <n>/<total>: <title>`.

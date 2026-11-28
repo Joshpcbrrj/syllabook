@@ -4,7 +4,7 @@
 Usage:
   python scripts/book.py validate <book.yaml>     check fields and the concept graph; selects the book
   python scripts/book.py brief <n> [--book B]     create the chapter skeleton and print its brief
-  python scripts/book.py reread <n> [--book B]    print the chapter's prose for the native reread, then a code
+  python scripts/book.py reread <n> [--book B]    print the prose for the native reread, a code among the lines
   python scripts/book.py done <n> --summary "..." --reread <code> [--book B]   record the chapter as done
   python scripts/book.py status [--book B]        where the book stopped and the next step
   python scripts/book.py handoff ["item"...] [--book B]   save what the next conversation must know (none = clear)
@@ -340,8 +340,10 @@ def pending_rereads(data):
 
 def cmd_reread(args):
     """Step 5 of the chapter loop, done for real: the chapter's prose comes back to be read as a native
-    reader would. A new code comes after the lines and `done` asks for it, so a reread whose output was
-    thrown away (`reread >/dev/null; done`) does not count."""
+    reader would. `done` asks for a new code that sits on one line at a random place among the chapter's
+    lines, in plain text (not JSON): a reread whose output was thrown away (`reread >/dev/null; done`),
+    cut to a range of lines or to its tail, or parsed for a code field leaves no code. In the history
+    pilot, sessions printed only the JSON's `code` field, or only some lines, and called done."""
     book_dir, path = find_book(args.book)
     data = load_yaml(path)
     chapter(data, args.n)
@@ -355,14 +357,16 @@ def cmd_reread(args):
     code = secrets.token_hex(3)
     data['reread'] = {**pending_rereads(data), args.n: code}
     save_yaml(path, data)
-    out({'file': os.path.relpath(file, book_dir).replace(os.sep, '/'), 'style': style,
-         'do': 'Read every line below as a native reader of the book language, following the style file: '
-               'fix (Edit) each sentence that sounds translated, unnatural or unclear; then run '
-               f'audit.py {args.n} and book.py done {args.n} --reread <the code after the lines>. '
-               'This output is meant to be read whole: if it reached you filtered (through head, grep or a '
-               'script, only some lines, only the code), run reread again without the filter.',
-         'lines': prose(open(file, encoding='utf-8').read()),
-         'code': code})
+    lines = prose(open(file, encoding='utf-8').read())
+    lines.insert(secrets.randbelow(max(len(lines) - 1, 1)) + 1, f'>>> reread code: {code} <<<')
+    rel = os.path.relpath(file, book_dir).replace(os.sep, '/')
+    print(f'Reread of chapter {args.n} ({rel}, {len(lines) - 1} lines), as a native reader of {language}, '
+          f'following {style}. Fix (Edit) each sentence that sounds translated, unnatural or unclear; then run '
+          f'audit.py {args.n} and book.py done {args.n} --reread <code>. The code is on one line somewhere '
+          'among the lines below, not at the end: read them all to find it. This output is meant to be read '
+          'whole: if it reached you filtered (through head, tail, grep or a script, only some lines), run '
+          'reread again without the filter.\n')
+    print('\n'.join(lines))
 
 
 def cmd_done(args):
@@ -380,7 +384,7 @@ def cmd_done(args):
         fail('--summary is required (3 to 5 lines: what it taught, terms, examples used)')
     rereads = pending_rereads(data)
     how = (f'run "book.py reread {args.n}", read every line it prints as a native reader, fix what sounds '
-           f'translated, then audit.py {args.n} and done with --reread <the code printed after the lines>')
+           f'translated, then audit.py {args.n} and done with --reread <the code found among the lines>')
     if args.n not in rereads:
         fail(f'chapter {args.n} was not reread: {how}')
     if args.reread != rereads[args.n]:
@@ -585,7 +589,7 @@ def main():
     d = sub.add_parser('done')
     d.add_argument('n', type=int)
     d.add_argument('--summary')
-    d.add_argument('--reread', help='the code printed after the lines of "book.py reread <n>"')
+    d.add_argument('--reread', help='the code found among the lines of "book.py reread <n>"')
     s = sub.add_parser('status')
     h = sub.add_parser('handoff')
     h.add_argument('items', nargs='*')

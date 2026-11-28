@@ -1,5 +1,8 @@
 """book.py: every validation rule, the chapter brief and skeleton, progress and status."""
+import importlib
 import os
+import re
+import sys
 
 import pytest
 from conftest import SAMPLE, edit, load, read, save
@@ -181,37 +184,73 @@ def test_brief_for_a_chapter_not_in_the_syllabus(cli, book):
     assert code == 1 and 'chapter 9 is not in book.yaml' in r['error']
 
 
-def done(cli, book, n, summary):
-    """The end of the chapter loop: the native reread, then done with the code printed after the lines."""
-    code, r = cli('book', 'reread', n, '--book', book)
-    assert code == 0, r
-    return cli('book', 'done', n, '--summary', summary, '--reread', r['code'], '--book', book)
+REREAD_CODE = re.compile(r'^>>> reread code: ([0-9a-f]{6}) <<<$', re.M)
 
 
-def test_done_records_progress_and_points_to_the_next_step(cli, book):
-    code, r = done(cli, book, 1, 'Listas e len.')
+@pytest.fixture
+def reread(monkeypatch, capsys):
+    """`book.py reread` prints plain text, not JSON: returns (exit code, text, the code among the lines)."""
+    def run(book, n):
+        monkeypatch.setattr(sys, 'argv', ['book.py', 'reread', str(n), '--book', str(book)])
+        code = 0
+        try:
+            importlib.import_module('book').main()
+        except SystemExit as e:
+            code = e.code or 0
+        text = capsys.readouterr().out
+        found = REREAD_CODE.findall(text)
+        return code, text, found[0] if len(found) == 1 else None
+    return run
+
+
+def done(cli, reread, book, n, summary):
+    """The end of the chapter loop: the native reread, then done with the code found among the lines."""
+    code, text, word = reread(book, n)
+    assert code == 0 and word, text
+    return cli('book', 'done', n, '--summary', summary, '--reread', word, '--book', book)
+
+
+def test_done_records_progress_and_points_to_the_next_step(cli, reread, book):
+    code, r = done(cli, reread, book, 1, 'Listas e len.')
     assert code == 0 and r == {'saved': True, 'progress': '1/2', 'next': 'book.py brief 2'}
-    code, r = done(cli, book, 1, 'Listas, len e índices.')
+    code, r = done(cli, reread, book, 1, 'Listas, len e índices.')
     assert [p['summary'] for p in load(book / 'book.yaml')['progress']] == ['Listas, len e índices.']
-    code, r = done(cli, book, 2, 'Laço for.')
+    code, r = done(cli, reread, book, 2, 'Laço for.')
     assert r['progress'] == '2/2' and 'fixed parts' in r['next']
 
 
-def test_reread_prints_the_prose_with_line_numbers_and_the_style_file(cli, book):
+def prose_lines(text):
+    return [line for line in text.splitlines() if re.match(r'^\d+: ', line)]
+
+
+def test_reread_prints_the_prose_with_line_numbers_and_the_style_file(reread, book):
     edit(book / 'chapters' / '01-listas.md', '## Listas', '## Listas\n\n```python\nnums = [1]\n```')
-    code, r = cli('book', 'reread', 1, '--book', book)
-    assert code == 0 and r['style'] == 'references/style/pt-BR.md' and r['file'] == 'chapters/01-listas.md'
-    lines = r['lines']
+    code, text, word = reread(book, 1)
+    assert code == 0 and 'references/style/pt-BR.md' in text and 'chapters/01-listas.md' in text
+    lines = prose_lines(text)
     assert any(line.endswith(': ## Listas') for line in lines), lines
     assert not any('nums = [1]' in line for line in lines), 'code is run, not reread'
-    number, text = lines[0].split(': ', 1)
-    assert read(book / r['file']).splitlines()[int(number) - 1] == text
-    assert list(r)[-1] == 'code', 'the code comes after the lines: whoever drops the output has no code'
+    number, line = lines[0].split(': ', 1)
+    assert read(book / 'chapters' / '01-listas.md').splitlines()[int(number) - 1] == line
+    assert not text.lstrip().startswith('{'), 'plain text: no JSON field to pull the code out of'
 
 
-def test_each_reread_gets_a_new_code(cli, book):
-    codes = {cli('book', 'reread', 1, '--book', book)[1]['code'] for _ in range(3)}
-    assert len(codes) == 3
+def test_the_code_hides_among_the_lines_not_at_the_end(reread, book):
+    """Pulling out the code, printing a range of lines or only the tail must miss it most of the time."""
+    places = set()
+    for _ in range(12):
+        code, text, word = reread(book, 1)
+        rows = text.strip().splitlines()
+        at = next(i for i, row in enumerate(rows) if word in row)
+        first = next(i for i, row in enumerate(rows) if re.match(r'^\d+: ', row))
+        assert first < at < len(rows) - 1, 'the code sits between two lines of the chapter'
+        places.add(at)
+    assert len(places) > 1, 'its place changes from one reread to the next'
+
+
+def test_each_reread_gets_a_new_code(reread, book):
+    codes = {reread(book, 1)[2] for _ in range(3)}
+    assert len(codes) == 3 and None not in codes
 
 
 def test_done_refuses_a_chapter_that_was_not_reread(cli, book):
@@ -220,25 +259,24 @@ def test_done_refuses_a_chapter_that_was_not_reread(cli, book):
 
 
 @pytest.mark.parametrize('given', [None, 'abc123'])
-def test_done_refuses_a_reread_without_its_code(cli, book, given):
+def test_done_refuses_a_reread_without_its_code(cli, reread, book, given):
     """`reread >/dev/null; done` in one command: the reread ran, but nobody read its output."""
-    cli('book', 'reread', 1, '--book', book)
+    reread(book, 1)
     extra = ['--reread', given] if given else []
     code, r = cli('book', 'done', 1, '--summary', 'Listas.', *extra, '--book', book)
     assert code == 1 and 'code' in r['error']
 
 
-def test_an_old_code_does_not_work_after_a_new_reread(cli, book):
-    old = cli('book', 'reread', 1, '--book', book)[1]['code']
-    cli('book', 'reread', 1, '--book', book)
+def test_an_old_code_does_not_work_after_a_new_reread(cli, reread, book):
+    old = reread(book, 1)[2]
+    reread(book, 1)
     code, r = cli('book', 'done', 1, '--summary', 'Listas.', '--reread', old, '--book', book)
     assert code == 1
 
 
-def test_done_uses_up_the_reread(cli, book):
+def test_done_uses_up_the_reread(cli, reread, book):
     """Done again later (after a fix) needs a new reread; the date of the last one stays in progress."""
-    code, r = cli('book', 'reread', 1, '--book', book)
-    first = r['code']
+    first = reread(book, 1)[2]
     done_code, _ = cli('book', 'done', 1, '--summary', 'Listas.', '--reread', first, '--book', book)
     data = load(book / 'book.yaml')
     assert done_code == 0 and 'reread' not in data

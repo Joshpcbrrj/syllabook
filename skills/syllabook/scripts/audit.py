@@ -34,6 +34,8 @@ OPEN_PORT = [re.compile(r'''^\s*-\s*["']?(\d+(?:-\d+)?:\d+(?:-\d+)?(?:/(?:tcp|ud
              re.compile(r'''(?:\s-p|--publish)[ =]["']?(\d+(?:-\d+)?:\d+(?:-\d+)?)\b''')]  # docker run
 YAML_LANGS = {'yaml', 'yml'}
 LINK = re.compile(r'(?<!!)\[[^\]]*\]\(([^)\s#]+\.md)(#[^)]*)?\)')
+# a map to the sources, never a source itself (SOURCES.md §1)
+ENCYCLOPEDIA = re.compile(r'https?://(?:[\w-]+\.)*(wikipedia\.org|britannica\.com)\b', re.I)
 
 
 def audit_chapter(path, n, lab, limits, language, errors, warnings):
@@ -113,6 +115,10 @@ def audit_chapter(path, n, lab, limits, language, errors, warnings):
     sources = text[heading.end():].split('\n## ', 1)[0] if heading else ''
     if heading and 'http' not in sources:
         warnings.append(f'{name}: "{lab["Sources"]}" has no link')
+    for site in sorted(set(ENCYCLOPEDIA.findall(sources))):
+        errors.append(f'{name}: {site} listed as an encyclopedia in "{lab["Sources"]}": it is a map, not a source; '
+                      'open what it cites and list that, and leave out a fact only the encyclopedia gives '
+                      '(SOURCES.md §1)')
     return re.findall(r'\]\(\.\./img/([^)\s]+)\)', text)
 
 

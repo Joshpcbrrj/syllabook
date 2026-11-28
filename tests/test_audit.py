@@ -51,7 +51,21 @@ ERRORS = [
     ('unclosed code block', '```text\n3\n```', '```text\n3\n', 'never closed'),
     ('placeholder read as a tag', '## 📚 Fontes', 'Cole aqui: <sua resposta>.\n\n## 📚 Fontes',
      '"<sua resposta>" outside code'),
+    ('encyclopedia as a source', '- [The Python Tutorial](https://docs.python.org/3/tutorial/), conferido em 2026',
+     '- Wikipedia, [Python](https://en.wikipedia.org/wiki/Python_(programming_language)), consultado em 2026',
+     'wikipedia.org listed as an encyclopedia'),
+    ('Britannica as a source', '- [The Python Tutorial](https://docs.python.org/3/tutorial/), conferido em 2026-11-20.',
+     '- [The Python Tutorial](https://docs.python.org/3/tutorial/), conferido em 2026-11-20.\n'
+     '- [Britannica](https://www.britannica.com/technology/Python-computer-language), 2026-11-20.',
+     'britannica.com'),
 ]
+
+
+def test_an_encyclopedia_named_in_the_text_as_a_map_is_fine(cli, book):
+    edit(book / CHAPTER, '## 📚 Fontes', 'A [Wikipédia](https://pt.wikipedia.org/wiki/Python), usada só como mapa, '
+         'aponta o tutorial oficial.\n\n## 📚 Fontes')
+    code, r = audit(cli, book, 1)
+    assert code == 0, r['errors']
 
 
 def test_the_mock_exam_is_not_audited_as_a_chapter(cli, book):

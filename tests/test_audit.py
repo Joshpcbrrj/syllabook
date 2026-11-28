@@ -228,13 +228,15 @@ def faithful(book):
     for path in (book / 'chapters').glob('*.md'):
         os.remove(path)
     (book / 'chapters' / '01-listas.md').write_text('# 1. Listas\n\nUm capítulo de romance.\n', encoding='utf-8')
-    (book / 'chapters' / '02-o-laco-for.md').write_text('# 2. O laço for\n\nOutro capítulo.\n', encoding='utf-8')
+    # the author's own words: a filler word here is not the translator's to remove
+    (book / 'chapters' / '02-o-laco-for.md').write_text('# 2. O laço for\n\nBasicamente, outro capítulo.\n',
+                                                        encoding='utf-8')
 
 
 def test_a_faithful_translation_needs_no_study_sections_nor_fixed_parts(cli, book):
     faithful(book)
     code, r = audit(cli, book, 2)
-    assert code == 0, r['errors']
+    assert code == 0 and not r['warnings'], r
     code, r = audit(cli, book)
     assert code == 0 and not any('analogy' in w for w in r['warnings']), r
 

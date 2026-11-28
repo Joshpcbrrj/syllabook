@@ -159,7 +159,8 @@ def audit_chapter(path, n, lab, limits, language, errors, warnings, done=None, f
         for target, _ in LINK.findall(line):
             if not target.startswith('http') and not os.path.exists(os.path.join(os.path.dirname(path), target)):
                 errors.append(f'{where(i)}: link to a missing file ({target})')
-        filler = FILLER.get(language.split('-')[0])
+        # a faithful translation keeps the author's words, "simply" included
+        filler = None if bare else FILLER.get(language.split('-')[0])
         if filler:
             prose = re.sub(r'`[^`]*`', '', line)
             for word in re.findall(filler, prose, re.I):

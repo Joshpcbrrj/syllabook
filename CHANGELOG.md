@@ -8,6 +8,10 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ### Changed
 
+- `facts.py --fixed` lists every item of chapter 0, the mock exam and the glossary with the chapter it points to (a question goes with its hidden answer, which holds the link); `BOOK.md` and the flow in `SKILL.md` ask to check each item against that chapter before the whole-book audit. In the history and English pilots, the sessions skipped it and the glossary contradicted its chapters.
+- `notion.py` writes file names whose extension is also an internet domain (`bootstrap.sh`, `README.md`, `db.py`) as code in the text and in image captions, so Notion does not link them to `http://bootstrap.sh`; inline code, link targets and addresses stay as they are. It was done only for the file title of a code block.
+- `audit.py` (whole book) warns when `library.yaml` has no author: the cover would go without "by <author>"; `COVER.md` asks the user for the name first. The history and English pilots, made in a test library, went out with no name on the cover.
+
 - The native reread of each chapter is a step of its own: `book.py reread <n>` prints the chapter's prose line by line (no code blocks, images or HTML) with the style file to follow, then a new code; `book.py done <n> --reread <code>` refuses a chapter without that code, and keeps the reread date in `progress`. In the English-book pilot and in a WSL book session, the reread was skipped whenever the message did not ask for it; in the history pilot, a plain record was beaten by `reread 1 >/dev/null; done 1` in one command. The rule and the output itself also forbid reading it filtered: with the code in place, a later session piped the output into a script that printed only the long lines, or only the code.
 - `book.py brief` refuses to start a chapter until `research/guide.md` and the dossier of every chapter exist, and lists the missing ones (a translation follows the original's research). In the history pilot, a session wrote only the dossier of chapter 1 and went on.
 - `SOURCES.md`: encyclopedias (Wikipedia, Britannica) are a map to the primary sources, not a source to cite.

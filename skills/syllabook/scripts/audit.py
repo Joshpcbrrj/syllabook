@@ -10,6 +10,7 @@ final summary with the reason. Limits follow the reading profile in book.yaml.
 """
 import argparse
 import glob
+import html
 import os
 import re
 import sys
@@ -17,8 +18,8 @@ import sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import diagram
 import illustration
-from common import (READING, chapter_numbers, chapter_path, fail, find_book, labels, load_yaml, out, placeholders,
-                    research_path, slugify)
+from common import (READING, chapter_numbers, chapter_path, fail, find_book, labels, library_root, load_yaml, out,
+                    placeholders, research_path, slugify)
 
 # blocks that hold program output or data, not code: no comment required
 NO_COMMENT_LANGS = {'', 'text', 'txt', 'output', 'console', 'plaintext', 'json', 'csv', 'markdown', 'md', 'diff'}
@@ -228,6 +229,20 @@ def book_on_one_page(book_dir, lab, readme, chapter0):
     return errors
 
 
+def cover_author(book_dir):
+    """The cover says "by <author>" with the author of the library that holds the book (COVER.md). A book made
+    in another library (a test folder, a zip) and published here keeps a cover without it unless redrawn."""
+    cover, root = os.path.join(book_dir, 'cover.svg'), library_root(book_dir)
+    author = str((load_yaml(os.path.join(root, 'library.yaml')) or {}).get('author') or '').strip() if root else ''
+    if not author or not os.path.exists(cover):
+        return []
+    text = html.unescape(re.sub(r'<[^>]+>', ' ', open(cover, encoding='utf-8', errors='replace').read()))
+    if author.casefold() in ' '.join(text.split()).casefold():
+        return []
+    return [f'cover.svg does not say "by {author}" (author in library.yaml): add the line, as in the other covers '
+            'of the library, and render cover.png again (COVER.md)']
+
+
 def main():
     p = argparse.ArgumentParser(description='Ready criteria for a chapter or the whole book.')
     p.add_argument('n', type=int, nargs='?')
@@ -295,6 +310,7 @@ def main():
             zero = fixed['chapter 0']
             chapter0 = open(os.path.join(book_dir, 'chapters', zero[0]), encoding='utf-8').read() if zero else ''
             errors += book_on_one_page(book_dir, lab, front, chapter0)
+        errors += cover_author(book_dir)
         img = os.path.join(book_dir, 'img')
         if os.path.isdir(img):
             existing = {os.path.relpath(f, img).replace(os.sep, '/')

@@ -79,6 +79,21 @@ def test_optional_parts_and_mentions_of_the_mark_are_fine(cli, book, text):
     assert code == 0, r['errors']
 
 
+COVER = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 2560"><text>Python do zero</text>{}</svg>'
+
+
+@pytest.mark.parametrize('byline, ok', [('', False), ('<text>por Teste</text>', True)])
+def test_the_cover_carries_the_library_author(cli, library, byline, ok):
+    """A book made in another library and published here: its cover must say who wrote it (COVER.md)."""
+    book = library / 'created-books' / 'python-do-zero-teste'
+    (book / 'cover.svg').write_text(COVER.format(byline), encoding='utf-8')
+    code, r = audit(cli, book)
+    missing = [e for e in r['errors'] if 'cover.svg' in e]
+    assert (not missing) == ok, r['errors']
+    if not ok:
+        assert 'Teste' in missing[0] and 'library.yaml' in missing[0]
+
+
 def test_a_png_named_svg_is_an_error_not_a_crash(cli, book):
     (book / 'img' / 'c01-foto.svg').write_bytes(b'\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\xff\xfe')
     edit(book / CHAPTER, '## 📚 Fontes', '![Uma foto](../img/c01-foto.svg)\n\n## 📚 Fontes')

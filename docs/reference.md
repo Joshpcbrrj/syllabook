@@ -40,7 +40,7 @@ It is the book's contract and its memory: the approved syllabus, your choices an
 | `level` | `{start, end}`, in the book language (`{start: iniciante, end: intermediário}`) |
 | `audience` | who the book is for |
 | `goal` | what the reader will be able to do at the end |
-| `sources` | the sources: each one `{title, url, checked}`, with `checked` as `YYYY-MM-DD` |
+| `sources` | the sources: each one `{title, url, checked}`, with `checked` as `YYYY-MM-DD`, the day the page was opened; a source that could not be opened has no `checked` (a warning), and an encyclopedia is not a source (an error) |
 | `approved_on` | the date you approved the syllabus; empty while it is a draft |
 | `concepts` | the concept graph (below) |
 | `chapters` | the chapters: `n` (1, 2, 3... with no gaps), `title`, `goal`, `topics` and `minutes` |

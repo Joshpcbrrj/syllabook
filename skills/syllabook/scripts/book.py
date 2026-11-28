@@ -25,7 +25,7 @@ import subprocess
 import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from common import (chapter_numbers, chapter_path, fail, find_book, labels, library_book, library_root,
+from common import (ENCYCLOPEDIA, chapter_numbers, chapter_path, fail, find_book, labels, library_book, library_root,
                     library_slugs, load_yaml, next_steps, out, remember, research_path, review_due, save_yaml,
                     slugify)
 
@@ -78,7 +78,14 @@ def validate(path):
     for i, s in enumerate(data['sources'] or [], 1):
         if not isinstance(s, dict) or not s.get('title') or not s.get('url'):
             errors.append(f'sources[{i}]: needs title and url')
-        elif not DATE_RE.match(str(s.get('checked', ''))):
+        elif ENCYCLOPEDIA.search(str(s['url'])):
+            errors.append(f'sources[{i}] "{s["title"]}": an encyclopedia is a map, not a source: open what it '
+                          'cites and list that (SOURCES.md §1)')
+        elif s.get('checked') in (None, ''):
+            # a source that could not be opened stays, without a date, rather than being swapped for a weaker one
+            warnings.append(f'sources[{i}] "{s["title"]}": no checked date (not opened in any session): open it '
+                            'and date it, or say in the final summary that it could not be opened (SOURCES.md §1)')
+        elif not DATE_RE.match(str(s['checked'])):
             errors.append(f'sources[{i}] "{s["title"]}": checked must be a YYYY-MM-DD date')
 
     chapters = data['chapters'] or []

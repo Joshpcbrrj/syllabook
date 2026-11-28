@@ -1,4 +1,4 @@
-<!-- translation-of: reference.md sha256:78bf0984b0e6 -->
+<!-- translation-of: reference.md sha256:c95a6b28ec7a -->
 # Referência: `book.yaml` e `library.yaml`
 
 [English](reference.md) | **Português**
@@ -41,7 +41,7 @@ O `validate` recusa um livro sem algum destes.
 | `level` | `{start, end}`, no idioma do livro (`{start: iniciante, end: intermediário}`) |
 | `audience` | para quem é o livro |
 | `goal` | o que o leitor vai conseguir fazer no fim |
-| `sources` | as fontes: cada uma `{title, url, checked}`, com `checked` no formato `AAAA-MM-DD` |
+| `sources` | as fontes: cada uma `{title, url, checked}`, com `checked` no formato `AAAA-MM-DD`, o dia em que a página foi aberta; uma fonte que não abriu fica sem `checked` (aviso), e enciclopédia não é fonte (erro) |
 | `approved_on` | a data em que você aprovou a ementa; vazio enquanto é rascunho |
 | `concepts` | o grafo de conceitos (abaixo) |
 | `chapters` | os capítulos: `n` (1, 2, 3... sem pular), `title`, `goal`, `topics` e `minutes` |

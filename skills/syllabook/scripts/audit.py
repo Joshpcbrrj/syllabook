@@ -19,8 +19,8 @@ import sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import diagram
 import illustration
-from common import (READING, chapter_numbers, chapter_path, fail, find_book, labels, library_root, load_yaml, out,
-                    placeholders, research_path, slugify)
+from common import (ENCYCLOPEDIA, READING, chapter_numbers, chapter_path, fail, find_book, labels, library_root,
+                    load_yaml, out, placeholders, research_path, slugify)
 
 # blocks that hold program output or data, not code: no comment required
 NO_COMMENT_LANGS = {'', 'text', 'txt', 'output', 'console', 'plaintext', 'json', 'csv', 'markdown', 'md', 'diff'}
@@ -37,8 +37,6 @@ OPEN_PORT = [re.compile(r'''^\s*-\s*["']?(\d+(?:-\d+)?:\d+(?:-\d+)?(?:/(?:tcp|ud
 YAML_LANGS = {'yaml', 'yml'}
 LINK = re.compile(r'(?<!!)\[[^\]]*\]\(([^)\s#]+\.md)(#[^)]*)?\)')
 OPTIONAL_MARK = '🔎'  # starts the heading of a section the reader may skip, and nothing else
-# a map to the sources, never a source itself (SOURCES.md §1)
-ENCYCLOPEDIA = re.compile(r'https?://(?:[\w-]+\.)*(wikipedia\.org|britannica\.com)\b', re.I)
 # the date a source was checked: the one after the word that says so (a publication date may come before it)
 CHECKED = re.compile(r'\b(?:conferid|consultad|verificad|acessad|comprobad|checked|accessed|retrieved)\w*'
                      r'(?:\s+(?:em|on|el|en|in))?\s*:?\s*(\d{4}-\d{1,2}-\d{1,2}|\d{1,2}/\d{1,2}/\d{4})', re.I)

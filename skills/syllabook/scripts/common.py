@@ -25,6 +25,8 @@ STATE = os.environ.get('SYLLABOOK_STATE') or os.path.join(os.path.expanduser('~'
 
 # limits per reading profile (references/VISUALS.md §3)
 READING = {'large': {'code': 80, 'columns': 6}, 'small': {'code': 60, 'columns': 4}}
+# a map to the sources, never a source itself (SOURCES.md §1)
+ENCYCLOPEDIA = re.compile(r'https?://(?:[\w-]+\.)*(wikipedia\.org|britannica\.com)\b', re.I)
 
 
 def need_yaml():

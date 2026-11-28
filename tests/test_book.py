@@ -42,6 +42,9 @@ ERRORS = [
     ('bad reading choice', lambda d: d['choices'].update(reading='tiny'), 'choices.reading'),
     ('source without url', lambda d: d['sources'][0].pop('url'), 'needs title and url'),
     ('source date', lambda d: d['sources'][0].update(checked='ontem'), 'checked must be'),
+    # SOURCES.md §1: an encyclopedia is a map; the English book swapped an unopened source for Wikipedia here
+    ('encyclopedia as a source', lambda d: d['sources'][0].update(url='https://en.wikipedia.org/wiki/Paul_Nation'),
+     'encyclopedia'),
     ('chapter gap', lambda d: d['chapters'][1].update(n=3), 'n must go 1, 2, 3'),
     ('chapter without goal', lambda d: d['chapters'][0].pop('goal'), 'chapter 1: missing goal'),
     ('concept id', lambda d: d['concepts'][0].update(id='Lista'), 'id must be lowercase'),
@@ -72,6 +75,8 @@ def test_each_validation_error(cli, tmp_path, case, change, message):
 
 WARNINGS = [
     ('no sources', lambda d: d.update(sources=[]), 'sources: empty'),
+    # a source that could not be opened is listed without a date (SOURCES.md §1), not dropped or swapped
+    ('source not opened', lambda d: d['sources'][0].pop('checked'), 'not opened'),
     ('goal that cannot be checked', lambda d: d['chapters'][0].update(goal='Entender listas'), 'cannot be checked'),
     # an eval syllabus had "entender, resolver e evitar conflitos": the weak verb led a list of verbs
     ('weak verb first in a list', lambda d: d['chapters'][0].update(goal='Entender, resolver e evitar conflitos'),

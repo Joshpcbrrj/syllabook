@@ -237,6 +237,49 @@ def convert(source, engine, warnings):
 
 # ---------- sections ----------
 
+ROMAN = re.compile(r'^\s*\**\s*(?:(?:CAP[IÍ]TULO|Cap[ií]tulo|CHAPTER|Chapter)\s+)?([IVXLC]+)\.?\s*\**\s*$')
+MIN_CHAPTERS = 3  # fewer numbered lines may be a list or a stray letter, not the chapters of a book
+
+
+def roman(text):
+    values = {'I': 1, 'V': 5, 'X': 10, 'L': 50, 'C': 100}
+    total = 0
+    for a, b in zip(text, text[1:] + ' ', strict=True):  # each numeral with the one after it
+        total += -values[a] if values.get(b, 0) > values[a] else values[a]
+    return total
+
+
+def numbered_chapters(markdown, warnings):
+    """A text with no headings whose chapters start with a line holding only their roman number (I, II, III...),
+    usually followed by the title: an EPUB or PDF converted from print. Those lines become headings
+    ("# II. Title"); lone page numbers (arabic digits) are left alone. Only numbers in order 1, 2, 3... count."""
+    lines = markdown.splitlines()
+    if any(re.match(r'^#{1,6}\s', line) for line in lines):
+        return markdown
+    found, expected = [], 1
+    for i, line in enumerate(lines):
+        m = ROMAN.match(line)
+        if m and roman(m.group(1)) == expected:
+            found.append(i)
+            expected += 1
+    if len(found) < MIN_CHAPTERS:
+        return markdown
+    for i in reversed(found):
+        number = ROMAN.match(lines[i]).group(1)
+        # the title is the next line with text; a page number (digits only) may sit in between
+        j = next((k for k in range(i + 1, min(i + 6, len(lines)))
+                  if lines[k].strip() and not lines[k].strip().isdigit()), None)
+        title = lines[j].strip() if j is not None else ''
+        # a short line with no final period is the chapter title; a sentence is already the text
+        if title and len(title) <= 80 and not title.endswith(('.', ':', ';', ',')) and not ROMAN.match(title):
+            lines[i], lines[j] = f'# {number}. {title}', ''
+        else:
+            lines[i] = f'# {number}'
+    warnings.append(f'no headings: {len(found)} chapters found by their chapter numbers (I, II, III...); check '
+                    'the outline against the book\'s table of contents')
+    return '\n'.join(lines)
+
+
 def split(markdown, level):
     """Sections start at headings of level <= `level`; headings inside code blocks do not count."""
     sections, current, in_code = [], {'title': '(intro)', 'level': 0, 'lines': []}, False
@@ -263,7 +306,7 @@ def main():
     args = p.parse_args()
     warnings = []
     markdown, engine = convert(args.source, args.engine, warnings)
-    sections = split(markdown, args.level)
+    sections = split(numbered_chapters(markdown, warnings), args.level)
     if not sections:
         fail('the material has no text')
     os.makedirs(args.out, exist_ok=True)

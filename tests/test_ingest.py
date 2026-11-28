@@ -69,6 +69,27 @@ def test_plain_text_without_headings_is_one_section(cli, tmp_path):
     assert [s['title'] for s in r['sections']] == ['(intro)']
 
 
+NOVEL = ('1\n\nA MÃO E A LUVA\n\nMachado de Assis\n\nI\n\nO fim da carta\n\n- Mas que pretendes fazer?\n\n2\n\n'
+         'Texto do primeiro.\n\nII\n\nUm roupão\n\nTexto do segundo.\n\n3\n\nIII\n\n11\n\nNa chácara\n\n'
+         'Texto do terceiro.\n')
+
+
+def test_chapters_marked_only_by_roman_numerals_become_sections(cli, tmp_path):
+    """An EPUB made from a PDF (A mão e a luva, from the Biblioteca Nacional) had no headings: each chapter
+    starts with a line holding only its number, then its title; lone page numbers are not chapters."""
+    (tmp_path / 'romance.md').write_text(NOVEL, encoding='utf-8')
+    code, r = run(cli, tmp_path / 'romance.md', tmp_path / 'out')
+    assert [s['title'] for s in r['sections']] == ['(intro)', 'I. O fim da carta', 'II. Um roupão', 'III. Na chácara']
+    assert 'Texto do segundo' in read(tmp_path / 'out' / r['sections'][2]['file'])
+    assert any('chapter numbers' in w for w in r['warnings']), r['warnings']
+
+
+def test_a_few_roman_numerals_out_of_order_are_not_chapters(cli, tmp_path):
+    (tmp_path / 'notas.md').write_text('Item\n\nII\n\nTexto.\n\nV\n\nMais.\n', encoding='utf-8')
+    code, r = run(cli, tmp_path / 'notas.md', tmp_path / 'out')
+    assert [s['title'] for s in r['sections']] == ['(intro)']
+
+
 def test_a_folder_of_pages_in_name_order(cli, tmp_path):
     pages = tmp_path / 'notion'
     pages.mkdir()

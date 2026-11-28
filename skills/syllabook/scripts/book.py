@@ -73,7 +73,7 @@ def validate(path):
         if value is not None and value not in allowed:
             errors.append(f'choices.{key}: must be one of {sorted(allowed)}')
 
-    if not data['sources']:
+    if not data['sources'] and not faithful(data):  # a novel translated as it is: the original is its source
         warnings.append('sources: empty')
     for i, s in enumerate(data['sources'] or [], 1):
         if not isinstance(s, dict) or not s.get('title') or not s.get('url'):

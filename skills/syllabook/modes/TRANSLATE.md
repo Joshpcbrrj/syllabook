@@ -23,6 +23,8 @@ The original comes from one of three places, in this order of preference:
 
 **A file is translated faithfully:** the author's text, chapter by chapter, with nothing added or left out (a novel gets no exercises, reviews or fixed parts; a course from elsewhere keeps its own). `book.py` and `audit.py` know such a book by `original.rights`: the skeleton has no study sections, and the audit asks for none, nor for chapter 0, the mock exam or the glossary. The reread, the glossary of terms and the audit's other checks still apply.
 
+**A damaged file** (a scan read by OCR: cut sentences, garbled words, lost dialogue dashes, page numbers in the text) is mended against a reliable edition of the same text, never by guessing: the publisher's, or for a public-domain work a public library (Wikisource, Domínio Público, Project Gutenberg). Open it, fix the passage from it, and name it in the README as the text compared. Page numbers and line breaks in the middle of a sentence are removed without asking. A passage no edition settles is translated as it stands and listed in the final summary; never leave a note to the user inside the book's text.
+
 Then confirm the target language and the conversation language.
 
 **Language-learning books are adapted, not translated.** A book teaching English to Portuguese speakers cannot simply become a book for Spanish speakers: false friends, pronunciation traps and grammar contrasts change. Say so in one sentence and treat the examples about the learner's native language as content to rewrite.
@@ -49,7 +51,7 @@ Use the loop in `SKILL.md`, with these differences:
 - `book.py brief <n>` also gives the original chapter (`original_chapter`: its path in the library, or the list of its sections in `original/` for a file): read it, translate and adapt it into the new file. Do not add or remove content.
 - **Code:** stays identical; translate only comments and user-facing strings when they are part of the lesson. `projects.py` runs everything again.
 - **Commands and outputs:** keep the real outputs; translate only the explanation around them.
-- **Sources:** keep the originals; add a source in the target language when one exists and says the same.
+- **Sources:** keep the originals, with the dates they were checked (the date tells when the facts were verified; `audit.py` does not ask a translation to reopen them); add a source in the target language when one exists and says the same, opened in this session and dated today.
 - **Facts:** `facts.py` is still run, because adapted examples can introduce new numbers or names.
 
 ## 5. Fixed parts and images

@@ -291,7 +291,10 @@ SOURCE = '- [The Python Tutorial](https://docs.python.org/3/tutorial/), conferid
     '- [The Python Tutorial](https://docs.python.org/3/tutorial/) (conferido em 2026-11-19)',
     '- [The Python Tutorial](https://docs.python.org/3/tutorial/), 22/11/2021, consultado em 19/11/2026.',
     '- [The Python Tutorial](https://docs.python.org/3/tutorial/) (checked on 2026-11-27)',
-], ids=['iso, earlier session', 'day first, after a publication date', 'in the future'])
+    '- [The Python Tutorial](https://docs.python.org/3/tutorial/), checked on November 19, 2026.',
+    '- [The Python Tutorial](https://docs.python.org/3/tutorial/), conferido em 19 de novembro de 2026.',
+], ids=['iso, earlier session', 'day first, after a publication date', 'in the future', 'month in english',
+        'month in portuguese'])
 def test_a_checked_date_from_another_session_is_an_error(cli, book, line):
     """SOURCES.md §1: a checked date means the page was opened in this session. The English book's chapters
     copied their dossier's dates (from a search, a day before) without opening anything."""
@@ -323,6 +326,17 @@ def test_a_chapter_already_done_keeps_the_dates_it_had(cli, book):
     edit(book / CHAPTER, '2026-11-12', '2026-11-18')  # added after it was done, in another session
     code, r = audit(cli, book, 1)
     assert code == 1 and any('2026-11-18' in e for e in r['errors']), r['errors']
+
+
+def test_a_translation_keeps_the_dates_its_original_checked(cli, book):
+    """TRANSLATE.md §4: the sources and their checked dates are the original's (the translation of the history
+    book kept "November 27, 2026" from the Portuguese edition)."""
+    edit(book / CHAPTER, SOURCE, SOURCE.replace('2026-11-20', '2026-11-12'))
+    data = load(book / 'book.yaml')
+    data.update(translation_of='python-do-zero', glossary=[{'source': 'lista', 'target': 'list'}])
+    save(book / 'book.yaml', data)
+    code, r = audit(cli, book, 1)
+    assert not any('checked date' in e for e in r['errors']), r['errors']
 
 
 def test_the_whole_book_audit_does_not_check_the_dates_again(cli, book):

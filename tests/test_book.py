@@ -201,9 +201,11 @@ def from_a_file(book, **original):
 
 
 def test_brief_for_a_translation_of_a_file_points_to_its_ingested_sections(cli, book):
-    from_a_file(book)
+    data = from_a_file(book)
+    data['sources'] = []  # a novel translated as it is cites nothing: the original is its source
+    save(book / 'book.yaml', data)
     code, r = cli('book', 'validate', book / 'book.yaml')
-    assert code == 0, r['errors']
+    assert code == 0 and not any('sources' in w for w in r['warnings']), r
     code, r = cli('book', 'brief', 1, '--book', book)
     assert code == 0 and r['original_chapter'] == ['original/01-listas.md'], r
 

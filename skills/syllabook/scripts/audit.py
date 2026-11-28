@@ -39,7 +39,15 @@ LINK = re.compile(r'(?<!!)\[[^\]]*\]\(([^)\s#]+\.md)(#[^)]*)?\)')
 OPTIONAL_MARK = '🔎'  # starts the heading of a section the reader may skip, and nothing else
 # the date a source was checked: the one after the word that says so (a publication date may come before it)
 CHECKED = re.compile(r'\b(?:conferid|consultad|verificad|acessad|comprobad|checked|accessed|retrieved)\w*'
-                     r'(?:\s+(?:em|on|el|en|in))?\s*:?\s*(\d{4}-\d{1,2}-\d{1,2}|\d{1,2}/\d{1,2}/\d{4})', re.I)
+                     r'(?:\s+(?:em|on|el|en|in))?\s*:?\s*(\d{4}-\d{1,2}-\d{1,2}|\d{1,2}/\d{1,2}/\d{4}'
+                     r'|[A-Za-zçÇ]+\.? \d{1,2}, \d{4}|\d{1,2}(?: de)? [A-Za-zçÇ]+\.?(?: de)? \d{4})', re.I)
+MONTHS = {name: i for i, names in enumerate([
+    ('january', 'janeiro', 'enero', 'jan'), ('february', 'fevereiro', 'febrero', 'feb', 'fev'),
+    ('march', 'março', 'marzo', 'mar'), ('april', 'abril', 'apr', 'abr'), ('may', 'maio', 'mayo', 'mai'),
+    ('june', 'junho', 'junio', 'jun'), ('july', 'julho', 'julio', 'jul'),
+    ('august', 'agosto', 'aug', 'ago'), ('september', 'setembro', 'septiembre', 'sep', 'sept', 'set'),
+    ('october', 'outubro', 'octubre', 'oct', 'out'), ('november', 'novembro', 'noviembre', 'nov'),
+    ('december', 'dezembro', 'diciembre', 'dec', 'dez', 'dic')], 1) for name in names}
 
 
 def today():
@@ -51,12 +59,17 @@ def checked_dates(sources, language):
     for m in CHECKED.finditer(re.sub(r'https?://\S+', ' ', sources)):
         written = m.group(1)
         try:
-            if '-' in written:
+            words = re.findall(r'[^\W\d_]+', written.lower())
+            if words:  # the month in words: "November 27, 2026", "27 de novembro de 2026", "27 Nov 2026"
+                month = next(MONTHS[w.rstrip('.')] for w in words if w.rstrip('.') in MONTHS)
+                day, year = map(int, re.findall(r'\d+', written))
+                yield written, datetime.date(year, month, day)
+            elif '-' in written:
                 yield written, datetime.date(*map(int, written.split('-')))
             else:
                 a, b, year = map(int, written.split('/'))
                 yield written, datetime.date(year, *((a, b) if language.startswith('en') else (b, a)))
-        except ValueError:
+        except (ValueError, StopIteration):  # not a date after all ("checked in March of each year")
             continue
 
 
@@ -306,8 +319,10 @@ def main():
             continue
         done = next((p.get('done') for p in data.get('progress') or [] if p.get('n') == n), None)
         done = datetime.date.fromisoformat(str(done)) if done else None
-        # the dates are checked while a chapter is written (audit.py <n>), not again when the whole book is
-        names = audit_chapter(file, n, lab, limits, language, errors, warnings, done, fresh=bool(args.n),
+        # the dates are checked while a chapter is written (audit.py <n>), not again when the whole book is;
+        # a translation keeps its original's sources and the dates they were checked (TRANSLATE.md §4)
+        fresh = bool(args.n) and not data.get('translation_of')
+        names = audit_chapter(file, n, lab, limits, language, errors, warnings, done, fresh=fresh,
                               bare=bare)
         used.update(names)
         for name in uncredited(book_dir, names):

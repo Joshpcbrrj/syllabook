@@ -6,6 +6,7 @@ A book cover, not a template: original, clean and readable as a small thumbnail.
 
 - Title and subtitle, in the book language.
 - "by <author>" with `author` from `library.yaml` (in the book language, e.g. "por <author>"). With no `author` there, ask the user for the name to show and write it in `library.yaml` before drawing; a cover without it has to be redrawn when the book is published in a library that has one.
+- A translation of a library book keeps the original's author. A faithful translation of someone else's book (TRANSLATE.md §1, item 3) shows the original author as the author ("Machado de Assis") and the library's author as the translator ("translated by <author>").
 - For improved materials, a small line under the subtitle: the kind of original ("based on course notes").
 - No third-party logos, brands, mascots or characters, ever. Represent a technology with an original abstract shape, never its logo.
 

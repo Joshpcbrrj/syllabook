@@ -8,6 +8,8 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ### Changed
 
+- `audit.py` does not flag filler words in a faithful translation of a file: they are the author's.
+- `COVER.md`: the cover of a faithful translation of someone else's book shows the original author, and the library's author as the translator.
 - `facts.py --fixed` lists every item of chapter 0, the mock exam and the glossary with the chapter it points to (a question goes with its hidden answer, which holds the link); `BOOK.md` and the flow in `SKILL.md` ask to check each item against that chapter before the whole-book audit. In the history and English pilots, the sessions skipped it and the glossary contradicted its chapters.
 - `notion.py` writes file names whose extension is also an internet domain (`bootstrap.sh`, `README.md`, `db.py`) as code in the text and in image captions, so Notion does not link them to `http://bootstrap.sh`; inline code, link targets and addresses stay as they are. It was done only for the file title of a code block.
 - `audit.py` (whole book) warns when `library.yaml` has no author: the cover would go without "by <author>"; `COVER.md` asks the user for the name first. The history and English pilots, made in a test library, went out with no name on the cover.

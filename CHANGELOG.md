@@ -24,6 +24,7 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 - `SKILL.md` and `TRANSLATE.md`: the library is the user's folder, never the one the skill is installed in. In an eval, the skill looked for the book to translate inside its own folder, could not read it and stopped.
 - `CREATE.md`: chapter 0 is one line in the syllabus; the book on one page and the other fixed parts are written at the end. Eval 03 now fails only a syllabus that carries the book on one page as a block of its own, not one that names it in chapter 0's line.
 - `SOURCES.md`: a checked date means the page was opened in the session. A link seen only in search results gets no date until it is opened. In the English-book pilot, two links found by search and never opened were listed as "checked on" the day.
+- `audit.py <n>` blocks a checked date in a chapter's Sources that is not today's, unless the chapter was already done by that date (a later fix keeps the dates it had); it reads the date after "checked", "conferido", "consultado" and their kin, ISO or day first, not a publication date. In the English-book pilot, three chapters copied their dossier's dates from the day before, from a search, without opening any page, and kept them even after the session found that two of the links gave 403.
 
 ## [0.4.2] - 2026-11-27
 

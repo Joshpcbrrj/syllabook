@@ -9,6 +9,7 @@ Errors block (`ready: false`, exit code 1). Warnings are allowed, but go to the
 final summary with the reason. Limits follow the reading profile in book.yaml.
 """
 import argparse
+import datetime
 import glob
 import html
 import os
@@ -38,9 +39,43 @@ LINK = re.compile(r'(?<!!)\[[^\]]*\]\(([^)\s#]+\.md)(#[^)]*)?\)')
 OPTIONAL_MARK = '🔎'  # starts the heading of a section the reader may skip, and nothing else
 # a map to the sources, never a source itself (SOURCES.md §1)
 ENCYCLOPEDIA = re.compile(r'https?://(?:[\w-]+\.)*(wikipedia\.org|britannica\.com)\b', re.I)
+# the date a source was checked: the one after the word that says so (a publication date may come before it)
+CHECKED = re.compile(r'\b(?:conferid|consultad|verificad|acessad|comprobad|checked|accessed|retrieved)\w*'
+                     r'(?:\s+(?:em|on|el|en|in))?\s*:?\s*(\d{4}-\d{1,2}-\d{1,2}|\d{1,2}/\d{1,2}/\d{4})', re.I)
 
 
-def audit_chapter(path, n, lab, limits, language, errors, warnings):
+def today():
+    return datetime.date.today()
+
+
+def checked_dates(sources, language):
+    """(as written, date) of each checked date in a chapter's Sources; day first unless the book is in English."""
+    for m in CHECKED.finditer(re.sub(r'https?://\S+', ' ', sources)):
+        written = m.group(1)
+        try:
+            if '-' in written:
+                yield written, datetime.date(*map(int, written.split('-')))
+            else:
+                a, b, year = map(int, written.split('/'))
+                yield written, datetime.date(year, *((a, b) if language.startswith('en') else (b, a)))
+        except ValueError:
+            continue
+
+
+def stale_dates(sources, language, done, errors, name, label):
+    """SOURCES.md §1: a checked date means the page was opened in this session. A chapter being written gives its
+    sources today's date; one already done keeps the dates it had when it was recorded."""
+    now = today()
+    for written, date in dict(checked_dates(sources, language)).items():
+        if date != now and not (done and date <= done):
+            errors.append(f'{name}: "{label}" gives a source the checked date {written}, but a checked date means '
+                          'the page was opened in this session (SOURCES.md §1); a date copied from the dossier, '
+                          'book.yaml or an earlier session does not count. Open the page now and write today\'s date '
+                          f'({now.isoformat()}), or cite it without a date and say in the final summary that it '
+                          'could not be opened')
+
+
+def audit_chapter(path, n, lab, limits, language, errors, warnings, done=None, fresh=False):
     name = os.path.basename(path)
     text = open(path, encoding='utf-8').read()
     lines = text.splitlines()
@@ -128,6 +163,8 @@ def audit_chapter(path, n, lab, limits, language, errors, warnings):
         errors.append(f'{name}: {site} listed as an encyclopedia in "{lab["Sources"]}": it is a map, not a source; '
                       'open what it cites and list that, and leave out a fact only the encyclopedia gives '
                       '(SOURCES.md §1)')
+    if fresh:
+        stale_dates(sources, language, done, errors, name, lab['Sources'])
     return re.findall(r'\]\(\.\./img/([^)\s]+)\)', text)
 
 
@@ -267,7 +304,10 @@ def main():
         if not file:
             errors.append(f'chapter {n}: file missing')
             continue
-        names = audit_chapter(file, n, lab, limits, language, errors, warnings)
+        done = next((p.get('done') for p in data.get('progress') or [] if p.get('n') == n), None)
+        done = datetime.date.fromisoformat(str(done)) if done else None
+        # the dates are checked while a chapter is written (audit.py <n>), not again when the whole book is
+        names = audit_chapter(file, n, lab, limits, language, errors, warnings, done, fresh=bool(args.n))
         used.update(names)
         for name in uncredited(book_dir, names):
             errors.append(f'chapter {n}: img/{name} is a photo or screenshot without a line in img/CREDITS.md')

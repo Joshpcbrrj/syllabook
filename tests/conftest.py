@@ -3,6 +3,7 @@
 Scripts run in-process (their main() with a patched argv), so coverage sees them and a
 failure shows a normal Python traceback.
 """
+import datetime
 import importlib
 import json
 import os
@@ -16,14 +17,18 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SKILL = os.path.join(ROOT, 'skills', 'syllabook')
 SCRIPTS = os.path.join(SKILL, 'scripts')
 SAMPLE = os.path.join(ROOT, 'tests', 'fixtures', 'sample-book')
+SAMPLE_CHECKED = datetime.date(2026, 11, 20)
 sys.path[:0] = [SCRIPTS, os.path.join(ROOT, 'tools')]
 
 
 @pytest.fixture(autouse=True)
 def isolated(tmp_path, monkeypatch):
     """No test touches the user's home folder, the real repository or another test's book."""
+    import audit
     import common
     monkeypatch.setattr(common, 'STATE', str(tmp_path / 'state' / 'current'))
+    # the sample book's sources were checked on this day: audit.py reads it as the session's date
+    monkeypatch.setattr(audit, 'today', lambda: SAMPLE_CHECKED)
     monkeypatch.delenv('SYLLABOOK_BOOK', raising=False)
     monkeypatch.chdir(tmp_path)
 

@@ -264,6 +264,53 @@ def test_local_explicit_or_unrelated_ports_are_fine(cli, book, block):
 
 
 
+SOURCE = '- [The Python Tutorial](https://docs.python.org/3/tutorial/), conferido em 2026-11-20.'
+
+
+@pytest.mark.parametrize('line', [
+    '- [The Python Tutorial](https://docs.python.org/3/tutorial/) (conferido em 2026-11-19)',
+    '- [The Python Tutorial](https://docs.python.org/3/tutorial/), 22/11/2021, consultado em 19/11/2026.',
+    '- [The Python Tutorial](https://docs.python.org/3/tutorial/) (checked on 2026-11-27)',
+], ids=['iso, earlier session', 'day first, after a publication date', 'in the future'])
+def test_a_checked_date_from_another_session_is_an_error(cli, book, line):
+    """SOURCES.md §1: a checked date means the page was opened in this session. The English book's chapters
+    copied their dossier's dates (from a search, a day before) without opening anything."""
+    edit(book / CHAPTER, SOURCE, line)
+    code, r = audit(cli, book, 1)
+    assert code == 1 and any('opened in this session' in e and '2026-11-20' in e for e in r['errors']), r['errors']
+
+
+@pytest.mark.parametrize('line', [
+    '- [The Python Tutorial](https://docs.python.org/3/tutorial/), 22/11/2021, consultado em 20/11/2026.',
+    '- [The Python Tutorial](https://docs.python.org/3/tutorial/) (checked on 2026-11-20)',
+    '- Saída real: Python 3.14, Windows 11, em 12/11/2026.',
+    '- [The Python Tutorial](https://docs.python.org/3/tutorial/), dez. 2022, sem data de conferência.',
+], ids=['publication date is not a check', 'english', 'a run date is not a source check', 'no date'])
+def test_todays_checked_date_or_none_is_fine(cli, book, line):
+    edit(book / CHAPTER, SOURCE, line)
+    code, r = audit(cli, book, 1)
+    assert code == 0, r['errors']
+
+
+def test_a_chapter_already_done_keeps_the_dates_it_had(cli, book):
+    """A done chapter fixed later (a reread, an errata) keeps the dates checked when it was written."""
+    edit(book / CHAPTER, SOURCE, SOURCE.replace('2026-11-20', '2026-11-12'))
+    data = load(book / 'book.yaml')
+    data['progress'] = [{'n': 1, 'done': '2026-11-15', 'reread': '2026-11-15', 'summary': 'listas'}]
+    save(book / 'book.yaml', data)
+    code, r = audit(cli, book, 1)
+    assert code == 0, r['errors']
+    edit(book / CHAPTER, '2026-11-12', '2026-11-18')  # added after it was done, in another session
+    code, r = audit(cli, book, 1)
+    assert code == 1 and any('2026-11-18' in e for e in r['errors']), r['errors']
+
+
+def test_the_whole_book_audit_does_not_check_the_dates_again(cli, book):
+    edit(book / CHAPTER, SOURCE, SOURCE.replace('2026-11-20', '2026-11-12'))
+    code, r = audit(cli, book)
+    assert code == 0, r['errors']
+
+
 def test_an_image_used_only_in_the_readme_is_not_an_orphan(cli, book):
     shutil.copy(book / 'img' / 'c01-lista.svg', book / 'img' / 'c00-cola.svg')
     readme = book / 'README.md'

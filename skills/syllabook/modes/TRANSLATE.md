@@ -21,6 +21,8 @@ The original comes from one of three places, in this order of preference:
 2. **A zip this skill delivered** (it carries `book.yaml`): unzip it into the library as the original (`created-books/<slug>/`), then go on as in 1.
 3. **A file the user sends**: PDF, EPUB, DOCX, ODT, RTF, HTML, a web page or Markdown; PPTX and images through Docling (`ingest.py` lists what it reads; a PDF keeps its tables and headings only with Docling, see the note `ingest.py` prints). Before anything, ask whether they wrote it or its license allows translations (public domain, CC BY, CC BY-SA). All rights reserved, or a license with no derivatives (ND): do not translate it; offer mode 2 (Improve), which writes a new book in their own words from it. With the right confirmed, run `python scripts/ingest.py <file> --out translated-books/<slug>-<lang>/original`, read the outline, and map each chapter of the original to its sections. An EPUB or PDF made by this skill is better taken from the library or the zip when the user still has them: the file has lost the specs and the graph.
 
+**A file is translated faithfully:** the author's text, chapter by chapter, with nothing added or left out (a novel gets no exercises, reviews or fixed parts; a course from elsewhere keeps its own). `book.py` and `audit.py` know such a book by `original.rights`: the skeleton has no study sections, and the audit asks for none, nor for chapter 0, the mock exam or the glossary. The reread, the glossary of terms and the audit's other checks still apply.
+
 Then confirm the target language and the conversation language.
 
 **Language-learning books are adapted, not translated.** A book teaching English to Portuguese speakers cannot simply become a book for Spanish speakers: false friends, pronunciation traps and grammar contrasts change. Say so in one sentence and treat the examples about the learner's native language as content to rewrite.
@@ -51,6 +53,8 @@ Use the loop in `SKILL.md`, with these differences:
 - **Facts:** `facts.py` is still run, because adapted examples can introduce new numbers or names.
 
 ## 5. Fixed parts and images
+
+A faithful translation of a file (§1) has no fixed parts: only its images, as below, and the README `build.py` writes.
 
 - Chapter 0, placement test, mock exam, glossary and map: regenerate with `build.py` in the new language; translate their texts like a chapter. The book on one page and the cheat sheets are `cards` specs: translate them like any diagram (next line), keeping the label of the new language.
 - **SVG diagrams:** translate the text in each spec and redraw with `diagram.py`; never edit a diagram's SVG by hand.

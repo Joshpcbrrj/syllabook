@@ -68,7 +68,7 @@ def openverse_api(path, params=None):
         return json.load(response)
 
 
-MAX_IMAGE = 25 * 1024 * 1024
+MAX_IMAGE = 25 * 1024 * 1024  # above the largest Commons originals the book needs; it gets shrunk anyway
 NAME = re.compile(r'^[a-z0-9][a-z0-9-]{0,80}$')
 # what a downloaded SVG may not carry: it is published on the library's website
 UNSAFE_SVG = re.compile(r'<\s*(script|foreignObject|iframe|embed|object)\b|\son\w+\s*=|javascript:', re.I)
@@ -196,8 +196,8 @@ def credit(book_dir, filename, line):
 
 
 MAX_WIDTH = 1600  # wide enough for the site and an e-reader; a 4K screenshot weighs megabytes
-HEAVY = 1024 * 1024
-HEAVY_PNG = 500 * 1024
+HEAVY = 1024 * 1024  # the audit warns above 1 MB: the site and the EPUB carry every image
+HEAVY_PNG = 500 * 1024  # a PNG this heavy is usually a screenshot that keeps its look with 256 colors
 
 
 def kb(size):

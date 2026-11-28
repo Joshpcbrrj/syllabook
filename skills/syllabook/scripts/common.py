@@ -264,3 +264,10 @@ def research_path(book_dir, n):
 def chapter_numbers(data):
     return [c['n'] for c in data.get('chapters', []) if isinstance(c, dict) and 'n' in c]
 
+
+def faithful(data):
+    """A translation of a file the user sent (TRANSLATE.md §1): a novel, an essay, a book from elsewhere,
+    translated as the author wrote it. No study sections or fixed parts are added. Only such a translation
+    records the right to translate (original.rights); one of a library book copies the original's sections."""
+    return bool(data.get('translation_of') and (data.get('original') or {}).get('rights'))
+

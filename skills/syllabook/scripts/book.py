@@ -25,9 +25,9 @@ import subprocess
 import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from common import (ENCYCLOPEDIA, chapter_numbers, chapter_path, fail, find_book, labels, library_book, library_root,
-                    library_slugs, load_yaml, next_steps, out, remember, research_path, review_due, save_yaml,
-                    slugify)
+from common import (ENCYCLOPEDIA, chapter_numbers, chapter_path, fail, faithful, find_book, labels, library_book,
+                    library_root, library_slugs, load_yaml, next_steps, out, remember, research_path, review_due,
+                    save_yaml, slugify)
 
 REQUIRED = ['title', 'slug', 'origin', 'language', 'profiles', 'level', 'audience', 'goal',
             'sources', 'approved_on', 'concepts', 'chapters']
@@ -135,7 +135,7 @@ def validate(path):
             elif isinstance(taught[dep], int) and isinstance(c.get('chapter'), int) and taught[dep] > c['chapter']:
                 errors.append(f'concept "{c["id"]}" (ch. {c["chapter"]}) depends on "{dep}", '
                               f'taught later (ch. {taught[dep]})')
-    for n in numbers:
+    for n in [] if faithful(data) else numbers:  # a novel translated as it is teaches no concepts
         if n not in taught.values():
             warnings.append(f'chapter {n}: teaches no concept in the concept graph')
 
@@ -233,6 +233,10 @@ def summaries(data):
 
 def skeleton(data, ch, lab, review):
     n = ch['n']
+    if faithful(data):  # a book from outside, translated as it is: no study sections (TRANSLATE.md §1)
+        return '\n'.join([f'# {n}. {ch["title"]}', '',
+                          '<!-- TODO: the whole chapter of the original, translated; nothing added or left out -->',
+                          ''])
     lines = [f'# {n}. {ch["title"]}', '',
              f'> 🗺️ **{lab["In this chapter"]}:** <!-- TODO: 1–2 sentences --> · ⏱️ ~{ch.get("minutes", "?")} min', '']
     if n > 1:

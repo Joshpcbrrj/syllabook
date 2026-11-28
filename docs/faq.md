@@ -77,7 +77,7 @@ Yes, into any language; the new version is adapted for its readers (names, curre
 
 - **a book in your library** (its folder, or the library on GitHub): the best choice, because it keeps the code, the diagrams and the sources;
 - **a zip Syllabook gave you;**
-- **a file you send:** PDF, EPUB, DOCX, ODT, RTF, HTML, a web page or Markdown (PowerPoint and images through [Docling](integrations/docling.md), which also keeps the tables of a PDF). Syllabook asks first whether you wrote it or its license allows translations; a book with all rights reserved is not translated, but it can be the source of a new book of your own (Improve).
+- **a file you send:** PDF, EPUB, DOCX, ODT, RTF, HTML, a web page or Markdown (PowerPoint and images through [Docling](integrations/docling.md), which also keeps the tables of a PDF). Syllabook asks first whether you wrote it or its license allows translations; a book with all rights reserved is not translated, but it can be the source of a new book of your own (Improve). A file is translated as it is, with nothing added: a novel stays a novel, with no exercises.
 
 A book that teaches a language, translated into that same language (a Portuguese book teaching English, into English), is a different book: Syllabook asks you who it is for before starting.
 

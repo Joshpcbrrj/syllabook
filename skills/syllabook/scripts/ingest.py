@@ -112,7 +112,7 @@ def html_to_md(html):
 
 # ---------- converters ----------
 
-MAX_DOWNLOAD = 50 * 1024 * 1024
+MAX_DOWNLOAD = 50 * 1024 * 1024  # a whole book as PDF fits; a page this big is not study material
 MAX_EPUB_PART = 50 * 1024 * 1024  # uncompressed: a tiny zip can unpack to gigabytes
 
 

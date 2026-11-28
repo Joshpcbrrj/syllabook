@@ -212,7 +212,7 @@ def page(book_dir, data, file):
 
 
 SOURCE_LINE = re.compile(r'^- \[[^\]*`<>]+\]\(https?://[^)\s]+\)( \([^)*`<>]*\))?$')
-MAX_CHECKS = 40
+MAX_CHECKS = 40  # one check call per page stays short; the last lines are the ones a cut page loses
 
 
 def checks(content):

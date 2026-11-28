@@ -21,6 +21,7 @@ Cases for `claude plugin eval`: each one sends a real request to Claude with the
 | `15-continuar` | option 7: `book.py status` first, and the handoff note shown before anything else (needs a shell) |
 | `16-perfil-idiomas` | languages profile: research-backed assessment (input, output, spaced repetition), CEFR "can do" goals |
 | `17-perfil-conhecimento` | knowledge profile: reference sources, legends to check, fact × interpretation × legend |
+| `18-traduzir-idioma-ensinado` | option 3 on a book teaching English, into English: asks who the new version is for, nothing created |
 
 Every start option has at least one case: 1 (03–06, 12), 2 (07), 3 (13), 4 (09, 10), 5 (11), 6 (08, 14), 7 (15), and every area profile: stem (03, 12), skills (05), languages (16), knowledge (17). Cases that need a shell are tagged `completo` and use `scaffold.sh` with the sample book of the tests (`tests/fixtures/sample-book`).
 

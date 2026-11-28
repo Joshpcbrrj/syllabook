@@ -33,7 +33,7 @@ REPO = 'Joshpcbrrj/syllabook'
 TEMPLATE = 'report-error.yml'
 WHERE = 'In the skill or scripts (Na skill ou nos scripts)'
 MAX_URL = 8000  # GitHub refuses longer links; browsers and proxies too
-MAX_ERROR_LINES = 40
+MAX_ERROR_LINES = 40  # the end of a traceback is what matters; fewer lines if the link gets too long
 
 SECRETS = [
     r'\bgh[pousr]_[A-Za-z0-9]{20,}', r'\bgithub_pat_\w{20,}', r'\bsk-[A-Za-z0-9_-]{20,}',

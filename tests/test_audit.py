@@ -208,6 +208,26 @@ def test_a_translation_needs_no_research_dossier(cli, book):
     assert not any('research/' in w for w in r['warnings']), r
 
 
+def faithful(book):
+    """A translation of a file the user sent (TRANSLATE.md §1): the text as the author wrote it, nothing added."""
+    data = load(book / 'book.yaml')
+    data.update(translation_of='python-from-scratch', glossary=[{'source': 'lista', 'target': 'list'}],
+                original={'title': 'Python from scratch', 'where': 'original', 'rights': 'domínio público'})
+    save(book / 'book.yaml', data)
+    for path in (book / 'chapters').glob('*.md'):
+        os.remove(path)
+    (book / 'chapters' / '01-listas.md').write_text('# 1. Listas\n\nUm capítulo de romance.\n', encoding='utf-8')
+    (book / 'chapters' / '02-o-laco-for.md').write_text('# 2. O laço for\n\nOutro capítulo.\n', encoding='utf-8')
+
+
+def test_a_faithful_translation_needs_no_study_sections_nor_fixed_parts(cli, book):
+    faithful(book)
+    code, r = audit(cli, book, 2)
+    assert code == 0, r['errors']
+    code, r = audit(cli, book)
+    assert code == 0 and not any('analogy' in w for w in r['warnings']), r
+
+
 def test_a_book_without_any_analogy_is_a_warning(cli, book):
     for path in (book / 'chapters').glob('*.md'):
         text = path.read_text(encoding='utf-8')

@@ -19,8 +19,8 @@ import sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import diagram
 import illustration
-from common import (ENCYCLOPEDIA, READING, chapter_numbers, chapter_path, fail, find_book, labels, library_root,
-                    load_yaml, out, placeholders, research_path, slugify)
+from common import (ENCYCLOPEDIA, READING, chapter_numbers, chapter_path, fail, faithful, find_book, labels,
+                    library_root, load_yaml, out, placeholders, research_path, slugify)
 
 # blocks that hold program output or data, not code: no comment required
 NO_COMMENT_LANGS = {'', 'text', 'txt', 'output', 'console', 'plaintext', 'json', 'csv', 'markdown', 'md', 'diff'}
@@ -73,7 +73,8 @@ def stale_dates(sources, language, done, errors, name, label):
                           'could not be opened')
 
 
-def audit_chapter(path, n, lab, limits, language, errors, warnings, done=None, fresh=False):
+def audit_chapter(path, n, lab, limits, language, errors, warnings, done=None, fresh=False, bare=False):
+    """bare: a faithful translation of a file the user sent (common.faithful), with no study sections."""
     name = os.path.basename(path)
     text = open(path, encoding='utf-8').read()
     lines = text.splitlines()
@@ -83,8 +84,8 @@ def audit_chapter(path, n, lab, limits, language, errors, warnings, done=None, f
 
     if '<!-- TODO' in text:
         errors.append(f'{name}: {text.count("<!-- TODO")} TODO placeholder(s) left')
-    required = ['In this chapter', 'Practice', 'Quick review', 'Summary', 'Sources']
-    if n > 1:
+    required = [] if bare else ['In this chapter', 'Practice', 'Quick review', 'Summary', 'Sources']
+    if n > 1 and not bare:
         required.append('Where we left off')
     for part in required:
         if lab[part] not in text:
@@ -297,6 +298,7 @@ def main():
         fail(f'{args.n} is not a chapter of book.yaml: the fixed parts (chapter 0, mock exam, glossary) '
              'are checked by the whole book audit, audit.py without a number')
     numbers = [args.n] if args.n else chapter_numbers(data)
+    bare = faithful(data)  # a book from outside, translated as it is: no study sections, no fixed parts
     for n in numbers:
         file = chapter_path(book_dir, n)
         if not file:
@@ -305,7 +307,8 @@ def main():
         done = next((p.get('done') for p in data.get('progress') or [] if p.get('n') == n), None)
         done = datetime.date.fromisoformat(str(done)) if done else None
         # the dates are checked while a chapter is written (audit.py <n>), not again when the whole book is
-        names = audit_chapter(file, n, lab, limits, language, errors, warnings, done, fresh=bool(args.n))
+        names = audit_chapter(file, n, lab, limits, language, errors, warnings, done, fresh=bool(args.n),
+                              bare=bare)
         used.update(names)
         for name in uncredited(book_dir, names):
             errors.append(f'chapter {n}: img/{name} is a photo or screenshot without a line in img/CREDITS.md')
@@ -327,7 +330,7 @@ def main():
         fixed = {'chapter 0': [f for f in files if f.startswith('00-')],
                  lab['Final mock exam']: [f for f in files if slugify(lab['Final mock exam']) in f],
                  lab['Glossary']: [f for f in files if slugify(lab['Glossary']) in f]}
-        for part, found in fixed.items():
+        for part, found in ({} if bare else fixed).items():
             if not found:
                 errors.append(f'fixed part missing: {part}')
             else:
@@ -336,7 +339,7 @@ def main():
                     errors.append(f'{found[0]}: TODO placeholder(s) left')
                 used.update(re.findall(r'\]\(\.\./img/([^)\s]+)\)', text))
         chapters = [open(f, encoding='utf-8').read() for f in glob.glob(os.path.join(book_dir, 'chapters', '*.md'))]
-        if not any(f'**{lab["Analogy"]}:**' in text for text in chapters):
+        if not bare and not any(f'**{lab["Analogy"]}:**' in text for text in chapters):
             # TEACHING.md §6: abstract new ideas get an analogy; a whole book without one usually skipped them
             warnings.append('no analogy in the whole book: check each chapter\'s central concept (TEACHING.md §6)')
         readme = os.path.join(book_dir, 'README.md')
@@ -347,7 +350,8 @@ def main():
             used.update(re.findall(r'\]\((?:\./)?img/([^)\s]+)\)', front))
             zero = fixed['chapter 0']
             chapter0 = open(os.path.join(book_dir, 'chapters', zero[0]), encoding='utf-8').read() if zero else ''
-            errors += book_on_one_page(book_dir, lab, front, chapter0)
+            if not bare:
+                errors += book_on_one_page(book_dir, lab, front, chapter0)
         errors += cover_author(book_dir)
         img = os.path.join(book_dir, 'img')
         if os.path.isdir(img):

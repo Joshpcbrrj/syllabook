@@ -1,4 +1,4 @@
-<!-- translation-of: faq.md sha256:a2fdd2e136f6 -->
+<!-- translation-of: faq.md sha256:73dfb7e2f86e -->
 # Perguntas frequentes
 
 [English](faq.md) | **Português**
@@ -78,7 +78,7 @@ Pode, para qualquer idioma; a versão nova é adaptada para quem vai ler (nomes,
 
 - **um livro da sua biblioteca** (a pasta dele, ou a biblioteca no GitHub): a melhor escolha, porque mantém o código, os diagramas e as fontes;
 - **um zip que o Syllabook entregou;**
-- **um arquivo que você manda:** PDF, EPUB, DOCX, ODT, RTF, HTML, uma página da web ou Markdown (PowerPoint e imagens pelo [Docling](integrations/docling.pt-BR.md), que também mantém as tabelas de um PDF). O Syllabook pergunta antes se você escreveu o livro ou se a licença dele permite traduções; um livro com todos os direitos reservados não é traduzido, mas pode servir de fonte para um livro novo seu (Aprimorar).
+- **um arquivo que você manda:** PDF, EPUB, DOCX, ODT, RTF, HTML, uma página da web ou Markdown (PowerPoint e imagens pelo [Docling](integrations/docling.pt-BR.md), que também mantém as tabelas de um PDF). O Syllabook pergunta antes se você escreveu o livro ou se a licença dele permite traduções; um livro com todos os direitos reservados não é traduzido, mas pode servir de fonte para um livro novo seu (Aprimorar). Um arquivo é traduzido como é, sem nada a mais: um romance continua romance, sem exercícios.
 
 Um livro que ensina um idioma, traduzido para esse mesmo idioma (um livro em português que ensina inglês, para o inglês), é outro livro: o Syllabook pergunta para quem ele é antes de começar.
 

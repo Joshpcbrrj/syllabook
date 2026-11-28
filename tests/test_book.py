@@ -208,6 +208,16 @@ def test_brief_for_a_translation_of_a_file_points_to_its_ingested_sections(cli, 
     assert code == 0 and r['original_chapter'] == ['original/01-listas.md'], r
 
 
+def test_a_translation_of_a_file_gets_a_bare_skeleton(cli, book):
+    """A book from outside (a novel, an essay) is translated as it is: no study sections are added."""
+    from_a_file(book)
+    os.remove(book / 'chapters' / '02-o-laco-for.md')
+    code, r = cli('book', 'brief', 2, '--book', book)
+    text = read(book / r['file'])
+    assert code == 0 and text.startswith('# 2. O laço for') and '<!-- TODO' in text
+    assert 'Pratique' not in text and 'Revise hoje' not in text and 'De onde paramos' not in text, text
+
+
 @pytest.mark.parametrize('change, message', [
     (lambda d: d.pop('original'), 'original needs title, where, rights'),
     (lambda d: d['original'].pop('rights'), 'original needs rights'),
